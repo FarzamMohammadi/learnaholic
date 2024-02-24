@@ -114,3 +114,19 @@ Summary:
 - The aforementioned GCC is one of the many tools developed by the GNU (short for GNU’s Not Unix) project. This project is a tax-exempt charity started by Richard Stallman. He wanted to create a Unix-like system that could be shared and modified without restriction.
 - The modern open-source movement started with GNU, with the project's notion of free software (“free” as in “free speech,” not “free beer”). Linux owes a lot of its popularity to GNU tools.
 - "Free as in speech, not as in beer" distinguishes between freedom and price. It means something is free in terms of rights and liberty (like freedom of speech), not free of cost (like a free beer). This often refers to open-source software, where "free" means you're allowed to use, modify, and share the software, not that it's necessarily without cost.
+
+# 1.3 It Pays to Understand How Compilation Systems Work
+
+Reasons why programmers need to understand how compilation systems work:
+
+- Optimizing program performance.
+  - "For example, is a switch statement always more efficient than a sequence of if-else statements? How much overhead is incurred by a function call? Is a while loop more efficient than a for loop? Are pointer references more efficient than array indexes? Why does our loop run so much faster if we sum into a local variable instead of an argument that is passed by reference? How can a function run faster when we simply rearrange the parentheses in an arithmetic expression?"
+
+- Understanding link-time errors.
+  - Lots of complex errors come from linker operations, especially in large systems.
+  - "For example, what does it mean when the linker reports that it cannot resolve a reference? What is the difference between a static variable and a global variable? What happens if you define two global variables in different C files with the same name? What is the difference between a static library and a dynamic library? Why does it matter what order we list libraries on the command line? And scariest of all, why do some linker-related errors not appear until run time?"
+
+- Avoiding security holes.
+  - For a long time, Buffer Overflow vulnerabilities accounted for the majority of security holes in network and internet servers.
+    - Mainly because too few programmers understand the need to restrict the quantity and forms of data they accept from untrusted sources.
+    - Secure programming starts by understanding the consequences of the way data and control information are stored on the program stack.
