@@ -179,10 +179,12 @@ Reasons why programmers need to understand how compilation systems work:
   - Once the code and data from the hello object file are loaded into memory, the processor begins executing the machine-language instructions in the hello program's main routine.
   - These instructions copy the bytes in the “Greetings, universe\n” string from memory to the register file, and from there to the display device where it's displayed on the screen.
 
+Note: The illustrations in the text provide a detailed visualization of the program's execution flow within the hardware components.
+
 # 1.5 Caches Matter
 
 - An important lesson from the learnings so far: The system spends a lot of time moving information from one place to another.
-- The machine instructions in the hello program are originally stored on disk. When the program is loaded, they are copied to main memory. As the processor runs the program, instructions are copied from main memory into the processor. Similarly, the data string “hello, world\n”, originally on disk, is copied to main memory and then from main memory to the display device.
+- The machine instructions in the hello program are originally stored on disk. When the program is loaded, they are copied to main memory. As the processor runs the program, instructions are copied from main memory into the processor. Similarly, the data string “Greetings, universe\n”, originally on disk, is copied to main memory and then from main memory to the display device.
 - Due to physical laws, larger storage devices are slower than smaller storage devices.
 - Faster devices are more expensive to build than their slower counterparts.
 - A typical register file stores only a few hundred bytes of info, whereas main memory stores much more.
@@ -197,3 +199,14 @@ Reasons why programmers need to understand how compilation systems work:
 - In newer cache memories, there are 3 levels (L1, L2, L3).
 - The idea behind caching is that a system can get the effect of both a very large memory and a very fast one by exploiting 'locality', the tendency for programs to access data and code in localized regions.
 - Programmers can exploit their understanding of cache memories to improve the performance of their programs by an order of magnitude.
+
+# 1.6 Storage Devices Form a Hierarchy
+- The general idea: Inserting a smaller, faster storage device (e.g., cache memory) between the processor and a larger, slower device (e.g., main memory).
+- The storage devices in every computer system are organized as a 'memory hierarchy':
+  - As we move down the hierarchy, the devices become slower, larger, and less costly per byte.
+  - The register file is at the very top, known as L0 or level 0.
+  - Following this are L1 to L3 (or level 1 to level 3), which are the cache memories.
+  - Main memory is positioned from level 4 downwards.
+- The main concept of a memory hierarchy is that storage at one level acts as a cache for storage at the next lower level. For instance, the register file is a cache for the L1 cache. Caches L1 and L2 serve as caches for L2 and L3, respectively. The L3 cache is a cache for the main memory, which, in turn, is a cache for the disk. In certain networked systems with distributed file systems, the local disk functions as a cache for data stored on the disks of other systems.
+  - Side note: In the context of memory hierarchy, the term "cache" refers to speed of access and proximity to the CPU, rather than the amount of data stored. Higher levels of the hierarchy (like the register file) are faster but hold less data, caching data from the lower (slower but larger) levels.
+- As programmers, we can leverage our understanding of the memory hierarchy to write more efficient programs.
