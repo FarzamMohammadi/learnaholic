@@ -178,3 +178,22 @@ Reasons why programmers need to understand how compilation systems work:
     - Direct memory access (DMA) is a method that allows an input/output (I/O) device to send or receive data directly to or from the main memory, bypassing the CPU to speed up memory operations.
   - Once the code and data from the hello object file are loaded into memory, the processor begins executing the machine-language instructions in the hello program's main routine.
   - These instructions copy the bytes in the “Greetings, universe\n” string from memory to the register file, and from there to the display device where it's displayed on the screen.
+
+# 1.5 Caches Matter
+
+- An important lesson from the learnings so far: The system spends a lot of time moving information from one place to another.
+- The machine instructions in the hello program are originally stored on disk. When the program is loaded, they are copied to main memory. As the processor runs the program, instructions are copied from main memory into the processor. Similarly, the data string “hello, world\n”, originally on disk, is copied to main memory and then from main memory to the display device.
+- Due to physical laws, larger storage devices are slower than smaller storage devices.
+- Faster devices are more expensive to build than their slower counterparts.
+- A typical register file stores only a few hundred bytes of info, whereas main memory stores much more.
+- The processor can read data from the register file almost 100 times faster than from memory.
+- This processor-memory gap is continuously increasing due to the progression in semiconductor development.
+- It's much easier and cheaper to make processors run faster than to do the same for main memory.
+- To deal with this processor-memory gap, system designers include smaller and faster storage devices called cache memories (or caches) that serve as temporary staging areas for information the processor is likely to need in the near future.
+- Caches typically have multiple levels.
+- The L1 cache on the processor chip holds tens of thousands of bytes.
+- The L2 cache holds tens of millions of bytes, which is why it might take 5 times longer for the processor to access the L2 cache than the L1.
+- The L1 and L2 caches are implemented with a hardware technology known as static random-access memory (SRAM).
+- In newer cache memories, there are 3 levels (L1, L2, L3).
+- The idea behind caching is that a system can get the effect of both a very large memory and a very fast one by exploiting 'locality', the tendency for programs to access data and code in localized regions.
+- Programmers can exploit their understanding of cache memories to improve the performance of their programs by an order of magnitude.
