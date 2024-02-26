@@ -201,6 +201,7 @@ Note: The illustrations in the text provide a detailed visualization of the prog
 - Programmers can exploit their understanding of cache memories to improve the performance of their programs by an order of magnitude.
 
 # 1.6 Storage Devices Form a Hierarchy
+
 - The general idea: Inserting a smaller, faster storage device (e.g., cache memory) between the processor and a larger, slower device (e.g., main memory).
 - The storage devices in every computer system are organized as a 'memory hierarchy':
   - As we move down the hierarchy, the devices become slower, larger, and less costly per byte.
@@ -210,3 +211,93 @@ Note: The illustrations in the text provide a detailed visualization of the prog
 - The main concept of a memory hierarchy is that storage at one level acts as a cache for storage at the next lower level. For instance, the register file is a cache for the L1 cache. Caches L1 and L2 serve as caches for L2 and L3, respectively. The L3 cache is a cache for the main memory, which, in turn, is a cache for the disk. In certain networked systems with distributed file systems, the local disk functions as a cache for data stored on the disks of other systems.
   - Side note: In the context of memory hierarchy, the term "cache" refers to speed of access and proximity to the CPU, rather than the amount of data stored. Higher levels of the hierarchy (like the register file) are faster but hold less data, caching data from the lower (slower but larger) levels.
 - As programmers, we can leverage our understanding of the memory hierarchy to write more efficient programs.
+
+# 1.7 The Operating System Manages the Hardware
+
+- In previous processes, it was never the program or shell that was accessing the keyboard, display, disk, or main memory directly; it was the 'operating system'.
+- All attempts by an application to manipulate the hardware must go through the operating system.
+- The operating system has 2 purposes:
+  1. Protect hardware from misuse.
+  2. Provide applications with a simple and uniform mechanism for manipulating complicated and widely different low-level hardware devices.
+
+## Aside
+- The 1960s was an era with complex operating systems.
+  - IBM had OS/360.
+  - Honeywell had Multics.
+  - OS/360 was one of the most successful projects back then.
+  - Multics was taking a long time to complete, and Bell Labs was helping them.
+  - In 1969, it got super complex, and the progress was so little that Bell Labs, which included Dennis Ritchie, left the Multics team.
+  - Bell Labs created their own OS written entirely in machine language, with many ideas borrowed from Multics.
+  - They named the new system "Unix" as a pun on the complexity of "Multics".
+  - The kernel was rewritten in C in 1973, and Unix was announced to the world in 1974.
+  - In the 1980s, Unix vendors tried to differentiate themselves by adding new and often complicated features.
+  - To combat this, IEEE sponsored the effort to standardize Unix, which was later dubbed as "Posix" by Richard Stallman.
+
+## 1.7.1 Processes
+- When running hello, it appears that all throughout the flow, hello has exclusive access to main memory and I/O devices.
+- It appears that hello is running instructions one by one without disruption, completely in charge.
+- All of this is an illusion created by the notion of 'process'.
+- A process is the OS's abstraction for a running program.
+- Multiple processes can run concurrently, and each will appear to have exclusive access to the hardware it uses.
+  - Newer systems with multicore CPUs can execute multiple programs simultaneously.
+- The concurrency is enabled via the OS's interleaving ability with a mechanism known as 'context switching'.
+- The OS keeps track of all state information to handle concurrency.
+  - This state is known as context.
+- The OS performs context switching by saving the state of the currently executing program and its processes and switching and passing over control to the new one.
+- The process then picks up exactly where it left off before.
+- In our hello program example, there are 2 concurrent processes:
+  - The shell starts by running alone, waiting for input.
+  - When we run hello, the shell then carries out our request by invoking a special function known as 'system call' that passes control to the OS.
+  - The OS saves the shell's context and then passes control to the new hello process.
+  - After hello terminates, the OS restores the shell process, passes control back to it, and waits for the next command line input.
+- This process abstraction is enabled by close cooperation between low-level hardware and the OS.
+
+## 1.7.2 Threads
+- In modern systems, a process can consist of multiple execution units called 'threads'.
+- It is easier to share data between multiple threads than multiple processes.
+
+## 1.7.3 Virtual Memory
+- Virtual memory is an abstraction that provides each process with the illusion that it has exclusive use of the main memory.
+- Each process has the same uniform view of memory, which is known as its virtual address space.
+- In Linux, the topmost region of the address space is reserved for code and data in the OS that's common to all processes.
+- The low region of the address space holds the code and data defined by the user's process.
+
+- Notes on addresses, from lowest going up:  
+  - Program Code and Data: This is where your program's code (instructions) and global variables live. Every process starts with its code at a specific address, and right after the code, you have the global variables. This part doesn't change size while the program runs. It's set up when your program starts, based on the executable file.
+  
+  - Heap: Right after your program's code and global variables, there's the heap. Unlike the code and data, the heap's size can change while your program is running. When you create new objects or free up space (like using malloc and free in C), you're working with the heap. It grows when you allocate more memory and shrinks when you free memory.
+  
+  - Shared Libraries: In the middle of the address space, there's a section for shared libraries. These are common pieces of code, like the C standard library, that many programs use. Instead of having a copy in every program, they share this code to save space and resources. This part includes code and data that are reused across different programs.
+  
+  - Stack: Near the top of the address space, you have the stack. This is used for managing function calls. Every time you enter a function, a "layer" (or frame) is added to the stack with information like variables local to that function. When the function returns, that layer is removed. The stack grows and shrinks dynamically as functions are called and return.
+  
+  - Kernel Virtual Memory: The very top part of the address space is reserved for the operating system's kernel. This is the core part of the OS, and it controls everything. Applications can't access this area directly; they have to go through system calls to interact with the kernel.
+
+### Personal notes:
+To explain virtual memory and how it works in simpler terms:
+
+Virtual memory is a system that lets your computer run programs that need more memory than what is physically available in the main memory (RAM). It does this by using a combination of hardware and software to manage memory more efficiently.
+
+Here's how it basically works:
+
+  1. Storing on Disk: The entire virtual memory a process might need is stored on the disk. This includes all the code, data, stack, and heap the process might use.
+
+  2. Main Memory as a Cache: The main memory (RAM) acts like a cache for the disk. A cache is a smaller, faster storage area that keeps copies of the data from the most frequently used parts of the disk.
+
+  3. Address Translation: Every time the processor needs to access memory, the hardware translates the virtual address (the address within the process's virtual memory space) to a physical address (the actual address in RAM). This translation is done using a special piece of hardware.
+
+  4. Working Set: Only a portion of the process's virtual memory is kept in RAM at any time. This portion is what's currently being used or what's expected to be used soon (often called the "working set"). If the process needs to access data not in RAM, the system will load it from the disk into RAM, potentially replacing some of the existing data in RAM.
+
+  5. Swap: The process of moving data between the disk and RAM to make space for new data is called swapping or paging. This allows the system to make efficient use of the available RAM and lets processes run as if they have more memory than what's physically available.
+
+In summary, virtual memory allows your computer to use its hardware and operating system software to make it seem like there's much more memory available by storing most of the data on disk and keeping only the most used data in RAM. This requires constant address translation and moving data back and forth between RAM and disk as needed.
+
+# 1.7.4 Files
+- File = Sequence of bytes.
+- Every I/O device is modeled as a file.
+- All I/O is performed by reading and writing files
+  - Using system calls known as Unix I/O
+
+## Aside
+- Linux was created by a Finnish graduate student named Linus Torvalds.
+
