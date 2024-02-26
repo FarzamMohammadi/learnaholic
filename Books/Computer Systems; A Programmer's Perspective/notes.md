@@ -130,3 +130,51 @@ Reasons why programmers need to understand how compilation systems work:
   - For a long time, Buffer Overflow vulnerabilities accounted for the majority of security holes in network and internet servers.
     - Mainly because too few programmers understand the need to restrict the quantity and forms of data they accept from untrusted sources.
     - Secure programming starts by understanding the consequences of the way data and control information are stored on the program stack.
+  
+# 1.4 Processors Read and Interpret Instructions Stored in Memory
+
+## Running the Hello Executable
+- Continuing with our hello file example, it's time to execute hello.
+- In Unix, we open an application program called "shell".
+- The shell then prompts for a command line.
+- To run hello, we type "./hello" and press Enter.
+- Then the following message is printed: Greetings, universe.
+  - Shell has built-in commands.
+  - When shell receives a command that starts with a word other than its built-in commands, it assumes the user is running an executable.
+  - After typing "./hello" and pressing Enter, the shell loads the file and runs it.
+  - It then waits for the program to terminate.
+- After the hello program runs and terminates, it then prompts the user for the next command line.
+
+## Hardware in Use
+- Some of the hardware in use during this process includes the following:
+  - Buses: They carry information back and forth between components. They typically transfer fixed-size chunks of bytes known as words. The number of bytes depends on the system. Most machines today are either 4 bytes, meaning 32-bits, or 8 bytes, meaning 64-bits.
+  - I/O Devices: Input/output (I/O) devices are the system’s connections to the external world, like a keyboard or a mouse. Each device is connected to the I/O bus by either a controller or an adapter. Regardless of the type, the purpose of both is to transfer information between the I/O bus and the device.
+    - Controllers are chipsets in the device itself or on the main printed circuit board, aka motherboard.
+    - Adapters are cards that plug into slots on the motherboard.
+  - Main Memory: A temporary storage device that holds both the program and the data it manipulates while the processor is executing the program.
+    - Physically, main memory consists of dynamic random-access memory, aka DRAM, chips.
+    - Logically, memory is organized as a linear array of bytes, each with its own unique address (array index) starting at 0.
+    - Each machine instruction that constitutes a program is made up of a variable number of bytes.
+      - Even for C alone, the size of data items can vary based on the machine.
+        - On an IA32 machine, for instance, data of type short requires two bytes, types int, float, and long four bytes, and type double eight bytes.
+  - Processor: The central processing unit, aka CPU, aka processor, is the engine that interprets (or executes) instructions in main memory. From the moment power is applied to the system until the last moment, the processor is executing instructions. It is constantly executing what is pointed at by the program counter, aka PC, and then updating the program counter to point to the next instruction.
+    - "A processor appears to operate according to a very simple instruction execution model, defined by its instruction set architecture."
+    - The described instruction set architecture is simple, but in reality, most instruction set architectures are extremely complex and have been designed to optimize the speed of program execution.
+    - The instruction set architecture can be found out based on the processor's microarchitecture.
+  - Examples of some instructions that the CPU may carry out:
+    - Load: Copy a byte or a word from main memory into a register, overwriting the previous contents of the register.
+    - Store: Copy a byte or a word from a register to a location in main memory, overwriting the previous contents of that location.
+    - Operate: Copy the contents of two registers to the ALU, perform an arithmetic operation on the two words, and store the result in a register, overwriting the previous contents of that register.
+    - Jump: Extract a word from the instruction itself and copy that word into the program counter (PC), overwriting the previous value of the PC.
+
+## Hardware Processes Behind the Scenes
+- Now, we'll describe what happens with our hardware as we run the hello program.
+  - Initially, the shell program executes its instructions and waits for us to type a command.
+  - As we type "./hello" at the keyboard, the shell program reads each character into a register and then stores it in memory.
+  - As we hit Enter, the shell knows we've finished typing the command.
+  - The shell then loads the executable hello file by executing a sequence of instructions that copies the code and data from the object file from disk to main memory.
+  - The data includes the string of characters “Greetings, universe\n” that will eventually be printed out.
+  - Using a technique called direct memory access (or DMA), the data goes directly from the disk to main memory without passing through the processor.
+    - Direct memory access (DMA) is a method that allows an input/output (I/O) device to send or receive data directly to or from the main memory, bypassing the CPU to speed up memory operations.
+  - Once the code and data from the hello object file are loaded into memory, the processor begins executing the machine-language instructions in the hello program's main routine.
+  - These instructions copy the bytes in the “Greetings, universe\n” string from memory to the register file, and from there to the display device where it's displayed on the screen.
