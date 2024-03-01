@@ -299,3 +299,23 @@ In summary, virtual memory allows your computer to use its hardware and operatin
 
 ## Aside
 - Linux was created by Finnish graduate student Linus Torvalds.
+
+# 1.8 Systems Communicate with Other Systems Using Networks
+
+- Until now, we've considered the system as an isolated entity of hardware and software.
+- In reality, systems are connected to other systems via networks.
+- Network communication can be seen as another form of I/O process:
+  - Outgoing: The system copies a sequence of bytes from main memory to the network adapter.
+  - Incoming: The system reads data sent from other machines and copies it into main memory.
+- To illustrate using our hello program example, let's look at a telnet session:
+  - We run a telnet client on our local machine, connecting to a telnet server.
+  - We execute the hello program, just as we did previously in section 1.2.
+  - However, this time, the client sends the program across the network to the server on a remote machine.
+  - The remote server receives the "hello" command and forwards it to the remote shell (command interpreter).
+  - The remote shell executes the "hello" program.
+  - Instead of the output being displayed on the remote machine, the remote shell sends the output back to the telnet server.
+  - The telnet server then transmits this output across the network back to our local telnet client.
+  - Our local client receives the output and displays it on our local terminal.
+  - In conclusion: The command is executed on the server, but the output is routed back and displayed on the client's side.
+
+Note: Telnet is a network protocol used to provide a two-way, interactive and text-based communication channel between two machines, allowing for virtual access to another computer.
