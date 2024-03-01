@@ -319,3 +319,64 @@ In summary, virtual memory allows your computer to use its hardware and operatin
   - In conclusion: The command is executed on the server, but the output is routed back and displayed on the client's side.
 
 Note: Telnet is a network protocol used to provide a two-way, interactive and text-based communication channel between two machines, allowing for virtual access to another computer.
+
+# 1.9 Important Themes
+Concluding chapter and discussions:
+- Takeaway: A system is more than just hardware.
+  - It is the collection of intertwined hardware and software that must cooperate to achieve the ultimate goal of running application programs.
+
+To finish up, we will go over a few important aspects of computer systems:
+
+## Concurrency and Parallelism
+- Throughout the history of digital computers, two demands have driven improvement:
+  1. We want to do MORE.
+  2. We want to do it FASTER.
+  - Both of these improve when the processor does more!
+- Concurrency: A system that is performing multiple simultaneous activities.
+- Parallelism: Using concurrency to make a system run faster.
+
+## Parallelism Abstractions
+
+### Thread-Level Concurrency
+- Concurrency allows for multiple program executions at the same time.
+- A Thread supports multiple executions within a single program process.
+- Previously, this process was only simulated by having the computer switch between various processes (context-switching).
+  - This allowed multiple users to interact with the system simultaneously.
+  - For example, when users are getting pages from a Web server.
+  - Or one user doing multiple things, like having multiple browser tabs open.
+- Until most recently, most computing processes were done by a single processor that had to switch between multiple tasks.
+  - This configuration is known as a 'uniprocessor system'.
+- In contrast, when we have multiple processors under the control of a single OS kernel, we call it a 'multiprocessor system'.
+  - Such systems have been available since the 1980s but have become more common with the advent of multi-core processors and 'hyperthreading'.
+- Multi-core processors have several CPUs (referred to as 'cores') integrated onto a single integrated-circuit chip.
+- The industry expects we will have hundreds of cores on a single chip in the future.
+- Hyperthreading (also known as simultaneous multithreading) is a technique that allows a CPU to execute multiple flows of control. It involves having multiple copies of some of the CPU hardware, such as program counters and register files, while having only single copies of other parts of the hardware, such as units that perform floating-point arithmetic.
+- A conventional processor requires around 20,000 clock cycles to switch between threads.
+- A hyperthreaded processor decides which of its threads to execute on a cycle-by-cycle basis.
+- Multiprocessing improves the system in 2 ways:
+  1. Reduces the need to simulate concurrency when performing multiple tasks.
+  2. Can run a single application program faster, but only if the program is expressed in terms of multiple threads that can effectively execute in parallel.
+- We need to find ways to write programs that can exploit the thread-level parallelism available with the hardware.
+
+## Instruction-Level Parallelism
+- At a much lower level, modern processors can execute multiple instructions at one time, known as 'instruction-level' parallelism.
+- For example, early microprocessors required multiple (3-10) clock cycles to execute a single instruction.
+- More recent processors can execute 2-4 instructions per clock cycle.
+- Later, we'll look at pipelining, where the actions required to execute an instruction are partitioned into different steps, and the processor hardware is organized as a series of stages, each performing one of these steps. The stages can operate in parallel, working on different parts of different instructions.
+- Processors that can sustain execution rates faster than one instruction cycle are known as 'superscalar' processors. Most modern processors support superscalar operation. Later, we will look at how programmers can use their understanding of this to generate code that achieves higher degrees of instruction-level parallelism that run faster.
+
+## Single-Instruction, Multiple-Data (SIMD) Parallelism
+- At the lowest level, modern processors have special hardware that allows a single instruction to cause multiple operations to be performed in parallel, this mode is known as 'single-instruction, multiple-data' or 'SIMD' parallelism.
+  - For example, a processor that can add 4 pairs of floating-point numbers in parallel.
+- SIMD instructions are provided mostly to speed up applications that process image, sound, and video data.
+- Although some compilers attempt to automatically extract SIMD parallelism in C programs, a more reliable method is using special 'vector' data types supported in compilers such as GCC. This style of programming is described as 'Web Aside opt:simd'.
+
+## 1.9.2 The Importance of Abstractions in Computer Systems
+- The use of abstractions is one of the most important concepts in computer science.
+  - An example is APIs, allowing programmers to use code without having to dig deep into the nitty-gritty.
+- On the processor side, the 'instruction set architecture' provides an abstraction of the actual processor hardware. It seems like only one instruction is being performed at a time, when in reality what's happening under the hood is much more elaborate with multiple instructions executing in parallel.
+- On the operating system side, we talked about 4 abstractions:
+  1. File: an abstraction of I/O.
+  2. Virtual Memory: an abstraction of program memory.
+  3. Processes: an abstraction of a running program.
+  4. Virtual Machine: an abstraction of an entire computer system. VMs were introduced by IBM in the 1960s.
