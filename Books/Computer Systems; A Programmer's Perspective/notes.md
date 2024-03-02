@@ -380,3 +380,16 @@ To finish up, we will go over a few important aspects of computer systems:
   2. Virtual Memory: an abstraction of program memory.
   3. Processes: an abstraction of a running program.
   4. Virtual Machine: an abstraction of an entire computer system. VMs were introduced by IBM in the 1960s.
+
+# 1.10
+- Computer systems combine hardware and software to run applications.
+- Information is represented as bits, interpreted differently based on context.
+- Programs start as ASCII text and are translated into binary executables by compilers and linkers.
+- Processors execute binary instructions from main memory, often moving data between memory, I/O devices, and CPU registers.
+- Storage devices are arranged hierarchically: CPU registers, cache memories, DRAM, and disk storage, with higher levels being faster and costlier.
+- Higher-level storage caches for lower levels; understanding this hierarchy helps optimize C program performance.
+- The operating system kernel mediates between applications and hardware, providing key abstractions:
+  1. Files for I/O devices.
+  2. Virtual memory for main memory and disks.
+  3. Processes for the processor, memory, and I/O devices.
+- Networks enable system communication, acting as another I/O device.
