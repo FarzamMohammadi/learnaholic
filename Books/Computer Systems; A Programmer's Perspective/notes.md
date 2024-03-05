@@ -1,5 +1,7 @@
 # Computer Systems: A Programmer's Perspective by Randal E. Bryant & David R. O'Hallaron
 
+# 1 - A Tour of Computer Systems
+
 # 1.1 Information Is Bits + Context
 
 - hello.c = a source program / source file
@@ -393,3 +395,39 @@ To finish up, we will go over a few important aspects of computer systems:
   2. Virtual memory for main memory and disks.
   3. Processes for the processor, memory, and I/O devices.
 - Networks enable system communication, acting as another I/O device.
+
+# 2 - Representing and Manipulating Information
+
+- Modern computers store and process information represented as 2-valued signals, aka 'bits'.
+- Bits on their own don't mean much.
+  - However, when they're grouped, we can apply some 'interpretation' to give them useful meanings.
+- Representations of numbers:
+  - Unsigned encodings: are based on traditional binary notation and represent numbers greater or equal to 0.
+  - Two's-complement encodings: Represent 'signed' integers - numbers that may either be positive or negative.
+  - Floating-point encodings: are Base-two version of scientific notation for representing real numbers.
+- Computer representations use a limited number of bits to encode a number, and hence some operations can 'overflow' when the results are too large to be represented.
+- Decimal representation, developed over 1000 years ago, is natural for humans but binary values are more efficient for machines.
+- Binary signals can be easily stored and transmitted, enabling the creation of complex digital systems on silicon chips.
+- Groups of bits can encode elements of any finite set, allowing for the representation of numbers, characters, and more.
+- Important number representations in computing:
+  - Unsigned for nonnegative numbers.
+  - Two’s-complement for signed integers.
+  - Floating-point for real numbers.
+- Arithmetic operations in computers mimic those on integers and real numbers but are subject to overflow and precision limitations.
+- Understanding the ranges of values and arithmetic operations properties is crucial for correct program operation and security.
+- Numeric representations and operations in C are consistent with those in C++, whereas Java defines its own standards for numeric data.
+
+# 2.1 Information Storage
+- Computers operate on 8-bit blocks, known as bytes, rather than individual bits.
+  - A byte is the smallest addressable memory unit.
+- Each memory byte has a unique address.
+- The 'virtual address space' encompasses all possible addresses.
+  - It's a conceptual model for machine-level programs, implemented using RAM, disk storage, special hardware, and OS software to simulate a unified byte array.
+- The compiler and runtime system manage memory, organizing it for data, instructions, and control information within this virtual space.
+- In C, pointer values are virtual addresses pointing to storage blocks.
+- The C compiler assigns type information to pointers, affecting the machine-level code it generates for data access.
+- At the machine level, programs perceive objects and their sequences merely as byte blocks, disregarding data types.
+
+# Aside
+- Pointers are crucial in C, allowing for direct data structure element reference.
+- A pointer includes a value (the object's location) and a type (the kind of object at that location, e.g., integer or floating-point number).
