@@ -431,3 +431,69 @@ To finish up, we will go over a few important aspects of computer systems:
 # Aside
 - Pointers are crucial in C, allowing for direct data structure element reference.
 - A pointer includes a value (the object's location) and a type (the kind of object at that location, e.g., integer or floating-point number).
+
+## 2.1.1 Hexadecimal Notation
+- A byte consists of 8 bits, which can be represented in binary (base-2) or decimal (base-10) formats.
+  - However, these formats are not always convenient for depicting bit patterns.
+- Hexadecimal (base-16) notation is a more effective method for representing bit patterns.
+  - It employs digits 0-9 and letters A-F to represent values from 0 to 15.
+  - Each hexadecimal digit corresponds to a 4-bit binary sequence.
+
+### Hexadecimal notation
+Hex digit | Decimal value | Binary value
+----------------------------------------
+    0     |       0       |    0000
+    1     |       1       |    0001
+    2     |       2       |    0010
+    3     |       3       |    0011
+    4     |       4       |    0100
+    5     |       5       |    0101
+    6     |       6       |    0110
+    7     |       7       |    0111
+    8     |       8       |    1000
+    9     |       9       |    1001
+    A     |      10       |    1010
+    B     |      11       |    1011
+    C     |      12       |    1100
+    D     |      13       |    1101
+    E     |      14       |    1110
+    F     |      15       |    1111
+
+#### Example Conversion:
+
+Hexadecimal to Binary:
+Hex: 1    7    3    A    4    C
+Bin: 0001 0111 0011 1010 0100 1100
+
+Binary to Hexadecimal:
+Bin: 1111 0010 1011 0111 0011
+Hex:    F    2    B    7    3
+
+## 2.1.2 Words
+- A computer's 'word size' is crucial as it defines the virtual address space limit.
+- With a word size of 'w' bits, the virtual address range is 0 to 2^w - 1, equating to 2^w accessible bytes.
+- At the time of writing, many personal computers use a 32-bit word size, capping the virtual address space at 4GB (4 billion bytes).
+- A shift towards 64-bit word sizes is occurring, vastly expanding the virtual address space.
+- In essence, word size determines the max memory accessible by a program, and as technology evolves, word sizes increase to support more complex applications.
+
+## 2.1.3 Data Sizes
+- Computers and compilers manipulate various data formats with different encodings and sizes.
+- C data types like 'char', 'int', 'float', and pointers have sizes that vary depending on the system and compiler.
+- Program portability requires awareness of these size differences.
+  - For instance, using an 'int' to store a pointer is fine on a 32-bit machine but problematic on a 64-bit one.
+- As technology shifts towards 64-bit architectures, programmers must adapt to avoid bugs related to data size assumptions.
+
+## Sizes (in bytes) of C numeric data types. 
+The number of bytes allocated varies with machine and compiler. This chart shows the values typical of 32-bit and 64-bit
+machines.
+
+C declaration    | 32-bit | 64-bit
+-----------------------------------
+char             |    1   |    1
+short int        |    2   |    2
+int              |    4   |    4
+long int         |    4   |    8
+long long int    |    8   |    8
+char *           |    4   |    8
+float            |    4   |    4
+double           |    8   |    8
