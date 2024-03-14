@@ -497,3 +497,49 @@ long long int    |    8   |    8
 char *           |    4   |    8
 float            |    4   |    4
 double           |    8   |    8
+
+# 2.1.4 Addressing and Byte Ordering
+- Multi-byte objects in memory are contiguous and addressed by the smallest byte address.
+- Byte order is either little endian (least significant byte first) or big endian (most significant byte first).
+  - Little endian: Intel-compatible machines.
+  - Big endian: IBM, Sun Microsystems machines.
+  - Some machines are bi-endian (support both orders).
+- Byte order choice is arbitrary but should be consistent.
+- Networking and machine-level program inspection often involve byte order considerations.
+- C code example shows printing byte representations using casting.
+- Different machines may show different byte orderings for the same data.
+- Integer and floating-point data encode numbers differently, leading to different byte patterns.
+
+# 2.1.5 Representing Strings
+- Strings in C are arrays of characters ending with a null character (0).
+- Characters use standard encodings, commonly ASCII.
+- Example: "12345" is represented as 31 32 33 34 35 00 in ASCII (including the null terminator).
+- ASCII representation of decimal digits is 0x3x for digit x.
+- Text data, due to ASCII encoding, is more platform-independent than binary data, unaffected by system's byte ordering or word size.
+
+# 2.1.6 Representing Code
+- Code Compilation and Machine Code Representation:
+  - C functions compile into machine-specific code, varying significantly across systems.
+  - Example Function: `int sum(int x, int y) { return x + y; }`
+    - Linux 32 Byte Representation: `55 89 e5 8b 45 0c 03 45 08 c9 c3`
+    - Windows Byte Representation: `55 89 e5 8b 45 0c 03 45 08 5d c3`
+    - Sun Byte Representation: `81 c3 e0 08 90 02 00 09`
+    - Linux 64 Byte Representation: `55 48 89 e5 89 7d fc 89 75 f8 03 45 fc c9 c3`
+  - These byte representations show that even identical processors under different operating systems generate different machine codes.
+
+- Compatibility and Portability:
+  - Machine instructions and their encodings are specific to each system type, leading to incompatibilities across different hardware and software environments.
+  - Binary compatibility and portability of code are limited across different systems, highlighting the non-universal nature of compiled binary code.
+
+- Machine Perspective of Programs:
+  - From the machine's viewpoint, a program is merely a sequence of bytes with no inherent meaning or structure derived from the original source code.
+  - Debugging aids may include auxiliary tables to link back to the source, but the core executable lacks this contextual information.
+
+- Boolean Algebra in Computing:
+  - Basic operations of Boolean algebra are foundational in computing, utilizing binary values (1 and 0) to represent logical states (True and False).
+  - Key Operations: 
+    - NOT (`~`), 
+    - AND (`&`), 
+    - OR (`|`), 
+    - EXCLUSIVE-OR (`^`).
+  - These operations underpin the logical processing capabilities of computer systems, enabling complex decision-making and control flow.
