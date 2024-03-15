@@ -535,11 +535,64 @@ double           |    8   |    8
   - From the machine's viewpoint, a program is merely a sequence of bytes with no inherent meaning or structure derived from the original source code.
   - Debugging aids may include auxiliary tables to link back to the source, but the core executable lacks this contextual information.
 
-- Boolean Algebra in Computing:
-  - Basic operations of Boolean algebra are foundational in computing, utilizing binary values (1 and 0) to represent logical states (True and False).
-  - Key Operations: 
-    - NOT (`~`), 
-    - AND (`&`), 
-    - OR (`|`), 
-    - EXCLUSIVE-OR (`^`).
-  - These operations underpin the logical processing capabilities of computer systems, enabling complex decision-making and control flow.
+
+# 2.1.7 Introduction to Boolean Algebra
+- Boolean Algebra Basics
+  - Binary values (0 and 1) form the core of computer data encoding, manipulation.
+  - Founded by George Boole in the mid-19th century, defining True and False as 1 and 0.
+
+- Fundamental Operations
+  - NOT (`~` or `¬`): Inverts the value. ¬P is true if P is false, and vice versa.
+  - AND (`&` or `∧`): True if both operands are true. p & q is 1 if both p and q are 1.
+  - OR (`|` or `∨`): True if at least one operand is true. p | q is 1 if either p or q is 1.
+  - XOR aka Exclusive or (`^` or `⊕`): True if exactly one operand is true. p ^ q is 1 if p ≠ q.
+
+- Claude Shannon's Contribution
+  - Linked Boolean algebra with digital logic, crucial for designing digital systems.
+
+- Operations on Bit Vectors
+  - Extend basic Boolean operations to operate on sequences of bits (bit vectors).
+  - Operations applied element-wise to bit vectors of fixed length (w).
+  - For a 4-bit vector to be considered `true` in a strict binary sense, all four bits must be 1 ([1111]).
+    - Any bit vector that does not meet this criterion (i.e., contains any 0s) is considered `false`.
+  - Example: 
+    - Given bit vectors:
+      - `a = [0110]` (In binary)
+      - `b = [1100]` (In binary)
+    - Operations, results, and implications:
+      - **AND (`&`)**: Compares each bit position in `a` and `b`. If both are 1, result is 1; otherwise, 0.
+        - `a & b = [0100]` -> Only the second position is true, which means the result mostly represents false conditions except for one true condition.
+          - To make the result entirely true, change either `a` or `b` to `[1111]`.
+      - **OR (`|`)**: Compares each bit position. If at least one is 1, result is 1; if both are 0, result is 0.
+        - `a | b = [1110]` -> Most positions are true; only the last is false. This means the result is largely true with a minor false condition.
+          - To make the result entirely false, change both `a` and `b` to `[0000]`.
+      - **XOR (`^`)**: Compares each bit position. If the bits are different, result is 1; if the same, result is 0.
+        - `a ^ b = [1010]` -> This result has an equal mix of true and false conditions, indicating differences between `a` and `b`.
+          - To reverse the result, swap the bits in either `a` or `b` to get `[0101]` or `[1011]`, respectively.
+      - **NOT (`~`) on `b`**: Flips each bit in `b`. If it's 1, it becomes 0; if it's 0, it becomes 1.
+        - `~b = [0011]` -> Flipping `b`'s bits makes the result true in the positions where `b` was false, and vice versa.
+          - To get the opposite result, apply `~` again to return to the original `b` = `[1100]`.
+      - `True`: If we're considering the entire 4-bit vector as a single truth value, then for it to be considered "true" in an all-or-nothing sense, all four bits must be 1 ([1111]).
+      - `False`: Conversely, if even one bit of the 4-bit vector is 0, then the entire vector would not be considered wholly true in this strict interpretation. It would have at least one "false" condition, making the overall result less than entirely true ([1110], [1101], etc., would not be considered completely true).
+
+- Boolean Algebra and Rings
+  - Boolean operations form a structured algebra with properties like arithmetic.
+  - Distribution: a & (b | c) = (a & b) | (a & c); also, a | (b & c) = (a | b) & (a | c).
+  - Boolean rings: Each element is its own additive inverse (a ^ a = 0).
+  
+- Encoding Sets with Bit Vectors
+  - Encode sets as bit vectors, where each bit represents the presence (1) or absence (0) of an element.
+  - Operations | and & correspond to set union and intersection, respectively.
+  - Example:
+    - Consider the bit vector [01101001].
+      - This means:
+        - Slot 0 is filled (1 at the rightmost position).
+        - Slot 1 is empty (0 next to it).
+        - Slot 2 is filled.
+        - Slot 3 is filled.
+        - Slot 4 is empty.
+        - Slot 5 is filled.
+        - Slot 6 is empty.
+        - Slot 7 is filled (1 at the leftmost position).
+      - It encodes the set {0, 2, 3, 5, 7} (if we count slots from right to left, starting at 0).
+  - Practical application: Using bit-vector masks to enable/disable signals in programs.
