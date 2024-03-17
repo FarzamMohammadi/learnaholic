@@ -658,3 +658,64 @@ double           |    8   |    8
   - int num = 4; // 4 in binary: 0100
   - int result = num >> 1; // Shift right by 1: 0010 in binary, which is 2 in decimal
   ```
+
+# 2.2 Integer Representations
+- Bits encode integers in two ways:
+  1. Represent nonnegative numbers.
+  2. Represent negative, zero, and positive numbers.
+- Discusses resizing encoded integers for different bit lengths.
+
+# 2.2.1 Integral Data Types in C
+
+- C supports a variety of integral data types that represent a finite range of integers.
+- Each type can specify a size with keywords `char`, `short`, `long`, or `long long`, and can be `unsigned` (all nonnegative numbers) or signed (possibly negative, which is the default).
+
+## Ranges for C Integral Data Types on 32-bit and 64-bit Machines
+
+### 32-bit Machine
+| C data type             | Minimum                         | Maximum                         |
+|-------------------------|---------------------------------|---------------------------------|
+| char                    | -128                            | 127                             |
+| unsigned char           | 0                               | 255                             |
+| short [int]             | -32,768                         | 32,767                          |
+| unsigned short [int]    | 0                               | 65,535                          |
+| int                     | -2,147,483,648                  | 2,147,483,647                   |
+| unsigned [int]          | 0                               | 4,294,967,295                   |
+| long [int]              | -2,147,483,648                  | 2,147,483,647                   |
+| unsigned long [int]     | 0                               | 4,294,967,295                   |
+| long long [int]         | -9,223,372,036,854,775,808      | 9,223,372,036,854,775,807       |
+| unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
+
+### 64-bit Machine
+| C data type             | Minimum                         | Maximum                         |
+|-------------------------|---------------------------------|---------------------------------|
+| char                    | -128                            | 127                             |
+| unsigned char           | 0                               | 255                             |
+| short [int]             | -32,768                         | 32,767                          |
+| unsigned short [int]    | 0                               | 65,535                          |
+| int                     | -2,147,483,648                  | 2,147,483,647                   |
+| unsigned [int]          | 0                               | 4,294,967,295                   |
+| long [int]              | -9,223,372,036,854,775,808      | 9,223,372,036,854,775,807       |
+| unsigned long [int]     | 0                               | 18,446,744,073,709,551,615      |
+| long long [int]         | -9,223,372,036,854,775,808      | 9,223,372,036,854,775,807       |
+| unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
+
+- The number of bytes allocated for different sizes varies by the machine’s word size and compiler. This affects the range of values that can be represented.
+- For example, most 64-bit machines use an 8-byte representation for `long`, offering a much wider range of values than the 4-byte representation used on 32-bit machines.
+- The ranges of represented numbers are not symmetric: the range of negative numbers extends one more than positive numbers, which we'll understand better when considering how negative numbers are represented.
+- The C standards define minimum ranges of values that each data type must be able to represent. These ranges are symmetric for positive and negative representations, a characteristic not always matched by typical implementations.
+- The introduction of `long long` with ISO C99 requires at least an 8-byte representation, reflecting the trend towards supporting wider integral types for enhanced computational capabilities.
+
+## Guaranteed ranges for C integral data types
+| C data type             | Minimum                         | Maximum                         |
+|-------------------------|---------------------------------|---------------------------------|
+| char                    | -127                            | 127                             |
+| unsigned char           | 0                               | 255                             |
+| short [int]             | -32,767                         | 32,767                          |
+| unsigned short [int]    | 0                               | 65,535                          |
+| int                     | -32,767                         | 32,767                          |
+| unsigned [int]          | 0                               | 65,535                          |
+| long [int]              | -2,147,483,647                  | 2,147,483,647                   |
+| unsigned long [int]     | 0                               | 4,294,967,295                   |
+| long long [int]         | -9,223,372,036,854,775,807      | 9,223,372,036,854,775,807       |
+| unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
