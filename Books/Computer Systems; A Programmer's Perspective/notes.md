@@ -560,16 +560,16 @@ double           |    8   |    8
       - `a = [0110]` (In binary)
       - `b = [1100]` (In binary)
     - Operations, results, and implications:
-      - **AND (`&`)**: Compares each bit position in `a` and `b`. If both are 1, result is 1; otherwise, 0.
+      - AND (`&`): Compares each bit position in `a` and `b`. If both are 1, result is 1; otherwise, 0.
         - `a & b = [0100]` -> Only the second position is true, which means the result mostly represents false conditions except for one true condition.
           - To make the result entirely true, change either `a` or `b` to `[1111]`.
-      - **OR (`|`)**: Compares each bit position. If at least one is 1, result is 1; if both are 0, result is 0.
+      - OR (`|`): Compares each bit position. If at least one is 1, result is 1; if both are 0, result is 0.
         - `a | b = [1110]` -> Most positions are true; only the last is false. This means the result is largely true with a minor false condition.
           - To make the result entirely false, change both `a` and `b` to `[0000]`.
-      - **XOR (`^`)**: Compares each bit position. If the bits are different, result is 1; if the same, result is 0.
+      - XOR (`^`): Compares each bit position. If the bits are different, result is 1; if the same, result is 0.
         - `a ^ b = [1010]` -> This result has an equal mix of true and false conditions, indicating differences between `a` and `b`.
           - To reverse the result, swap the bits in either `a` or `b` to get `[0101]` or `[1011]`, respectively.
-      - **NOT (`~`) on `b`**: Flips each bit in `b`. If it's 1, it becomes 0; if it's 0, it becomes 1.
+      - NOT (`~`) on `b`: Flips each bit in `b`. If it's 1, it becomes 0; if it's 0, it becomes 1.
         - `~b = [0011]` -> Flipping `b`'s bits makes the result true in the positions where `b` was false, and vice versa.
           - To get the opposite result, apply `~` again to return to the original `b` = `[1100]`.
       - `True`: If we're considering the entire 4-bit vector as a single truth value, then for it to be considered "true" in an all-or-nothing sense, all four bits must be 1 ([1111]).
@@ -621,3 +621,40 @@ double           |    8   |    8
 ### Important Distinctions
 - Bit-wise (`&`, `|`) and logical (`&&`, `||`) operations yield similar outcomes when using `0` or `1` as arguments.
 - Logical operators evaluate the second argument only if necessary. This prevents errors like division by zero (`a && 5/a`) or null pointer dereferencing (`p && *p++`).
+
+# 2.1.10 Shift Operations in C
+- C provides shift operations to shift bit patterns left (`<<`) or right (`>>`).
+- Left shift `x << k`: Shifts `x` by `k` bits to the left, dropping the `k` most significant bits and filling the right end with `k` zeros.
+  - Example: `[01100011] << 4` results in `[00110000]`.
+- Right shift `x >> k` has two forms:
+  - Logical Right Shift: Fills the left end with `k` zeros.
+    - Example: `[01100011] >> 4` (logical) results in `[00000110]`.
+  - Arithmetic Right Shift: Fills the left end with `k` repetitions of the most significant bit, useful for signed integer data.
+    - Example: `[10010101] >> 4` (arithmetic) results in `[11111001]`.
+- C standards are not precise about the right shift type for signed data:
+  - Unsigned data must use logical shifts.
+  - Signed data may use either, leading to portability issues.
+- Most compilers/machines use arithmetic right shifts for signed data.
+- Java defines right shifts precisely: `x >> k` (arithmetic), `x >>> k` (logical).
+
+## Special Cases and Considerations
+- Shifting by `k >= w` (where `w` is bit width):
+  - C does not specify behavior; often results in `k mod w`.
+  - Java specifies shifts should be modular.
+- Operator precedence:
+  - Addition/subtraction have higher precedence than shifts in C.
+  - Common source of errors; use parentheses to clarify intentions.
+
+# Practical Example
+- Multiplying by a Power of 2:
+- To multiply an integer by 2, you can simply left shift (<<) the number by 1. This operation moves all the bits to the left, effectively doubling the number.
+  ```c
+  - int num = 4; // 4 in binary: 0100
+  - int result = num << 1; // Shift left by 1: 1000 in binary, which is 8 in decimal
+  ```
+- Dividing by a Power of 2:
+- To divide an integer by 2, you can right shift (>>) the number by 1. This operation moves all the bits to the right, halving the number.
+  ```c
+  - int num = 4; // 4 in binary: 0100
+  - int result = num >> 1; // Shift right by 1: 0010 in binary, which is 2 in decimal
+  ```
