@@ -596,3 +596,28 @@ double           |    8   |    8
         - Slot 7 is filled (1 at the leftmost position).
       - It encodes the set {0, 2, 3, 5, 7} (if we count slots from right to left, starting at 0).
   - Practical application: Using bit-vector masks to enable/disable signals in programs.
+
+# 2.1.8 Bit-Level Operations in C
+- C supports bit-wise Boolean operations:
+  - `|` for Or
+  - `&` for And
+  - `~` for Not
+  - `^` for Exclusive-Or
+- Types include `char` or `int`, with qualifiers like `short`, `long`, `long long`, or `unsigned`.
+- Convert hexadecimal arguments to binary, perform operations, then convert back to hexadecimal.
+
+# 2.1.9 Logical Operations in C
+- C includes logical operators `||`, `&&`, and `!`, corresponding to logical OR, AND, and NOT.
+- Logical operators interpret any nonzero argument as `True` and `0` as `False`.
+- Returns either `1` (True) or `0` (False).
+
+### Examples
+- `!0x41` results in `0x00` (False).
+- `!0x00` results in `0x01` (True).
+- `!!0x41` results in `0x01` (True).
+- `0x69 && 0x55` results in `0x01` (True).
+- `0x69 || 0x55` results in `0x01` (True).
+
+### Important Distinctions
+- Bit-wise (`&`, `|`) and logical (`&&`, `||`) operations yield similar outcomes when using `0` or `1` as arguments.
+- Logical operators evaluate the second argument only if necessary. This prevents errors like division by zero (`a && 5/a`) or null pointer dereferencing (`p && *p++`).
