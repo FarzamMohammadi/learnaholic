@@ -670,36 +670,6 @@ double           |    8   |    8
 - C supports a variety of integral data types that represent a finite range of integers.
 - Each type can specify a size with keywords `char`, `short`, `long`, or `long long`, and can be `unsigned` (all nonnegative numbers) or signed (possibly negative, which is the default).
 
-## Ranges for C Integral Data Types on 32-bit and 64-bit Machines
-
-### 32-bit Machine
-| C data type             | Minimum                         | Maximum                         |
-|-------------------------|---------------------------------|---------------------------------|
-| char                    | -128                            | 127                             |
-| unsigned char           | 0                               | 255                             |
-| short [int]             | -32,768                         | 32,767                          |
-| unsigned short [int]    | 0                               | 65,535                          |
-| int                     | -2,147,483,648                  | 2,147,483,647                   |
-| unsigned [int]          | 0                               | 4,294,967,295                   |
-| long [int]              | -2,147,483,648                  | 2,147,483,647                   |
-| unsigned long [int]     | 0                               | 4,294,967,295                   |
-| long long [int]         | -9,223,372,036,854,775,808      | 9,223,372,036,854,775,807       |
-| unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
-
-### 64-bit Machine
-| C data type             | Minimum                         | Maximum                         |
-|-------------------------|---------------------------------|---------------------------------|
-| char                    | -128                            | 127                             |
-| unsigned char           | 0                               | 255                             |
-| short [int]             | -32,768                         | 32,767                          |
-| unsigned short [int]    | 0                               | 65,535                          |
-| int                     | -2,147,483,648                  | 2,147,483,647                   |
-| unsigned [int]          | 0                               | 4,294,967,295                   |
-| long [int]              | -9,223,372,036,854,775,808      | 9,223,372,036,854,775,807       |
-| unsigned long [int]     | 0                               | 18,446,744,073,709,551,615      |
-| long long [int]         | -9,223,372,036,854,775,808      | 9,223,372,036,854,775,807       |
-| unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
-
 - The number of bytes allocated for different sizes varies by the machine’s word size and compiler. This affects the range of values that can be represented.
 - For example, most 64-bit machines use an 8-byte representation for `long`, offering a much wider range of values than the 4-byte representation used on 32-bit machines.
 - The ranges of represented numbers are not symmetric: the range of negative numbers extends one more than positive numbers, which we'll understand better when considering how negative numbers are represented.
@@ -707,6 +677,7 @@ double           |    8   |    8
 - The introduction of `long long` with ISO C99 requires at least an 8-byte representation, reflecting the trend towards supporting wider integral types for enhanced computational capabilities.
 
 ## Guaranteed ranges for C integral data types
+
 | C data type             | Minimum                         | Maximum                         |
 |-------------------------|---------------------------------|---------------------------------|
 | char                    | -127                            | 127                             |
@@ -719,3 +690,42 @@ double           |    8   |    8
 | unsigned long [int]     | 0                               | 4,294,967,295                   |
 | long long [int]         | -9,223,372,036,854,775,807      | 9,223,372,036,854,775,807       |
 | unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
+
+# 2.2.2 Unsigned Encodings
+
+# 2.2.2 Unsigned Encodings
+
+- Unsigned integers use a binary representation where each bit contributes a value based on its position: `value = Σ(bit * 2^position)`.
+
+## Representation Examples
+- `B2U4([0001])` equals `1` (`0*2^3 + 0*2^2 + 0*2^1 + 1*2^0`).
+- `B2U4([0101])` equals `5` (`0*2^3 + 1*2^2 + 0*2^1 + 1*2^0`).
+- `B2U4([1011])` equals `11` (`1*2^3 + 0*2^2 + 1*2^1 + 1*2^0`).
+- `B2U4([1111])` equals `15` (`1*2^3 + 1*2^2 + 1*2^1 + 1*2^0`).
+
+- The range of values for a w-bit unsigned integer is from 0 to `2^w - 1`.
+- Every number in the range 0 to `2^w - 1` has a unique w-bit representation, making the mapping between bit vectors and integers a bijection.
+
+# 2.2.3 Two’s-Complement Encodings
+
+- Two’s-complement encoding is used for signed integers, interpreting the most significant bit as negative.
+- Examples with a 4-bit two’s-complement integer:
+  - `[0001]` represents 1.
+  - `[0101]` represents 5.
+  - `[1011]` represents -5.
+  - `[1111]` represents -1.
+- The least and greatest values for a w-bit two’s-complement number are `-2^(w-1)` and `2^(w-1) - 1`, respectively.
+- This encoding scheme ensures every number within its range has a unique representation and supports bijection.
+- Notable aspects:
+  - The range of two’s-complement is asymmetric: the magnitude of the minimum negative value is one greater than the maximum positive value.
+  - The maximum unsigned value is just over twice the maximum two’s-complement value.
+  - Numeric value `-1` in two’s-complement has the same bit pattern as the maximum unsigned value (all bits set to 1).
+  - Zero is represented by a string of all zeros in both signed and unsigned representations.
+- C standards do not mandate two’s-complement for signed integers, but it's widely used. Ranges and representations can vary, so use `<limits.h>` for portability.
+- Java specifies two’s-complement representation with exact ranges for its integer types, aiming for consistent behavior across platforms.
+
+## Two's-Complement Representation Examples
+- `B2T4([0001])` equals `1` (`-0*2^3 + 0*2^2 + 0*2^1 + 1*2^0 = 0 + 0 + 0 + 1`).
+- `B2T4([0101])` equals `5` (`-0*2^3 + 1*2^2 + 0*2^1 + 1*2^0 = 0 + 4 + 0 + 1`).
+- `B2T4([1011])` equals `-5` (`-1*2^3 + 0*2^2 + 1*2^1 + 1*2^0 = -8 + 0 + 2 + 1`).
+- `B2T4([1111])` equals `-1` (`-1*2^3 + 1*2^2 + 1*2^1 + 1*2^0 = -8 + 4 + 2 + 1`).
