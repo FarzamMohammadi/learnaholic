@@ -748,3 +748,29 @@ double           |    8   |    8
 - `TMaxw` represents the maximum two's-complement value for a given word size.
 - `-1` is represented by all bits set to 1 across different word sizes.
 - `0` is represented by all bits set to 0 across different word sizes.
+
+# 2.2.4 Conversions Between Signed and Unsigned
+
+## Casting Between Signed and Unsigned
+- Casting from signed to unsigned (or vice versa) in C keeps the bit pattern but changes its interpretation.
+- For example:
+  - A 16-bit signed `short int` with a value of `-12345` has the same bit pattern as an unsigned `short int` of `53191`.
+  - A 32-bit unsigned `int` of `4294967295` (`UMax_32`) has the same bit pattern as a signed `int` of `-1`.
+- The conversion functions U2T and T2U describe the casting effects in C, based on the bit-level perspective.
+- In C, casting does not change the bit pattern, only how the bit pattern is interpreted:
+  - Negative signed values may become large unsigned values after casting.
+  - Large unsigned values may become negative when cast to signed types.
+- For values in the range 0 to 2^(w-1)-1, signed and unsigned representations are identical.
+- For negative signed values or unsigned values greater than 2^(w-1), casting adds or subtracts 2^w:
+  - For a negative signed value x, `T2Uw(x) = x + 2^w`.
+  - For an unsigned value u that is >= 2^(w-1), `U2Tw(u) = u - 2^w`.
+- Conversion examples:
+  - Casting the most negative two's-complement number `TMinw` to unsigned gives `TMaxw + 1`.
+  - Casting -1 to unsigned gives `UMaxw`.
+
+### Understanding without Math Complexity
+- Casting is like changing the label on a box without changing the contents.
+- Imagine a box labeled "-1" and another labeled "4294967295". They actually contain the same thing, but the labels tell us how to interpret what's inside.
+- When you're coding, remember that changing a variable's type doesn't change its underlying data, just how the computer uses it.
+- This can cause unexpected behaviors, like making a negative number seem very large, or vice versa.
+- To avoid issues, be mindful of these conversions, especially when dealing with operations that mix signed and unsigned types.
