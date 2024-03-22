@@ -813,3 +813,25 @@ double           |    8   |    8
 - In programming, when you need to ensure a negative number stays negative in a larger type, you copy its sign bit (the leftmost bit) to the new bits.
 - Remember, zero extension does not affect the sign because it only adds zeroes, which don't change the value.
 - Always keep in mind that the purpose of these extensions is to retain the same value when you change to a larger data type.
+
+# 2.2.7 Truncating Numbers
+
+- Truncation reduces the number of bits representing a number, potentially altering its value due to overflow.
+- In C, casting from a larger integer type to a smaller one truncates the number:
+  - `(short) x` converts a 32-bit `int x` to a 16-bit `short`.
+  - When casting back to `int`, sign extension occurs.
+- Truncation drops the high-order bits, changing the bit vector from [xw-1, ..., x0] to [xk-1, ..., x0], where k is the new size.
+- For unsigned numbers, truncating a w-bit number to k bits is like calculating x modulo 2^k:
+  - `B2Uk([xk-1, ..., x0]) = B2Uw([xw-1, ..., x0]) mod 2^k`.
+- For two's-complement numbers, truncation applies the modulus operation and then converts the result to the corresponding signed value:
+  - `B2Tk([xk-1, ..., x0]) = U2Tk(B2Uw([xw-1, ..., x0]) mod 2^k)`.
+
+### Practical Takeaways for Software Engineers
+
+- Be cautious when truncating as it can lead to overflow and unexpected values.
+- Casting to a smaller type does not simply cut off the higher bits; it applies a modulus operation which keeps the lower bits' pattern.
+- When expanding or truncating integers, remember:
+  - Zero extension is used for unsigned integers (add zeros at the high-order end).
+  - Sign extension is used for signed integers (replicate the most significant bit at the high-order end).
+- When converting back to a larger type, C will fill in the higher order bits appropriately based on whether the number is signed (sign extension) or unsigned (zero extension).
+- Always ensure the destination type has enough bits to represent the value to avoid unintended truncation.
