@@ -729,3 +729,22 @@ double           |    8   |    8
 - `B2T4([0101])` equals `5` (`-0*2^3 + 1*2^2 + 0*2^1 + 1*2^0 = 0 + 4 + 0 + 1`).
 - `B2T4([1011])` equals `-5` (`-1*2^3 + 0*2^2 + 1*2^1 + 1*2^0 = -8 + 0 + 2 + 1`).
 - `B2T4([1111])` equals `-1` (`-1*2^3 + 1*2^2 + 1*2^1 + 1*2^0 = -8 + 4 + 2 + 1`).
+
+## Important Numeric Values and Their Hexadecimal Representations
+
+| Value  | 8-bit  | 16-bit       | 32-bit           | 64-bit                        |
+|--------|--------|--------------|------------------|-------------------------------|
+| UMaxw  | 0xFF   | 0xFFFF       | 0xFFFFFFFF       | 0xFFFFFFFFFFFFFFFF            |
+|        | 255    | 65,535       | 4,294,967,295    | 18,446,744,073,709,551,615    |
+| TMinw  | 0x80   | 0x8000       | 0x80000000       | 0x8000000000000000            |
+|        | -128   | -32,768      | -2,147,483,648   | -9,223,372,036,854,775,808    |
+| TMaxw  | 0x7F   | 0x7FFF       | 0x7FFFFFFF       | 0x7FFFFFFFFFFFFFFF            |
+|        | 127    | 32,767       | 2,147,483,647    | 9,223,372,036,854,775,807     |
+| -1     | 0xFF   | 0xFFFF       | 0xFFFFFFFF       | 0xFFFFFFFFFFFFFFFF            |
+| 0      | 0x00   | 0x0000       | 0x00000000       | 0x0000000000000000            |
+
+- `UMaxw` represents the maximum unsigned value for a given word size.
+- `TMinw` represents the minimum two's-complement value (most negative) for a given word size.
+- `TMaxw` represents the maximum two's-complement value for a given word size.
+- `-1` is represented by all bits set to 1 across different word sizes.
+- `0` is represented by all bits set to 0 across different word sizes.
