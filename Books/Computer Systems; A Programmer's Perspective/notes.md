@@ -660,6 +660,7 @@ double           |    8   |    8
   ```
 
 # 2.2 Integer Representations
+
 - Bits encode integers in two ways:
   1. Represent nonnegative numbers.
   2. Represent negative, zero, and positive numbers.
@@ -690,8 +691,6 @@ double           |    8   |    8
 | unsigned long [int]     | 0                               | 4,294,967,295                   |
 | long long [int]         | -9,223,372,036,854,775,807      | 9,223,372,036,854,775,807       |
 | unsigned long long [int]| 0                               | 18,446,744,073,709,551,615      |
-
-# 2.2.2 Unsigned Encodings
 
 # 2.2.2 Unsigned Encodings
 
@@ -774,3 +773,23 @@ double           |    8   |    8
 - When you're coding, remember that changing a variable's type doesn't change its underlying data, just how the computer uses it.
 - This can cause unexpected behaviors, like making a negative number seem very large, or vice versa.
 - To avoid issues, be mindful of these conversions, especially when dealing with operations that mix signed and unsigned types.
+
+# 2.2.5 Signed vs. Unsigned in C
+
+- C supports both signed and unsigned integers; by default, integers are signed.
+- Unsigned constants are created with a 'U' or 'u' suffix, like `12345U`.
+- Casting between signed and unsigned types does not change the bit pattern.
+- On a two’s-complement machine, converting unsigned to signed applies `U2Tw`, and converting signed to unsigned applies `T2Uw`.
+- Conversions can be explicit (with casting) or implicit (assignment without casting).
+- `printf` uses `%d` for signed, `%u` for unsigned, and `%x` for hexadecimal output, regardless of the actual type.
+- When combining signed and unsigned in operations, C casts the signed value to unsigned.
+- This can lead to unintuitive results, especially with relational operators like `<` and `>`.
+- Example: In the expression `-1 < 0U`, `-1` is cast to unsigned, resulting in a comparison of `4294967295U < 0U`.
+
+### Practical Insights for Software Engineers
+
+- When declaring literals in your code, be mindful of whether you want them to be treated as signed or unsigned to avoid implicit conversions that can cause bugs.
+- Always use the correct format specifier when printing values with `printf` to avoid confusion about the value being represented.
+- Be cautious with mixed signed and unsigned expressions, particularly with conditional statements, as the results may not be what you expect.
+- Remember, casting changes the interpretation, not the actual data. Keep track of what type your variables should be and convert them explicitly if necessary.
+- Understanding the bit-level behavior of your data types is crucial, as it affects operations and conversions in your code.
