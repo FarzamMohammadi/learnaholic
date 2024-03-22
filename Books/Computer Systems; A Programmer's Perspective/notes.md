@@ -793,3 +793,23 @@ double           |    8   |    8
 - Be cautious with mixed signed and unsigned expressions, particularly with conditional statements, as the results may not be what you expect.
 - Remember, casting changes the interpretation, not the actual data. Keep track of what type your variables should be and convert them explicitly if necessary.
 - Understanding the bit-level behavior of your data types is crucial, as it affects operations and conversions in your code.
+
+# 2.2.6 Expanding the Bit Representation of a Number
+
+- Expanding a number to a larger word size involves either 'zero extension' (for unsigned) or 'sign extension' (for signed numbers).
+- Zero extension adds leading zeros for unsigned numbers.
+- Sign extension duplicates the most significant bit (sign bit) for signed numbers.
+- The process ensures the same numeric value in the larger data type.
+- Example from C code:
+  - Converting 16-bit `-12345` (signed) to 32-bit preserves the value as `-12345`.
+  - Converting 16-bit `53191` (unsigned) to 32-bit preserves the value as `53191`.
+- For a signed number, the 16-bit representation `0xCFC7` becomes `0xFFFFCFC7` after sign extension.
+- For an unsigned number, the 16-bit representation `0xCFC7` becomes `0x0000CFC7` after zero extension.
+
+### Understanding the Concept
+
+- Think of zero extension as adding zeroes in front of a shorter phone number to fit into a format that requires more digits, without changing the actual number you're dialing.
+- Sign extension is like copying the area code for a local phone number to make it fit an international format, ensuring it's recognized correctly in a broader system.
+- In programming, when you need to ensure a negative number stays negative in a larger type, you copy its sign bit (the leftmost bit) to the new bits.
+- Remember, zero extension does not affect the sign because it only adds zeroes, which don't change the value.
+- Always keep in mind that the purpose of these extensions is to retain the same value when you change to a larger data type.
