@@ -869,3 +869,78 @@ double           |    8   |    8
 - Understand the implications of signed and unsigned arithmetic in C to write robust and secure code.
 - Use unsigned types judiciously and be aware of their behavior in computations and comparisons to prevent bugs.
 - Consider the consequences of type conversions, especially in critical code paths, such as security checks or memory operations.
+
+# 2.3 Integer Arithmetic
+It can be surprising, whether you're a new or seasoned programmer, to find that adding two positive numbers yields a negative result. Similarly, the comparison `x < y` may differ from `x-y < 0`. These quirks stem from the finite nature of computer arithmetic.
+
+## 2.3.1 Unsigned Addition
+- `0 <= x, y <= 2^w - 1`: Nonnegative integers represented by w-bits.
+- `Sum range: 0 <= x + y <= 2^(w+1) - 2`, may need w+1 bits.
+- **Modular arithmetic**: Unsigned addition is sum modulo 2^w.
+- **Overflow**: Occurs when sum is 2^w or more.
+- **Overflow detection**: If result `s < x`, then overflow occurred.
+- **Abelian group properties**: Commutative, associative, has identity (0), every element has an inverse.
+
+## Modular Addition in Programming
+- **C behavior**: Doesn't signal errors on overflow.
+- **Inverse calculation**: For non-zero `x`, inverse is `2^w - x`.
+
+## Unsigned Addition Simplified
+- Imagine having only `w` blocks to build numbers.
+- The total can stretch up to 2 blocks past the limit (`2^(w+1) - 2`).
+- If you have more than `w` blocks, you start from 0 again (that's like modular arithmetic).
+- **Overflow**: When your number pile needs more blocks than you have.
+- **Spotting Overflow**: If your total (`s`) is less than what you started with (`x`), you've got overflow.
+- **Special Math Group**: Think of it as a club where you can swap, combine, or remove blocks and still play by the rules.
+
+## Modular Addition in Programming Simplified
+- In language C, it won't complain if you overflow.
+- To find the block that balances another so the total is zero, if it's not the starting block (0), then subtract the block number from 2 times your block limit (`2^w - x`).
+
+## Key Takeaways
+- Finite nature of computer arithmetic can cause unexpected results (e.g., positive sum yielding negative).
+- Fixed-precision arithmetic in languages like C can differ from mathematical operations.
+- Detection of overflow is crucial for reliability in programs.
+
+## 2.3.2  Two’s-Complement Addition
+- **Two's-Complement**: A way for computers to understand negative and positive numbers.
+- **Range**: Each number can range from very negative (-2^(w-1)) to very positive (2^(w-1)-1).
+- **Adding**: When you add two numbers:
+  - **No overflow**: If the sum is not too big or too small, it’s just the regular sum.
+  - **Positive overflow**: If the sum is too big, it wraps around to negative.
+  - **Negative overflow**: If the sum is too small, it wraps around to positive.
+- **Detecting Overflow**: Check if the sign of the result is not what you expect (negative when it should be positive or vice versa).
+
+## Two’s-Complement Addition with 4-Bit Numbers
+
+- **Understanding 4-Bit Limits**: A 4-bit number can only hold values from -8 to 7.
+- **Normal Addition**: If you add any two numbers within the limits (-8 to 7) and the sum stays within these limits, the sum is accurate.
+- **Overflow in Addition**:
+  - **Positive Overflow**: If the sum of two positive numbers is 8 or more, it's too big for 4 bits. The sum loops around and becomes negative.
+  - **Negative Overflow**: If the sum of two negative numbers is less than -8, it's too small for 4 bits. The sum loops around and becomes positive.
+- **Examples**:
+  - `-8 + (-5)` gives `3` due to negative overflow. `-13` is out of range, so it loops and lands on `3`.
+    ```plaintext
+    -8 = 1000 (4-bit two's complement)
+    -5 = 1011 (4-bit two's complement)
+
+      1000
+    + 1011
+    -------
+    (1)0011 (5-bit result with overflow bit)
+    Discard the overflow bit to fit into 4 bits: 0011 = 3
+    ```
+
+  - `5 + 5` gives `-6` due to positive overflow. `10` is out of range, so it subtracts 16 (the total number of values in 4 bits) and lands on `-6`.
+    ```plaintext
+    5 = 0101 (4-bit two's complement)
+    5 = 0101 (4-bit two's complement)
+
+      0101
+    + 0101
+    -------
+    1010 (4-bit result, no need to discard bits)
+
+    The result 1010 in two's complement equals -6.
+    ```
+- **Identifying Overflow**: If adding two negatives gives a positive, or two positives give a negative, there's an overflow.
