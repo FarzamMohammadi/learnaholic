@@ -1,12 +1,18 @@
-APIE:
-- Encapsulation
-  - The principal that seeks to hide the implementation details of an object from the outside world
-    - All important information is contained within the object, but only selected data is available externally
-    - All the inner workings of the object are privately defined within the object, where other objects have no access to it
-    - Instead, access and interaction to the object is allowed only through its public methods
-    - This form of data hiding, provides program security and control over object state changes, reduces risk of errors, and make the program more understandable
-  - MS Definition (C#): Hiding the internal state and functionality of an object and only allowing access through a set of public methods
-  - Achieved: Through the user of access modifiers: private, protected, public, internal, protected internal.
+# APIE: OOP Fundamentals
+
+## Encapsulation
+  - Definition: Encapsulation is the principal of hiding the internal state and functionality of an object and only allowing access and interaction through a set of public methods or properties. It restricts direct access to some of an object's components, which means that the internal representation of an object CANNOT be seen from outside of the object's definition.
+  - Key points:
+    - All important information is contained within the object, but only selected data is exposed externally
+    - The inner workings of the object are privately defined and inaccessible to other objects
+    - Interaction with the object is only possible through its public methods or properties
+  - Goals:
+    - Increase program security by preventing unauthorized access to data
+    - Control over object state changes to maintain data integrity
+    - Reduce errors by limiting the interdependencies between components
+    - Make the program more intuitive and easier to maintain
+  - Achieved Through: 
+    - Use of access modifiers: `private`, `protected`, `public`, `internal`, `protected internal`
   - Example:
     - ```csharp
         // Without encapsulation
@@ -25,16 +31,15 @@ APIE:
         {
             private decimal balance = 0; // Private field
 
-            public decimal Balance 
-            { 
+            public decimal Balance
+            {
                 get { return balance; }
                 private set { balance = value; } // Only class can modify
             }
 
             public void Deposit(decimal amount)
             {
-                if (amount > 0)
-                    balance += amount;
+                if (amount > 0) balance += amount;
             }
 
             public bool Withdraw(decimal amount)
@@ -47,22 +52,23 @@ APIE:
                 return false;
             }
         }
+
         // Usage:
         var account2 = new BankAccount();
         account2.Deposit(100);       // Must use methods
         account2.Withdraw(50);       // Can't go negative
-        // account2.balance = -500;  // Won't compile - field is private
+        // account2.balance = -500;  // Error: 'balance' is inaccessible due to its protection level
 
-- Abstraction
-  - Can be viewed as an expansion of encapsulation (Hiding the internal state and functionality of an object and allowing access and interaction ability only through a set of public methods)
-  - High level: Exposing only the necessary details to the outside world, while hiding implementation details.
-  - Helps focus on the system's essential elements and ignore the less important details that have no affect on its key features
-  - Helps construct more understandable programs
-  - MS definition (C#): Modelling the relevant attributes and interactions of entities as classes to define an abstract representation of a system
-  - Achieved: Through abstract classes and interfaces
-  - Example: Defining a class/interface that outlines methods without implementing them, allowing different implementations
-  - Example: A program that contains thousands of lines. Through abstraction, the code in side becomes largely independent of other objects. For instance, in a program that stores information about movies, we can create a "Movie" class that provides access to only the most essential details, such as title, release year, and genre, while hiding the less important information, like shorts, or technical aspects.
-  - Example: 
+## Abstraction
+  - Definition: Abstraction focuses on exposing only the necessary details to the outside world while hiding the internal implementation details. It allows developers to work with complex systems by modelling classes appropriate to the problem domain.
+  - Key Points:
+    - Helps in managing complexity by hiding irrelevant details
+    - Allows focusing on what an object does instead of how it does it
+    - Achieved through abstract classes and interfaces
+  - Goals:
+    - Make the program easier to understand and maintain
+    - Reduce complexity by providing a simplified model of the system
+  - Example:
     - ```csharp
         // Interface - pure contract, NO implementations
         public interface IMovie
@@ -70,7 +76,7 @@ APIE:
             string Title { get; }
             int ReleaseYear { get; }
             string Genre { get; }
-            
+
             double CalculateRating();
             string GetMovieInfo();
             void Play();
@@ -98,10 +104,8 @@ APIE:
                 return $"{Title} ({ReleaseYear}) - {Genre}";
             }
 
-            // Abstract method - must be implemented by child classes
+            // Abstract methods - must be implemented by derived classes
             public abstract double CalculateRating();
-            
-            // Abstract method - must be implemented by child classes
             public abstract void Play();
         }
 
@@ -110,12 +114,15 @@ APIE:
         {
             private int boxOfficeEarnings;
 
-            public TheatricalMovie(string title, int releaseYear, string genre) 
-                : base(title, releaseYear, genre) { }
+            public TheatricalMovie(string title, int releaseYear, string genre, int boxOfficeEarnings)
+                : base(title, releaseYear, genre)
+            {
+                this.boxOfficeEarnings = boxOfficeEarnings;
+            }
 
             public override double CalculateRating()
             {
-                return boxOfficeEarnings * 0.5;
+                return boxOfficeEarnings * 0.0001;
             }
 
             public override void Play()
@@ -132,16 +139,17 @@ APIE:
             public string Genre { get; private set; }
             private int streamCount;
 
-            public StreamingMovie(string title, int releaseYear, string genre)
+            public StreamingMovie(string title, int releaseYear, string genre, int streamCount)
             {
                 Title = title;
                 ReleaseYear = releaseYear;
                 Genre = genre;
+                this.streamCount = streamCount;
             }
 
             public double CalculateRating()
             {
-                return streamCount * 0.1;
+                return streamCount * 0.001;
             }
 
             public string GetMovieInfo()
@@ -154,3 +162,304 @@ APIE:
                 Console.WriteLine("Streaming online...");
             }
         }
+
+        // Usage:
+        var theatricalMovie = new TheatricalMovie("Inception", 2010, "Sci-Fi", 800000000);
+        var streamingMovie = new StreamingMovie("Warrior", 2011, "Drama", 50000000);
+
+        Console.WriteLine(theatricalMovie.GetMovieInfo());
+        theatricalMovie.Play();
+        Console.WriteLine($"Rating: {theatricalMovie.CalculateRating()}");
+
+        Console.WriteLine(streamingMovie.GetMovieInfo());
+        streamingMovie.Play();
+        Console.WriteLine($"Rating: {streamingMovie.CalculateRating()}");
+
+
+## Inheritance
+  - Definition: Inheritance allows a new class (derived/child class) to gain the method and properties fo an existing class (base/parent class), promoting code reusability and hierarchical classifications.
+  - Types:
+    - Types of inheritance in C#:
+        - Single Inheritance: A class inherits from one base class
+        - Multilevel Inheritance: A class inherits from a derived class, forming a hierarchy
+        - Hierarchical Inheritance: Multiple classes inherit from the same base class
+    - C# does not support multiple inheritance of classes (a class cannot inherit from more than one base class), but it can implement multiple interfaces
+  - Goal:
+    - Reduce code duplication by reusing existing code
+    - Simplify maintenance by having a centralized base class
+    - Create a natural and logical hierarchical relationship between classes
+  - MS definition (C#): Ability to create abstractions based on existing abstractions
+  - Example:
+    - ```csharp
+        // Base class (parent)
+        public class Vehicle
+        {
+            public string Brand { get; set; }
+            public int Year { get; set; }
+
+            public virtual void Start()
+            {
+                Console.WriteLine($"{Brand} vehicle starting...");
+            }
+        }
+
+        // Single Inheritance: Car inherits from Vehicle
+        public class Car : Vehicle
+        {
+            public int NumberOfDoors { get; set; }
+
+            public override void Start()
+            {
+                Console.WriteLine($"{Brand} car engine starting...");
+            }
+        }
+
+        // Single Inheritance: Motorcycle inherits from Vehicle
+        public class Motorcycle : Vehicle
+        {
+            public bool HasSidecar { get; set; }
+
+            public override void Start()
+            {
+                Console.WriteLine($"{Brand} motorcycle revving up...");
+            }
+        }
+
+        // Multilevel Inheritance: ElectricCar inherits from Car
+        public class ElectricCar : Car
+        {
+            public int BatteryCapacity { get; set; }
+
+            public override void Start()
+            {
+                Console.WriteLine($"{Brand} electric car powering up...");
+            }
+        }
+
+        // Hierarchical Inheritance: SportsCar and SUV inherit from Car
+        public class SportsCar : Car
+        {
+            public bool HasTurbo { get; set; }
+
+            public override void Start()
+            {
+                Console.WriteLine($"{Brand} sports car roaring to life...");
+            }
+        }
+
+        public class SUV : Car
+        {
+            public bool HasAllWheelDrive { get; set; }
+
+            public override void Start()
+            {
+                Console.WriteLine($"{Brand} SUV engine starting...");
+            }
+        }
+
+        // Usage
+        public void Example()
+        {
+            // Single inheritance example
+            Car car = new Car
+            {
+                Brand = "Toyota",
+                Year = 2020,
+                NumberOfDoors = 4
+            };
+
+            // Multilevel inheritance example
+            ElectricCar tesla = new ElectricCar
+            {
+                Brand = "Tesla",
+                Year = 2023,
+                NumberOfDoors = 4,
+                BatteryCapacity = 100
+            };
+
+            // Hierarchical inheritance examples
+            SportsCar ferrari = new SportsCar
+            {
+                Brand = "Ferrari",
+                Year = 2023,
+                NumberOfDoors = 2,
+                HasTurbo = true
+            };
+
+            SUV rangeRover = new SUV
+            {
+                Brand = "Range Rover",
+                Year = 2023,
+                NumberOfDoors = 4,
+                HasAllWheelDrive = true
+            };
+
+            // Demonstrating polymorphism
+            Vehicle[] vehicles = { car, tesla, ferrari, rangeRover };
+            foreach (var vehicle in vehicles)
+            {
+                vehicle.Start();
+            }
+        }
+
+        /*
+            Output:
+            Toyota car engine starting...
+            Tesla electric car powering up...
+            Ferrari sports car roaring to life...
+            Range Rover SUV engine starting...
+        */
+
+                     Vehicle
+                    /       \
+                  Car     Motorcycle
+                /  |  \
+               /   |   \
+         SportsCar |  SUV
+                   |
+                ElectricCar
+                
+                Single Inheritance: Car and Motorcycle inherit from Vehicle
+                Multilevel Inheritance: ElectricCar -> Car -> Vehicle
+                Hierarchical Inheritance: SportsCar, SUV, and ElectricCar all inherit from Car
+## Polymorphism
+  - Definition: Polymorphism allows methods to have the same name but behave differently based on the object that invokes them. It enables objects of different classes to be treated as objects of a common superclass or interface, allowing for interchangeable use of different implementations.
+  - Key Points:
+    - Compile-time Polymorphism (Method Overloading):
+        - Same method name with different signatures (parameters).
+        - Resolved at compile time.
+    - Runtime Polymorphism (Method Overriding):
+      - Derived classes override methods of the base class using the `virtual` and `override` keywords
+      - Resolved at runtime based on the object's actual type
+    - Polymorphism through Interfaces:
+        - Allows for swapping implementations without changing dependent code.
+        - Enables code to be flexible and extensible.
+        - Fundamental for adhering to the Dependency Inversion Principle.
+  - Goals:
+    - Enable flexibility and integration by allowing objects to be treated as instances of their parent class or interface.
+    - Promote code reuse and maintainability.
+    - Allow switching of implementations without modifying existing code, facilitating easier maintenance and testing.
+  - Example: Compile-time and Runtime
+    - ```csharp
+        // Method Overloading (Compile-time Polymorphism)
+        public class Calculator
+        {
+            public int Add(int a, int b)
+            {
+                return a + b;
+            }
+
+            public double Add(double a, double b)
+            {
+                return a + b;
+            }
+
+            public int Add(int a, int b, int c)
+            {
+                return a + b + c;
+            }
+        }
+
+        // Usage:
+        var calculator = new Calculator();
+        int sum1 = calculator.Add(1, 2);        // Calls Add(int, int)
+        double sum2 = calculator.Add(1.5, 2.5); // Calls Add(double, double)
+        int sum3 = calculator.Add(1, 2, 3);     // Calls Add(int, int, int)
+
+        // Method Overriding (Runtime Polymorphism)
+        public class Animal
+        {
+            public virtual void Speak()
+            {
+                Console.WriteLine("The animal makes a sound.");
+            }
+        }
+
+        public class Dog : Animal
+        {
+            public override void Speak()
+            {
+                Console.WriteLine("The dog barks.");
+            }
+        }
+
+        public class Cat : Animal
+        {
+            public override void Speak()
+            {
+                Console.WriteLine("The cat meows.");
+            }
+        }
+
+        // Usage:
+        Animal myAnimal = new Animal();
+        Animal myDog = new Dog();
+        Animal myCat = new Cat();
+
+        myAnimal.Speak(); // Output: The animal makes a sound.
+        myDog.Speak();    // Output: The dog barks.
+        myCat.Speak();    // Output: The cat meows.
+  - Example: Switching Implementations Using Interfaces (Dependency Injection):
+    - ```csharp
+        // Interface defining the contract
+        public interface INotificationService
+        {
+            void Send(string message);
+        }
+
+        // First implementation using Email
+        public class EmailNotificationService : INotificationService
+        {
+            public void Send(string message)
+            {
+                // Code to send email
+                Console.WriteLine($"Email sent: {message}");
+            }
+        }
+
+        // New implementation using SMS
+        public class SmsNotificationService : INotificationService
+        {
+            public void Send(string message)
+            {
+                // Code to send SMS
+                Console.WriteLine($"SMS sent: {message}");
+            }
+        }
+
+        // Client code depending on the abstraction
+        public class NotificationManager
+        {
+            private readonly INotificationService _notificationService;
+
+            // Constructor Injection
+            public NotificationManager(INotificationService notificationService)
+            {
+                _notificationService = notificationService;
+            }
+
+            public void Notify(string message)
+            {
+                _notificationService.Send(message);
+            }
+        }
+
+        // Usage
+        public void Example()
+        {
+            // Using EmailNotificationService
+            INotificationService emailService = new EmailNotificationService();
+            NotificationManager managerEmail = new NotificationManager(emailService);
+            managerEmail.Notify("Hello via Email!");
+
+            // Switching to SmsNotificationService without changing NotificationManager
+            INotificationService smsService = new SmsNotificationService();
+            NotificationManager managerSms = new NotificationManager(smsService);
+            managerSms.Notify("Hello via SMS!");
+        }
+
+        /*
+            Output:
+            Email sent: Hello via Email!
+            SMS sent: Hello via SMS!
+        */
