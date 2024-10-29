@@ -495,3 +495,21 @@
         Email sent: Hello via Email!
         SMS sent: Hello via SMS!
     */
+
+## SOLID
+
+### Single Responsibility Principle (SRP)
+A class should do only one thing, and there for have only one reason to change.
+
+### Open/Closed Principle (OCP)
+Classes should be open for extension and closed for modification.
+
+### Liskov Substitution Principle (LSP)
+Derived classed should be substitutable for their base classes. Objects of a super class should be replaceable with objects of a subclass without affecting correctness.
+
+### Interface Segregation Principle (ISP)
+Many client-specific interfaces are better than one general-purpose interface. Clients should not need to implement a function they do not need.
+
+### Dependency Inversion Principle (DIP)
+Classes should depend on interfaces and abstract classes instead of concrete classes and function.
+
