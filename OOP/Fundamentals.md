@@ -353,25 +353,28 @@
 
 - **Key Points**:
   - **Compile-time Polymorphism (Method Overloading)**:
-    - Same method name with different signatures (parameters).
-    - Resolved at compile time.
-  - **Runtime Polymorphism (Method Overriding)**:
-    - Derived classes override methods of the base class using the `virtual` and `override` keywords.
-    - Resolved at runtime based on the object's actual type.
-  - **Polymorphism through Interfaces**:
-    - Allows for swapping implementations without changing dependent code.
-    - Enables code to be flexible and extensible.
-    - Fundamental for adhering to the Dependency Inversion Principle.
+    - Same method name with different signatures (parameters)
+    - Resolved at compile time based on method signatures
+    - Also known as static binding or early binding
+  
+  - **Runtime Polymorphism**:
+    - Also known as dynamic binding or late binding
+    - Resolved at runtime based on the object's actual type
+    - Implemented through:
+      - **Method Overriding**:
+        - Derived classes override methods of the base class using the `virtual` and `override` keywords
+      - **Interface-based Polymorphism**:
+        - Allows for swapping implementations without changing dependent code
+        - Enables code to be flexible and extensible
+        - Fundamental for adhering to the Dependency Inversion Principle
 
 - **Goals**:
-  - Enable flexibility and integration by allowing objects to be treated as instances of their parent class or interface.
-  - Promote code reuse and maintainability.
-  - Allow switching of implementations without modifying existing code, facilitating easier maintenance and testing.
+  - Enable flexibility and integration by allowing objects to be treated as instances of their parent class or interface
+  - Promote code reuse and maintainability
+  - Allow switching of implementations without modifying existing code, facilitating easier maintenance and testing
 
-- **Example: Compile-time and Runtime Polymorphism**
-
+- **Example 1: Compile-time Polymorphism (Method Overloading)**
     ```csharp
-    // Method Overloading (Compile-time Polymorphism)
     public class Calculator
     {
         public int Add(int a, int b)
@@ -395,8 +398,12 @@
     int sum1 = calculator.Add(1, 2);        // Calls Add(int, int)
     double sum2 = calculator.Add(1.5, 2.5); // Calls Add(double, double)
     int sum3 = calculator.Add(1, 2, 3);     // Calls Add(int, int, int)
+    ```
 
-    // Method Overriding (Runtime Polymorphism)
+    - **Examples: Runtime Polymorphism**
+
+    **1. Method Overriding:**
+    ```csharp
     public class Animal
     {
         public virtual void Speak()
@@ -429,9 +436,9 @@
     myAnimal.Speak(); // Output: The animal makes a sound.
     myDog.Speak();    // Output: The dog barks.
     myCat.Speak();    // Output: The cat meows.
+    ```
 
-- **Example: Switching Implementations Using Interfaces (Dependency Injection)**:
-
+- **Example 2: Interface-based Polymorphism:**
     ```csharp
     // Interface defining the contract
     public interface INotificationService
@@ -495,6 +502,7 @@
         Email sent: Hello via Email!
         SMS sent: Hello via SMS!
     */
+    ```
 
 ## SOLID
 
