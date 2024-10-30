@@ -345,7 +345,7 @@
     Single Inheritance: Car and Motorcycle inherit from Vehicle.
     Multilevel Inheritance: ElectricCar inherits from Car, which inherits from Vehicle.
     Hierarchical Inheritance: SportsCar, SUV, and ElectricCar all inherit from Car. */
-
+    ```
 
 ## Polymorphism
 
@@ -517,6 +517,99 @@ This principle is fundamental to achieving loose coupling, enabling code reuse, 
 
 ### Single Responsibility Principle (SRP)
 A class should do only one thing, and there for have only one reason to change.
+
+```csharp
+// ❌ BAD: Single class handling multiple responsibilities
+public class Employee
+{
+    public string Name { get; set; }
+    public decimal Salary { get; set; }
+
+    public void CalculateSalary()
+    {
+        // Salary calculation logic
+        Salary = /* calculation */ 1000;
+    }
+
+    public void SaveToDatabase()
+    {
+        // Database logic
+        Console.WriteLine($"Saving {Name} to database");
+    }
+
+    public void GeneratePayslip()
+    {
+        // PDF generation logic
+        Console.WriteLine($"Generating payslip for {Name}");
+    }
+
+    public void SendPayslipEmail()
+    {
+        // Email logic
+        Console.WriteLine($"Sending payslip to {Name}");
+    }
+}
+
+// ✅ GOOD: Separated responsibilities into focused classes
+public class Employee
+{
+    public string Name { get; set; }
+    public decimal Salary { get; set; }
+
+    public void CalculateSalary()
+    {
+        // Only handles salary calculation
+        Salary = /* calculation */ 1000;
+    }
+}
+
+public class EmployeeRepository
+{
+    public void Save(Employee employee)
+    {
+        // Only handles database operations
+        Console.WriteLine($"Saving {employee.Name} to database");
+    }
+}
+
+public class PayslipGenerator
+{
+    public void GeneratePayslip(Employee employee)
+    {
+        // Only handles payslip generation
+        Console.WriteLine($"Generating payslip for {employee.Name}");
+    }
+}
+
+public class EmailService
+{
+    public void SendPayslipEmail(Employee employee)
+    {
+        // Only handles email communication
+        Console.WriteLine($"Sending payslip to {employee.Name}");
+    }
+}
+
+// Usage Example
+public class Example
+{
+    public void ProcessEmployee()
+    {
+        // Each class has a single responsibility
+        var employee = new Employee { Name = "John" };
+        employee.CalculateSalary();
+
+        var repository = new EmployeeRepository();
+        repository.Save(employee);
+
+        var payslipGenerator = new PayslipGenerator();
+        payslipGenerator.GeneratePayslip(employee);
+
+        var emailService = new EmailService();
+        emailService.SendPayslipEmail(employee);
+    }
+}
+```
 
 ### Open/Closed Principle (OCP)
 Classes should be open for extension and closed for modification.
