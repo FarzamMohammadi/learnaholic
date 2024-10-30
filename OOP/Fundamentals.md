@@ -730,6 +730,120 @@ The Strategy Pattern:
 ### Liskov Substitution Principle (LSP)
 Derived classed should be substitutable for their base classes. Objects of a super class should be replaceable with objects of a subclass without affecting correctness.
 
+```csharp
+// ❌ BAD: Violates LSP - Square can't properly substitute Rectangle
+public class Rectangle
+{
+    public virtual int Width { get; set; }
+    public virtual int Height { get; set; }
+
+    public int CalculateArea()
+    {
+        return Width * Height;
+    }
+}
+
+public class Square : Rectangle
+{
+    private int _size;
+
+    public override int Width
+    {
+        get { return _size; }
+        set { _size = value; }
+    }
+
+    public override int Height
+    {
+        get { return _size; }
+        set { _size = value; }
+    }
+}
+
+// This test will fail for Square!
+public class Test
+{
+    public void TestRectangle(Rectangle rectangle)
+    {
+        rectangle.Width = 5;
+        rectangle.Height = 10;
+        
+        // Should be 50 for rectangle, but will be 100 for square!
+        Console.WriteLine(rectangle.CalculateArea());
+    }
+}
+
+// ✅ GOOD: Follows LSP - Each shape has its own contract
+public interface IShape
+{
+    int CalculateArea();
+}
+
+public class Rectangle : IShape
+{
+    public int Width { get; set; }
+    public int Height { get; set; }
+
+    public int CalculateArea()
+    {
+        return Width * Height;
+    }
+}
+
+public class Square : IShape
+{
+    public int Size { get; set; }
+
+    public int CalculateArea()
+    {
+        return Size * Size;
+    }
+}
+
+// Usage Example
+public class Example
+{
+    public void CalculateAreas()
+    {
+        // Bad example - LSP violation
+        Rectangle rect = new Rectangle { Width = 5, Height = 10 };
+        Rectangle square = new Square { Width = 5 }; // Height will also become 5!
+        
+        Console.WriteLine(rect.CalculateArea());    // 50
+        Console.WriteLine(square.CalculateArea());  // 25 (unexpected!)
+
+        // Good example - LSP compliant
+        IShape goodRect = new Rectangle { Width = 5, Height = 10 };
+        IShape goodSquare = new Square { Size = 5 };
+        
+        Console.WriteLine(goodRect.CalculateArea());   // 50
+        Console.WriteLine(goodSquare.CalculateArea()); // 25 (as expected)
+    }
+}
+
+/*
+1. The LSP Violation:
+
+- Square inherits from Rectangle but breaks its behavior
+- Changing Width also changes Height in Square
+- Code that works with Rectangle won't work correctly with Square
+- This violates the "substitutability" principle
+
+2. The Solution:
+
+- Use an interface instead of inheritance
+- Each shape has its own independent implementation
+- No unexpected behavior when using either shape
+- Both shapes can be used interchangeably through the interface
+
+3. Why It Matters:
+
+- Prevents subtle bugs in code that expects Rectangle behavior
+- Makes the code more predictable
+- Maintains the "is-substitutable-for" relationship
+*/
+```
+
 ### Interface Segregation Principle (ISP)
 Many client-specific interfaces are better than one general-purpose interface. Clients should not need to implement a function they do not need.
 
