@@ -614,6 +614,119 @@ public class Example
 ### Open/Closed Principle (OCP)
 Classes should be open for extension and closed for modification.
 
+- Open for extension (should be able to add new behaviors)
+- Closed for modification (shouldn't need to change existing code)
+
+```csharp
+// ❌ BAD: Violates OCP - needs modification for each new discount type
+public class OrderProcessor
+{
+    public decimal CalculateDiscount(Order order)
+    {
+        decimal discount = 0;
+        
+        // Need to modify this method every time we add a new discount rule
+        if (order.Value > 1000)
+            discount += order.Value * 0.1m; // 10% discount for large orders
+            
+        if (order.CustomerType == "Premium")
+            discount += order.Value * 0.05m; // 5% for premium customers
+            
+        if (order.IsHolidaySeason)
+            discount += order.Value * 0.05m; // 5% holiday discount
+            
+        return discount;
+    }
+}
+
+// ✅ GOOD: Follows OCP - can add new discount rules without changing existing code
+public abstract class DiscountRule
+{
+    public abstract decimal CalculateDiscount(Order order);
+}
+
+// Core discount rules defined once
+public class LargeOrderDiscount : DiscountRule
+{
+    public override decimal CalculateDiscount(Order order)
+    {
+        if (order.Value > 1000)
+            return order.Value * 0.1m;
+        return 0;
+    }
+}
+
+public class PremiumCustomerDiscount : DiscountRule
+{
+    public override decimal CalculateDiscount(Order order)
+    {
+        if (order.CustomerType == "Premium")
+            return order.Value * 0.05m;
+        return 0;
+    }
+}
+
+// The processor that's truly closed for modification
+public class OrderProcessor
+{
+    private readonly List<DiscountRule> _discountRules;
+
+    public OrderProcessor(List<DiscountRule> discountRules)
+    {
+        _discountRules = discountRules;
+    }
+
+    // This method never needs to change
+    public decimal CalculateDiscount(Order order)
+    {
+        return _discountRules.Sum(rule => rule.CalculateDiscount(order));
+    }
+}
+
+// Later, we can add new discount rules without modifying OrderProcessor
+public class HolidaySeasonDiscount : DiscountRule
+{
+    public override decimal CalculateDiscount(Order order)
+    {
+        if (order.IsHolidaySeason)
+            return order.Value * 0.05m;
+        return 0;
+    }
+}
+
+// Usage
+public class Example
+{
+    public void ProcessOrder()
+    {
+        var rules = new List<DiscountRule>
+        {
+            new LargeOrderDiscount(),
+            new PremiumCustomerDiscount(),
+            // Can add new rules without changing OrderProcessor
+            new HolidaySeasonDiscount()
+        };
+
+        var processor = new OrderProcessor(rules);
+        var order = new Order { Value = 2000, CustomerType = "Premium", IsHolidaySeason = true };
+        var discount = processor.CalculateDiscount(order);
+    }
+}
+/*
+True Closure for Modification:
+- The OrderProcessor class is truly closed - its CalculateDiscount method never needs to change
+- The core logic for combining discounts is written once and stays fixed
+
+Open for Extension:
+- New discount types can be added by creating new DiscountRule classes
+- No existing code needs to be modified to add new discount behaviors
+
+The Strategy Pattern:
+- Uses the Strategy pattern to make the code genuinely extensible
+- Each discount rule is a strategy that can be plugged into the processor
+*/
+```
+
 ### Liskov Substitution Principle (LSP)
 Derived classed should be substitutable for their base classes. Objects of a super class should be replaceable with objects of a subclass without affecting correctness.
 
