@@ -349,7 +349,13 @@
 
 ## Polymorphism
 
-- **Definition**: Polymorphism allows methods to have the same name but behave differently based on the object that invokes them. It enables objects of different classes to be treated as objects of a common superclass or interface, allowing for interchangeable use of different implementations.
+- **Definition**: Polymorphism (meaning "many forms") is the principle that allows objects to be treated as instances of their parent class or interface while maintaining their unique behaviors. It enables you to:
+
+1. Write code that works with objects based on their shared interfaces rather than specific implementations
+2. Define multiple methods with the same name but different parameters (compile-time)
+3. Allow different classes to provide their own implementation of the same method (runtime)
+
+This principle is fundamental to achieving loose coupling, enabling code reuse, and making systems more flexible and maintainable.
 
 - **Key Points**:
   - **Compile-time Polymorphism (Method Overloading)**:
@@ -369,9 +375,12 @@
         - Fundamental for adhering to the Dependency Inversion Principle
 
 - **Goals**:
-  - Enable flexibility and integration by allowing objects to be treated as instances of their parent class or interface
-  - Promote code reuse and maintainability
-  - Allow switching of implementations without modifying existing code, facilitating easier maintenance and testing
+  - Enable code flexibility by treating objects through shared interfaces
+  - Promote code reuse through shared implementations
+  - Achieve loose coupling between components
+  - Make code easier to test through interface-based design
+  - Support extension without modifying existing code
+  - Reduce maintenance costs through better organization
 
 - **Example 1: Compile-time Polymorphism (Method Overloading)**
     ```csharp
