@@ -197,6 +197,8 @@
 
 ## 3. System Design Basics
 
+- Learn the ins and outs of requirement gathering!!
+
 ### Key Concepts
 
 - **Scalability, Reliability, Availability**
