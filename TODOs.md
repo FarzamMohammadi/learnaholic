@@ -198,6 +198,7 @@
 ## 3. System Design Basics
 
 - Learn the ins and outs of requirement gathering!!
+- How do you take software idea, understand it, break it down, plan and design it, and then start building.
 
 ### Key Concepts
 
