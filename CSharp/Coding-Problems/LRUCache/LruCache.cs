@@ -6,7 +6,7 @@ public interface ILruCache
     public void Put(string key, int value);
 }
 
-public class Cache : ILruCache
+public class LruCache : ILruCache
 {
     /*
     Data structures are optimal:
@@ -39,7 +39,7 @@ public class Cache : ILruCache
     private readonly Dictionary<string, LinkedListNode<(string Key, int Value)>> _index;
     private readonly int _capacity;
 
-    public Cache(int capacity)
+    public LruCache(int capacity)
     {
         if (capacity < 0) throw new ArgumentException("Capacity cannot be negative.");
 
