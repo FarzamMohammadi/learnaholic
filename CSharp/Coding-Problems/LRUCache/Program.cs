@@ -1,4 +1,5 @@
 ﻿/*
+Testing Approach:
 Custom assertion implementation for testing purposes
 Simulates basic unit testing functionality without requiring test framework dependencies
 Common approach in coding interviews where external testing frameworks aren't available
