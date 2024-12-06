@@ -58,6 +58,9 @@ public class SolidifiedLruCache<TKey, TValue> : ICache<TKey, TValue> where TKey 
 
     public void Put(TKey key, TValue value)
     {
+        // Validation below could be swapped with a more comprehensive version that covers a wide variety of types
+        if (key is string stringKey && string.IsNullOrEmpty(stringKey)) throw new ArgumentException("Key is invalid.");
+
         if (_store.TryGet(key, out _))
         {
             _store.Remove(key);
