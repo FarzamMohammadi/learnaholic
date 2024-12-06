@@ -80,10 +80,7 @@ public class SolidifiedLruCache<TKey, TValue> : ICache<TKey, TValue> where TKey 
     }
 }
 
-public class LinkedListCacheStore<TKey, TValue>
-(
-    int capacity
-)
+public class LinkedListCacheStore<TKey, TValue>(int capacity)
     : ICacheStore<TKey, TValue> where TKey : notnull
 {
     private readonly Dictionary<TKey, LinkedListNode<(TKey Key, TValue Value)>> _index = new(capacity);
@@ -118,10 +115,7 @@ public class LinkedListCacheStore<TKey, TValue>
     }
 }
 
-public class LruCachePolicy<TKey>
-(
-    int capacity
-)
+public class LruCachePolicy<TKey>(int capacity)
     : ICachePolicy<TKey> where TKey : notnull
 {
     private readonly LinkedList<TKey> _accessOrder = [];
