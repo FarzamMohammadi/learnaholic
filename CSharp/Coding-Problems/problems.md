@@ -21,12 +21,12 @@
 
 ## Completed Challenges
 
-1. [x] **LRU (Least Recently Used) Cache**
+1. [x] [**LRU (Least Recently Used) Cache**](../Coding-Problems/LRUCache/README.md)
     - Implement PUT and GET methods with O(1) operations
     - Handle capacity limits and eviction
     - Consider thread safety and performance
 
-2. [x] **IP Request Validator**
+2. [x] [**IP Request Validator**](../Coding-Problems/IPRequestValidator/README.md)
     - Implement IsValid(byte[]) for IP validation
     - Track requests within rolling 1M window
     - Limit to 5 requests per IP
