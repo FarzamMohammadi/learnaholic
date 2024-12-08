@@ -1,0 +1,18 @@
+Language: Cpp
+BasedOnStyle: Microsoft  # This tends to preserve more traditional spacing
+PointerAlignment: Left   # This puts & next to type
+IndentWidth: 4          # Standard 4-space indentation
+UseTab: Never           # Use spaces instead of tabs
+BreakBeforeBraces: Allman  # Puts braces on new lines
+AccessModifierOffset: -4    # Aligns public: with class definition
+NamespaceIndentation: All   # Indents namespace contents
+IndentCaseLabels: true     # Indents case labels in switch statements
+
+# Preserve your spacing
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: true
+
+# Function declarations
+BinPackParameters: false
+BinPackArguments: false
+AlignAfterOpenBracket: Align
