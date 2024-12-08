@@ -1,13 +1,13 @@
+#include <climits>
 #include <iostream>
 #include <vector>
-#include <climits>
 
 using namespace std;
 
 class MaxSubarraySolutions
 {
 private:
-    void printArray(const vector<int> &nums)
+    void printArray(const vector<int>& nums)
     {
         /*
             Stream Insertion Operator: `<<`
@@ -62,7 +62,7 @@ public:
         */
 
     // Solution 1: Brute Force O(n^2)
-    int bruteForce(vector<int> &nums)
+    int bruteForce(vector<int>& nums)
     {
         int maxSum = INT_MIN;
 
@@ -81,7 +81,7 @@ public:
     }
 
     // Solution 2: Kadane's Algorithm O(n)
-    int kadane(vector<int> &nums)
+    int kadane(vector<int>& nums)
     {
         int maxSum = 0;
         int sum = 0;
@@ -98,7 +98,7 @@ public:
 
 public:
     // Test all solutions
-    void testAllSolutions(vector<int> &nums)
+    void testAllSolutions(vector<int>& nums)
     {
         cout << "\nMaximum Subarray Problem" << endl;
         cout << "------------------------" << endl;
