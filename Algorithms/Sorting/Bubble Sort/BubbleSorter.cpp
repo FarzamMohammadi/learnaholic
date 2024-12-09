@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 
+using namespace std;
+
 /*
     Inversions in Array Sorting:
     - An inversion is a pair (array[a],array[b]) where a < b and array[a] > array[b] (in short, in incorrect order)
@@ -42,8 +44,6 @@
     Time Complexity: O(n^2)
     Space Complexity: O(1) - in-place sorting
 */
-
-using namespace std;
 
 class BubbleSorter
 {

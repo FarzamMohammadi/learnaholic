@@ -39,8 +39,7 @@ private:
         {
             cout << nums[i];
 
-            if (i < nums.size() - 1)
-                cout << ", ";
+            if (i < nums.size() - 1) cout << ", ";
         }
 
         cout << "]" << endl;

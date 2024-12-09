@@ -9,15 +9,15 @@ NamespaceIndentation: All
 IndentCaseLabels: true
 
 # Column length settings
-ColumnLimit: 150              # Maximum line length
+ColumnLimit: 150
 PenaltyBreakBeforeFirstCallParameter: 1
 PenaltyBreakString: 1000
 PenaltyBreakComment: 300
 PenaltyReturnTypeOnItsOwnLine: 200
 AlignOperands: true
 AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
 
 # Line breaking for long lines
 BinPackParameters: false
@@ -29,3 +29,7 @@ BreakConstructorInitializers: BeforeColon
 # Spacing
 MaxEmptyLinesToKeep: 1
 KeepEmptyLinesAtTheStartOfBlocks: true
+
+# Additional control for single-line statements
+AllowShortBlocksOnASingleLine: Empty
+InsertBraces: false
