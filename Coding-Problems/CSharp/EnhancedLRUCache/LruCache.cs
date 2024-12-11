@@ -8,14 +8,13 @@ public interface ILruCache<TKey, TValue>
     public void Clear();
 }
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnull
+public class LruCache<TKey, TValue>
+(
+    ILruStorage<TKey, TValue> storage
+) : ILruCache<TKey, TValue>
+    where TKey : notnull
 {
-    private readonly ILruStorage<TKey, TValue> _storage;
-
-    public LruCache(ILruStorage<TKey, TValue> storage)
-    {
-        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-    }
+    private readonly ILruStorage<TKey, TValue> _storage = storage ?? throw new ArgumentNullException(nameof(storage));
 
     public void Put(TKey key, TValue value, TimeSpan? ttl)
     {

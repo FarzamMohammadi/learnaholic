@@ -11,6 +11,15 @@ public enum TtlPolicy
 }
 
 public class LruPolicy
+(
+    TtlPolicy policy,
+    TimeSpan? defaultTtl = null
+)
 {
-    private readonly TtlPolicy _ttlPolicy;
+    public TimeSpan? DefaultTtl { get; } = defaultTtl;
+
+    public bool UsesAbsoluteExpiration => policy.HasFlag(TtlPolicy.AbsoluteExpiration);
+    public bool UsesSlidingExpiration => policy.HasFlag(TtlPolicy.SlidingExpiration);
+    public bool UsesCacheLevelTtl => policy.HasFlag(TtlPolicy.CacheLevelTtl);
+    public bool UsesItemLevelTtl => policy.HasFlag(TtlPolicy.ItemLevelTtl);
 }
