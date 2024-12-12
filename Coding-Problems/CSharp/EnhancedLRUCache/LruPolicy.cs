@@ -10,11 +10,20 @@ public enum TtlPolicy
     ItemLevelTtl = 1 << 3        // 1000 - 8 - TTL settings applied at individual item level
 }
 
+public interface ILruPolicy
+{
+    public TimeSpan? DefaultTtl { get; }
+    public bool UsesAbsoluteExpiration { get; }
+    public bool UsesSlidingExpiration { get; }
+    public bool UsesCacheLevelTtl { get; }
+    public bool UsesItemLevelTtl { get; }
+}
+
 public class LruPolicy
 (
     TtlPolicy policy,
     TimeSpan? defaultTtl = null
-)
+) : ILruPolicy
 {
     public TimeSpan? DefaultTtl { get; } = defaultTtl;
 
