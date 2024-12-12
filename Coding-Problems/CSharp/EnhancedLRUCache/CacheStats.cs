@@ -23,6 +23,8 @@ public interface ICacheStats
 
     public void UpdateMemory(long size);
     long TotalMemoryBytes { get; }
+
+    public void ClearMetrics();
 }
 
 public class CacheStats : ICacheStats
@@ -54,4 +56,14 @@ public class CacheStats : ICacheStats
 
     public void UpdateMemory(long size) => Interlocked.Add(ref _totalMemory, size);
     public long TotalMemoryBytes => _totalMemory;
+
+    public void ClearMetrics()
+    {
+        Interlocked.Exchange(ref _totalRequests, 0);
+        Interlocked.Exchange(ref _cacheMisses, 0);
+        Interlocked.Exchange(ref _evictionCount, 0);
+        Interlocked.Exchange(ref _expiredCount, 0);
+        Interlocked.Exchange(ref _itemCount, 0);
+        Interlocked.Exchange(ref _totalMemory, 0);
+    }
 }

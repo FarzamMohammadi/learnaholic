@@ -11,16 +11,20 @@ public interface ILruCache<TKey, TValue>
 public class LruCache<TKey, TValue>
 (
     ILruStorage<TKey, TValue> storage,
-    ILruPolicy policy
+    ILruPolicy policy,
+    ICacheStats stats
 ) : ILruCache<TKey, TValue>
     where TKey : notnull
 {
     private readonly ILruStorage<TKey, TValue> _storage = storage ?? throw new ArgumentNullException(nameof(storage));
     private readonly ILruPolicy _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+    private readonly ICacheStats _stats = stats ?? throw new ArgumentNullException(nameof(stats));
 
     public void Put(TKey key, TValue? value, TimeSpan? ttl)
     {
         ArgumentNullException.ThrowIfNull(key);
+
+        _stats.IncrementRequestCount();
 
         DateTime? absoluteExpiration = null;
         TimeSpan? slidingExpiration = null;
@@ -37,9 +41,17 @@ public class LruCache<TKey, TValue>
 
         var newCacheEntry = new CacheItem<TValue>(value, absoluteExpiration, slidingExpiration);
 
-        var (itemAdded, error) = _storage.TryPut(key, newCacheEntry);
+        var (itemSuccessfullyAdded, error) = _storage.TryPut(key, newCacheEntry);
 
-        if (!itemAdded) throw new InvalidOperationException(error.ToString());
+        if (!itemSuccessfullyAdded)
+        {
+            _stats.IncrementMissedRequestCount();
+
+            throw new InvalidOperationException(error.ToString());
+        }
+
+        _stats.UpdateItemCount(1);
+        _stats.UpdateMemory(newCacheEntry.Size);
     }
 
 
@@ -61,11 +73,18 @@ public class LruCache<TKey, TValue>
     {
         ArgumentNullException.ThrowIfNull(key);
 
+        _storage.TryGet(key, out var entry);
+
+        _stats.UpdateItemCount(-1);
+        _stats.UpdateMemory(-entry.Size);
+
         _storage.Remove(key);
     }
 
     public void Clear()
     {
         _storage.Clear();
+
+        _stats.ClearMetrics();
     }
 }
