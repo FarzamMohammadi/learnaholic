@@ -1,17 +1,12 @@
-﻿using System.Runtime.InteropServices;
+﻿using EnhancedLRUCache.Errors;
 
 namespace EnhancedLRUCache;
-
-public enum CacheAdditionErrorType
-{
-    MaxMemorySizeExceeded = 1
-}
 
 public interface ILruStorage<TKey, TValue>
 {
     public bool ContainsKey(TKey key);
     public bool TryGet(TKey key, out CacheItem<TValue> cacheItem);
-    public (bool success, CacheAdditionErrorType? error) TryPut(TKey key, CacheItem<TValue> cacheItem);
+    public bool TryPut(TKey key, CacheItem<TValue> cacheItem, out CacheAdditionError? error);
     public void Remove(TKey key);
     public void Clear();
     public IReadOnlyCollection<TKey> GetExpiredKeys();
@@ -21,26 +16,23 @@ public interface ILruStorage<TKey, TValue>
     public bool IsFull { get; }
 }
 
-public class LruStorage<TKey, TValue> : ILruStorage<TKey, TValue> where TKey : notnull
+public class LruStorage<TKey, TValue>
+(
+    int maxItemCount,
+    long maxMemorySize,
+    ICacheStats stats
+)
+    : ILruStorage<TKey, TValue> where TKey : notnull
 {
-    private readonly LinkedList<(TKey Key, CacheItem<TValue> CacheItem)> _store;
-    private readonly Dictionary<TKey, LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>> _index;
+    private readonly LinkedList<(TKey Key, CacheItem<TValue> CacheItem)> _store = new();
+    private readonly Dictionary<TKey, LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>> _index = new(maxItemCount);
 
     private long _currentMemorySize;
-    private readonly long _maximumMemorySize;
-    private readonly int _maximumItemCount;
 
-    public LruStorage(int maxItemCount, long maxMemorySize)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxItemCount);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxMemorySize);
+    private readonly long _maximumMemorySize = maxMemorySize <= 0 ? throw new ArgumentOutOfRangeException(nameof(maxMemorySize)) : maxMemorySize;
+    private readonly int _maximumItemCount = maxItemCount <= 0 ? throw new ArgumentOutOfRangeException(nameof(maxItemCount)) : maxItemCount;
 
-        _maximumMemorySize = maxMemorySize;
-        _maximumItemCount = maxItemCount;
-
-        _store = new();
-        _index = new(maxItemCount);
-    }
+    private readonly ICacheStats _stats = stats ?? throw new ArgumentNullException(nameof(stats));
 
     public int Count => _store.Count;
     public long CurrentMemorySize => _currentMemorySize;
@@ -68,32 +60,56 @@ public class LruStorage<TKey, TValue> : ILruStorage<TKey, TValue> where TKey : n
         return true;
     }
 
-    public (bool success, CacheAdditionErrorType? error) TryPut(TKey key, CacheItem<TValue> cacheItem)
+    public bool TryPut(TKey key, CacheItem<TValue> cacheItem, out CacheAdditionError? error)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(cacheItem);
 
-        if (cacheItem.Size + _currentMemorySize > _maximumMemorySize)
+        if (cacheItem.Size > _maximumMemorySize)
         {
-            return (false, CacheAdditionErrorType.MaxMemorySizeExceeded);
+            error = CacheAdditionError.MaxMemorySizeExceeded;
+            return false;
         }
 
+        // Handle update case first - this actually frees memory
         if (_index.ContainsKey(key))
         {
             RefreshCacheItem(key, cacheItem);
-            return (true, null);
+
+            error = CacheAdditionError.None;
+            return true;
         }
+
+        // We prioritize new entry and evict items until enough space is available
+        while (Count > 0 && cacheItem.Size + _currentMemorySize > _maximumMemorySize) EvictLastEntry();
+
+        // Add failsafe here in case our initial calculation was correct (after all, it's all estimation)
+        if (cacheItem.Size + _currentMemorySize > _maximumMemorySize)
+        {
+            error = CacheAdditionError.MaxMemorySizeExceeded;
+            return false;
+        }
+
+        error = CacheAdditionError.None;
 
         _index[key] = new LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>((key, cacheItem));
         _store.AddFirst((key, cacheItem));
 
         _currentMemorySize += cacheItem.Size;
 
-        if (_store.Count < _maximumItemCount) return (true, null);
+        if (_store.Count < _maximumItemCount) return true;
 
-        Remove(_store.Last!.Value.Key);
+        EvictLastEntry();
 
-        return (true, null);
+        return true;
+    }
+
+    private void EvictLastEntry()
+    {
+        var evictionCandidate = _store.Last!.Value.Key;
+
+        Remove(evictionCandidate);
+        _stats.IncrementEvictionCount();
     }
 
     private void RefreshCacheItem(TKey key, CacheItem<TValue> cacheItem)
@@ -114,7 +130,7 @@ public class LruStorage<TKey, TValue> : ILruStorage<TKey, TValue> where TKey : n
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        if (!_index.TryGetValue(key, out var kvp)) throw new KeyNotFoundException();
+        if (!_index.TryGetValue(key, out var kvp)) return;
 
         _store.Remove(kvp);
         _index.Remove(key);
