@@ -1,4 +1,5 @@
-﻿using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.CacheItem;
+using EnhancedLRUCache.Errors;
 
 namespace EnhancedLRUCache;
 
@@ -8,24 +9,40 @@ public interface ILruCache<TKey, TValue>
     public bool TryGet(TKey key, out TValue? value, out CacheRetrievalError error);
     public bool Remove(TKey key, out CacheRemovalError error);
     public bool Clear();
+
+    event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemExpired;
+    event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 }
 
-public class LruCache<TKey, TValue>
-(
-    ILruStorage<TKey, TValue> storage,
-    ILruPolicy policy,
-    ICacheStats stats,
-    TimeSpan? lockTimeout = null
-) : ILruCache<TKey, TValue>, IDisposable
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
     where TKey : notnull
 {
-    private readonly ILruStorage<TKey, TValue> _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-    private readonly ILruPolicy _policy = policy ?? throw new ArgumentNullException(nameof(policy));
-    private readonly ICacheStats _stats = stats ?? throw new ArgumentNullException(nameof(stats));
+    private readonly ILruStorage<TKey, TValue> _storage;
+    private readonly ILruPolicy _policy;
+    private readonly ICacheStats _stats;
 
     private readonly ReaderWriterLockSlim _lock = new();
-    private readonly TimeSpan _lockTimeout = lockTimeout ?? TimeSpan.FromMinutes(3);
+    private readonly TimeSpan _lockTimeout;
     private bool _disposed;
+
+    public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemExpired;
+    public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
+
+    public LruCache(
+        ILruStorage<TKey, TValue> storage,
+        ILruPolicy policy,
+        ICacheStats stats,
+        TimeSpan? lockTimeout = null
+    )
+    {
+        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+        _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+        _stats = stats ?? throw new ArgumentNullException(nameof(stats));
+
+        _lockTimeout = lockTimeout ?? TimeSpan.FromMinutes(3);
+
+        _storage.ItemEvicted += OnStorageItemEvicted;
+    }
 
     /*
          ReaderWriterLockSlim Class is used for protecting a resource that is read by multiple threads and written to by one thread at a time.
@@ -109,6 +126,8 @@ public class LruCache<TKey, TValue>
 
             if (cacheItem.IsExpired())
             {
+                OnItemExpired(key, value);
+
                 _stats.IncrementMissedRequestCount();
                 _stats.IncrementExpiredCount();
 
@@ -229,4 +248,13 @@ public class LruCache<TKey, TValue>
 
         _disposed = true;
     }
+
+    private void OnItemExpired(TKey key, TValue? value) => ItemExpired?.Invoke(this, new CacheItemEventArgs<TKey, TValue>(key, value, DateTime.UtcNow));
+
+    private void OnStorageItemEvicted(object? sender, CacheItemEventArgs<TKey, TValue> item)
+    {
+        OnItemEvicted(item.Key, item.Value);
+    }
+
+    private void OnItemEvicted(TKey key, TValue? value) => ItemEvicted?.Invoke(this, new CacheItemEventArgs<TKey, TValue>(key, value, DateTime.UtcNow));
 }

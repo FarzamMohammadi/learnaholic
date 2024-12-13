@@ -1,4 +1,5 @@
-﻿using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.CacheItem;
+using EnhancedLRUCache.Errors;
 
 namespace EnhancedLRUCache;
 
@@ -14,6 +15,8 @@ public interface ILruStorage<TKey, TValue>
     public int Count { get; }
     public long CurrentMemorySize { get; }
     public bool IsFull { get; }
+
+    event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 }
 
 public class LruStorage<TKey, TValue>
@@ -27,18 +30,19 @@ public class LruStorage<TKey, TValue>
     private readonly LinkedList<(TKey Key, CacheItem<TValue> CacheItem)> _store = new();
     private readonly Dictionary<TKey, LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>> _index = new(maxItemCount);
 
-    private long _currentMemorySize;
+    private readonly ICacheStats _stats = stats ?? throw new ArgumentNullException(nameof(stats));
 
     private readonly long _maximumMemorySize = maxMemorySize <= 0 ? throw new ArgumentOutOfRangeException(nameof(maxMemorySize)) : maxMemorySize;
     private readonly int _maximumItemCount = maxItemCount <= 0 ? throw new ArgumentOutOfRangeException(nameof(maxItemCount)) : maxItemCount;
 
-    private readonly ICacheStats _stats = stats ?? throw new ArgumentNullException(nameof(stats));
-
     public int Count => _store.Count;
-    public long CurrentMemorySize => _currentMemorySize;
+    public long CurrentMemorySize { get; private set; }
+
     public bool IsFull => _store.Count >= _maximumItemCount;
 
     public bool ContainsKey(TKey key) => _index.ContainsKey(key);
+
+    public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 
     public bool TryGet(TKey key, out CacheItem<TValue> cacheItem)
     {
@@ -81,10 +85,10 @@ public class LruStorage<TKey, TValue>
         }
 
         // We prioritize new entry and evict items until enough space is available
-        while (Count > 0 && cacheItem.Size + _currentMemorySize > _maximumMemorySize) EvictLastEntry();
+        while (Count > 0 && cacheItem.Size + CurrentMemorySize > _maximumMemorySize) EvictLastEntry();
 
         // Add failsafe here in case our initial calculation was correct (after all, it's all estimation)
-        if (cacheItem.Size + _currentMemorySize > _maximumMemorySize)
+        if (cacheItem.Size + CurrentMemorySize > _maximumMemorySize)
         {
             error = CacheAdditionError.MaxMemorySizeExceeded;
             return false;
@@ -95,7 +99,7 @@ public class LruStorage<TKey, TValue>
         _index[key] = new LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>((key, cacheItem));
         _store.AddFirst((key, cacheItem));
 
-        _currentMemorySize += cacheItem.Size;
+        CurrentMemorySize += cacheItem.Size;
 
         if (_store.Count < _maximumItemCount) return true;
 
@@ -106,10 +110,13 @@ public class LruStorage<TKey, TValue>
 
     private void EvictLastEntry()
     {
-        var evictionCandidate = _store.Last!.Value.Key;
+        var evictionCandidate = _store.Last!.Value;
 
-        Remove(evictionCandidate);
+        Remove(evictionCandidate.Key);
+
         _stats.IncrementEvictionCount();
+
+        OnItemEvicted(evictionCandidate.Key, evictionCandidate.CacheItem.Value);
     }
 
     private void RefreshCacheItem(TKey key, CacheItem<TValue> cacheItem)
@@ -118,10 +125,10 @@ public class LruStorage<TKey, TValue>
         var oldEntry = _index[key];
 
         _store.Remove(oldEntry);
-        _currentMemorySize -= oldEntry.Value.CacheItem.Size;
+        CurrentMemorySize -= oldEntry.Value.CacheItem.Size;
 
         _store.AddFirst(newEntry);
-        _currentMemorySize += newEntry.Value.CacheItem.Size;
+        CurrentMemorySize += newEntry.Value.CacheItem.Size;
 
         _index[key] = newEntry;
     }
@@ -135,7 +142,7 @@ public class LruStorage<TKey, TValue>
         _store.Remove(kvp);
         _index.Remove(key);
 
-        _currentMemorySize -= kvp.Value.CacheItem.Size;
+        CurrentMemorySize -= kvp.Value.CacheItem.Size;
     }
 
     public void Clear()
@@ -143,7 +150,7 @@ public class LruStorage<TKey, TValue>
         _store.Clear();
         _index.Clear();
 
-        _currentMemorySize = 0;
+        CurrentMemorySize = 0;
     }
 
     public IReadOnlyCollection<TKey> GetExpiredKeys()
@@ -152,5 +159,10 @@ public class LruStorage<TKey, TValue>
             .Select(cacheItem => cacheItem.Key)
             .ToList()
             .AsReadOnly();
+    }
+
+    private void OnItemEvicted(TKey key, TValue? value)
+    {
+        ItemEvicted?.Invoke(this, new CacheItemEventArgs<TKey, TValue>(key, value, DateTime.UtcNow));
     }
 }
