@@ -3,21 +3,23 @@ using EnhancedLRUCache.Errors;
 
 namespace EnhancedLRUCache;
 
-public interface ILruCache<TKey, TValue>
+public interface ILruCache<TKey, TValue> : IDisposable
 {
     public bool Put(TKey key, TValue? value, TimeSpan? ttl, out CacheAdditionError error);
     public bool TryGet(TKey key, out TValue? value, out CacheRetrievalError error);
-    public bool Remove(TKey key, out CacheRemovalError error);
+    public bool Remove(TKey key, out TValue? value, out CacheRemovalError error);
+    public IReadOnlyCollection<TKey> GetExpiredKeys(out CacheRetrievalError error);
     public bool Clear();
 
-    event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemExpired;
-    event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
+    public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemExpired;
+    public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 }
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
     where TKey : notnull
 {
     private readonly ILruStorage<TKey, TValue> _storage;
+    private readonly CacheCustodian<TKey, TValue> _custodian;
     private readonly ILruPolicy _policy;
     private readonly ICacheStats _stats;
 
@@ -32,7 +34,9 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
         ILruStorage<TKey, TValue> storage,
         ILruPolicy policy,
         ICacheStats stats,
-        TimeSpan? lockTimeout = null
+        TimeSpan? lockTimeout = null,
+        TimeSpan? cleanupInterval = null,
+        TimeSpan? cleanupRetryInterval = null
     )
     {
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -42,6 +46,15 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
         _lockTimeout = lockTimeout ?? TimeSpan.FromMinutes(3);
 
         _storage.ItemEvicted += OnStorageItemEvicted;
+
+        _custodian = new CacheCustodian<TKey, TValue>(
+            cleanupInterval ?? TimeSpan.FromMinutes(10),
+            cleanupRetryInterval,
+            this
+        );
+
+        _custodian.ItemExpired += OnCustodianItemExpired;
+        _custodian.Start();
     }
 
     /*
@@ -132,7 +145,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
                 _stats.IncrementExpiredCount();
 
                 // Schedule async removal of expired item
-                Task.Run(() => Remove(key, out _));
+                Task.Run(() => Remove(key, out _, out _));
 
                 error = CacheRetrievalError.ItemExpired;
                 return false;
@@ -149,10 +162,12 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
         }
     }
 
-    public bool Remove(TKey key, out CacheRemovalError error)
+    public bool Remove(TKey key, out TValue? value, out CacheRemovalError error)
     {
         ArgumentNullException.ThrowIfNull(key);
         ThrowIfDisposed();
+
+        value = default;
 
         if (!_lock.TryEnterWriteLock(_lockTimeout))
         {
@@ -175,6 +190,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
             _stats.UpdateItemCount(-1);
             _stats.UpdateMemory(-entry.Size);
 
+            value = entry.Value;
             error = CacheRemovalError.None;
             return true;
         }
@@ -186,6 +202,27 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
         finally
         {
             _lock.ExitWriteLock();
+        }
+    }
+
+    public IReadOnlyCollection<TKey> GetExpiredKeys(out CacheRetrievalError error)
+    {
+        if (!_lock.TryEnterReadLock(_lockTimeout))
+        {
+            error = CacheRetrievalError.ThreadLockTimeout;
+            return [];
+        }
+
+        try
+        {
+            var expiredKeys = _storage.GetExpiredKeys();
+
+            error = CacheRetrievalError.None;
+            return expiredKeys;
+        }
+        finally
+        {
+            _lock.ExitReadLock();
         }
     }
 
@@ -244,12 +281,21 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable
     {
         if (_disposed) return;
 
-        if (disposing) _lock.Dispose();
+        if (disposing)
+        {
+            _lock.Dispose();
+            _custodian.Dispose();
+        }
 
         _disposed = true;
     }
 
     private void OnItemExpired(TKey key, TValue? value) => ItemExpired?.Invoke(this, new CacheItemEventArgs<TKey, TValue>(key, value, DateTime.UtcNow));
+
+    private void OnCustodianItemExpired(object? sender, CacheItemEventArgs<TKey, TValue> item)
+    {
+        OnItemExpired(item.Key, item.Value);
+    }
 
     private void OnStorageItemEvicted(object? sender, CacheItemEventArgs<TKey, TValue> item)
     {

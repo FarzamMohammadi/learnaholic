@@ -8,7 +8,6 @@ A thread-safe, generic LRU (Least Recently Used) cache implementation with TTL s
 - Flexible TTL (Time To Live) management
     - Absolute expiration (items expire at specific datetime)
     - Sliding expiration (items expire after period of non-use)
-    - Support for both cache-level and item-level TTL settings
 - Memory management
     - Maximum item count limit
     - Total memory size limit
