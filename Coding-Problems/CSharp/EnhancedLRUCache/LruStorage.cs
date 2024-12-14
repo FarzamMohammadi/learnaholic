@@ -96,8 +96,10 @@ public class LruStorage<TKey, TValue>
 
         error = CacheAdditionError.None;
 
-        _index[key] = new LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>((key, cacheItem));
-        _store.AddFirst((key, cacheItem));
+        var newNode = new LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>((key, cacheItem));
+
+        _index[key] = newNode;
+        _store.AddFirst(newNode);
 
         CurrentMemorySize += cacheItem.Size;
 
