@@ -5,12 +5,12 @@ public interface ICacheStats
     public void IncrementRequestCount();
     long TotalRequests { get; }
 
-    long CacheHits => TotalRequests - CacheMisses;
+    long CacheHits { get; }
 
     public void IncrementMissedRequestCount();
     long CacheMisses { get; }
 
-    double HitRatio => TotalRequests == 0 ? 0 : (double)CacheHits / TotalRequests;
+    double HitRatio { get; }
 
     public void IncrementEvictionCount();
     long EvictionCount { get; }
@@ -42,8 +42,27 @@ public class CacheStats : ICacheStats
     public void IncrementRequestCount() => Interlocked.Increment(ref _totalRequests);
     public long TotalRequests => _totalRequests;
 
+    public long CacheHits
+    {
+        get
+        {
+            var requests = TotalRequests;
+            var misses = CacheMisses;
+            return requests - misses;
+        }
+    }
+
     public void IncrementMissedRequestCount() => Interlocked.Increment(ref _cacheMisses);
     public long CacheMisses => _cacheMisses;
+
+    public double HitRatio
+    {
+        get
+        {
+            var requests = TotalRequests;
+            return requests == 0 ? 0 : (double)CacheHits / requests;
+        }
+    }
 
     public void IncrementEvictionCount() => Interlocked.Increment(ref _evictionCount);
     public long EvictionCount => _evictionCount;

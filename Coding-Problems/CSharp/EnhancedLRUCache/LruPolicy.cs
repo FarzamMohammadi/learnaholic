@@ -2,7 +2,6 @@
 
 public enum TtlPolicy
 {
-    None = 0,
     Absolute = 1, // Items expire at a specific datetime
     Sliding = 2   // Items expire after period of non-use
 }
