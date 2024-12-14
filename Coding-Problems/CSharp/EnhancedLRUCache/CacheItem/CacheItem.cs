@@ -16,7 +16,7 @@ public class CacheItem<TValue> : ICacheItem
     public long Size { get; }
     private DateTime? AbsoluteExpiration { get; }
     private TimeSpan? SlidingExpiration { get; }
-    private DateTime LastAccessed { get; set; }
+    public DateTime LastAccessed { get; private set; }
 
     public bool HasExpiration => AbsoluteExpiration.HasValue || SlidingExpiration.HasValue;
 
@@ -26,6 +26,7 @@ public class CacheItem<TValue> : ICacheItem
         TimeSpan? slidingExpiration = null)
     {
         if (absoluteExpiration.HasValue && absoluteExpiration <= DateTime.UtcNow) throw new ArgumentOutOfRangeException(nameof(absoluteExpiration), "Absolute Expiration older than UTC now!");
+
         if (slidingExpiration.HasValue && slidingExpiration <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(slidingExpiration), "Sliding expiration must be positive");
 
         Value = value;
