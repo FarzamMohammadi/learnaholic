@@ -26,7 +26,7 @@ public class CacheCustodian<TKey, TValue>
 {
     private Timer? _timer;
 
-    private readonly TimeSpan _cleanupInterval = cleanupInterval == TimeSpan.Zero
+    private readonly TimeSpan _cleanupInterval = cleanupInterval <= TimeSpan.Zero
         ? throw new ArgumentOutOfRangeException(nameof(cleanupInterval))
         : cleanupInterval;
 
