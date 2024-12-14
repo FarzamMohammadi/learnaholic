@@ -1,10 +1,11 @@
-﻿using EnhancedLRUCache.CacheItem;
+﻿using EnhancedLRUCache;
+using EnhancedLRUCache.CacheItem;
 using EnhancedLRUCache.Errors;
 using Moq;
 using Xunit;
 using static System.Threading.Thread;
 
-namespace EnhancedLRUCache.Tests;
+namespace EnhancedLRUCacheTests;
 
 public class CacheCustodianTests
 {

@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using EnhancedLRUCache;
+using Xunit;
 
-namespace EnhancedLRUCache.Tests;
+namespace EnhancedLRUCacheTests;
 
 public class CacheStatsTests
 {

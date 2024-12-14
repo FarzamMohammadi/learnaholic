@@ -3,7 +3,7 @@ using EnhancedLRUCache.CacheItem;
 using Xunit;
 using static System.Threading.Thread;
 
-namespace EnhancedLRUCache.Tests;
+namespace EnhancedLRUCacheTests;
 
 public class CacheItemTests
 {
