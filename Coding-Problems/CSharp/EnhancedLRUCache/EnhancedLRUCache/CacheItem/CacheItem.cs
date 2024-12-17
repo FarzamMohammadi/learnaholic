@@ -14,8 +14,8 @@ public class CacheItem<TValue> : ICacheItem
 {
     public TValue? Value { get; }
     public long Size { get; }
-    private DateTime? AbsoluteExpiration { get; }
-    private TimeSpan? SlidingExpiration { get; }
+    public DateTime? AbsoluteExpiration { get; }
+    public TimeSpan? SlidingExpiration { get; }
     public DateTime LastAccessed { get; private set; }
 
     public bool HasExpiration => AbsoluteExpiration.HasValue || SlidingExpiration.HasValue;
