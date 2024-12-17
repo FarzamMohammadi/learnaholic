@@ -87,25 +87,25 @@ public class LruStorage<TKey, TValue>
         // We prioritize new entry and evict items until enough space is available
         while (Count > 0 && cacheItem.Size + CurrentMemorySize > _maximumMemorySize) EvictLastEntry();
 
-        // Add failsafe here in case our initial calculation was correct (after all, it's all estimation)
+        // Add failsafe here in case our initial calculation was incorrect (after all, it's all estimation)
         if (cacheItem.Size + CurrentMemorySize > _maximumMemorySize)
         {
             error = CacheAdditionError.MaxMemorySizeExceeded;
             return false;
         }
 
+        // Check if we need to evict for item count BEFORE adding
+        if (_store.Count >= _maximumItemCount)
+        {
+            EvictLastEntry();
+        }
+
         error = CacheAdditionError.None;
 
         var newNode = new LinkedListNode<(TKey Key, CacheItem<TValue> CacheItem)>((key, cacheItem));
-
         _index[key] = newNode;
         _store.AddFirst(newNode);
-
         CurrentMemorySize += cacheItem.Size;
-
-        if (_store.Count < _maximumItemCount) return true;
-
-        EvictLastEntry();
 
         return true;
     }
@@ -158,9 +158,9 @@ public class LruStorage<TKey, TValue>
     public IReadOnlyCollection<TKey> GetExpiredKeys()
     {
         return _store.Where(entry => entry.CacheItem.IsExpired())
-            .Select(cacheItem => cacheItem.Key)
-            .ToList()
-            .AsReadOnly();
+                     .Select(cacheItem => cacheItem.Key)
+                     .ToList()
+                     .AsReadOnly();
     }
 
     private void OnItemEvicted(TKey key, TValue? value)
