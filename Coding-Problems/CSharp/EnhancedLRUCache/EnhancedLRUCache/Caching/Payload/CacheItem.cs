@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace EnhancedLRUCache.CacheItem;
+namespace EnhancedLRUCache.Caching.Payload;
 
 public interface ICacheItem
 {
@@ -25,12 +25,15 @@ public class CacheItem<TValue> : ICacheItem
         DateTime? absoluteExpiration = null,
         TimeSpan? slidingExpiration = null)
     {
-        if (absoluteExpiration.HasValue && absoluteExpiration <= DateTime.UtcNow) throw new ArgumentOutOfRangeException(nameof(absoluteExpiration), "Absolute Expiration older than UTC now!");
+        if (absoluteExpiration.HasValue && absoluteExpiration <= DateTime.UtcNow)
+            throw new ArgumentOutOfRangeException(nameof(absoluteExpiration), "Absolute Expiration older than UTC now!");
 
-        if (slidingExpiration.HasValue && slidingExpiration <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(slidingExpiration), "Sliding expiration must be positive");
+        if (slidingExpiration.HasValue && slidingExpiration <= TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(slidingExpiration), "Sliding expiration must be positive");
+
+        Size = GetObjectSize(value);
 
         Value = value;
-        Size = GetObjectSize(value);
         AbsoluteExpiration = absoluteExpiration;
         SlidingExpiration = slidingExpiration;
         LastAccessed = DateTime.UtcNow;
@@ -57,7 +60,7 @@ public class CacheItem<TValue> : ICacheItem
 
         if (SlidingExpiration.HasValue) return LastAccessed + SlidingExpiration.Value;
 
-        throw new InvalidOperationException("Attempted to retrieve cache entry expiration time but neither Absolute or Sliding expiration time was set");
+        throw new InvalidOperationException("Cache entry has no expiration time set (both absolute and sliding expiration are null)");
     }
 
     private static long GetObjectSize(TValue? obj)

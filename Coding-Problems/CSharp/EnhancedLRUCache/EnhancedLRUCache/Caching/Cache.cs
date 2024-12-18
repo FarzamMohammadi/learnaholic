@@ -1,7 +1,9 @@
-﻿using EnhancedLRUCache.CacheItem;
-using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.Caching.Core;
+using EnhancedLRUCache.Caching.Errors;
+using EnhancedLRUCache.Caching.Monitoring;
+using EnhancedLRUCache.Caching.Payload;
 
-namespace EnhancedLRUCache;
+namespace EnhancedLRUCache.Caching;
 
 public interface ILruCache<TKey, TValue> : IDisposable
 {
@@ -15,40 +17,43 @@ public interface ILruCache<TKey, TValue> : IDisposable
     public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 }
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
+public class Cache<TKey, TValue> : ILruCache<TKey, TValue>
     where TKey : notnull
 {
-    private readonly ILruStorage<TKey, TValue> _storage;
+    private readonly CacheStorage<TKey, TValue> _cacheStorage;
     private readonly CacheCustodian<TKey, TValue> _custodian;
-    private readonly ILruPolicy _policy;
-    private readonly ICacheStats _stats;
+    private readonly IEvictionPolicy _policy;
 
+    private bool _disposed;
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly TimeSpan _lockTimeout;
-    private bool _disposed;
+    private readonly TimeSpan _defaultLockTimout = TimeSpan.FromMinutes(3);
+    private readonly TimeSpan _defaultCleanupInterval = TimeSpan.FromMinutes(10);
+
+    private readonly ICacheMetricsInternal _metrics = new CacheMetrics();
+    public ICacheMetrics Metrics => _metrics;
 
     public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemExpired;
     public event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 
-    public LruCache(
-        ILruStorage<TKey, TValue> storage,
-        ILruPolicy policy,
-        ICacheStats stats,
+    public Cache(
+        int maxItemCount,
+        int maxMemorySize,
+        IEvictionPolicy policy,
         TimeSpan? lockTimeout = null,
         TimeSpan? cleanupInterval = null,
-        TimeSpan? cleanupRetryInterval = null
-    )
+        TimeSpan? cleanupRetryInterval = null)
     {
-        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
         _policy = policy ?? throw new ArgumentNullException(nameof(policy));
-        _stats = stats ?? throw new ArgumentNullException(nameof(stats));
 
-        _lockTimeout = lockTimeout ?? TimeSpan.FromMinutes(3);
+        _lockTimeout = lockTimeout ?? _defaultLockTimout;
 
-        _storage.ItemEvicted += OnStorageItemEvicted;
+        _cacheStorage = new CacheStorage<TKey, TValue>(maxItemCount, maxMemorySize);
+
+        _cacheStorage.ItemEvicted += OnCacheStorageEvicted;
 
         _custodian = new CacheCustodian<TKey, TValue>(
-            cleanupInterval ?? TimeSpan.FromMinutes(10),
+            cleanupInterval ?? _defaultCleanupInterval,
             cleanupRetryInterval,
             this
         );
@@ -90,9 +95,9 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            _stats.IncrementRequestCount();
+            _metrics.IncrementRequestCount();
 
-            var itemSuccessfullyAdded = _storage.TryPut(key, newCacheEntry, out var storageError);
+            var itemSuccessfullyAdded = _cacheStorage.TryPut(key, newCacheEntry, out var storageError);
 
             if (!itemSuccessfullyAdded)
             {
@@ -100,8 +105,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
                 return false;
             }
 
-            _stats.UpdateItemCount(1);
-            _stats.UpdateMemory(newCacheEntry.Size);
+            _metrics.AddNewItem(newCacheEntry.Size);
 
             error = CacheAdditionError.None;
             return true;
@@ -127,11 +131,11 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            _stats.IncrementRequestCount();
+            _metrics.IncrementRequestCount();
 
-            if (!_storage.TryGet(key, out var cacheItem))
+            if (!_cacheStorage.TryGet(key, out var cacheItem))
             {
-                _stats.IncrementMissedRequestCount();
+                _metrics.IncrementMissedRequestCount();
 
                 error = CacheRetrievalError.ItemNotFound;
                 return false;
@@ -141,8 +145,8 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
             {
                 OnItemExpired(key, value);
 
-                _stats.IncrementMissedRequestCount();
-                _stats.IncrementExpiredCount();
+                _metrics.IncrementMissedRequestCount();
+                _metrics.IncrementExpiredCount();
 
                 // Schedule async removal of expired item
                 Task.Run(() => Remove(key, out _, out _));
@@ -177,7 +181,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            var found = _storage.TryGet(key, out var entry);
+            var found = _cacheStorage.TryGet(key, out var entry);
 
             if (!found)
             {
@@ -185,10 +189,9 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
                 return false;
             }
 
-            _storage.Remove(key);
+            _cacheStorage.Remove(key);
 
-            _stats.UpdateItemCount(-1);
-            _stats.UpdateMemory(-entry.Size);
+            _metrics.RemoveItem(entry.Size);
 
             value = entry.Value;
             error = CacheRemovalError.None;
@@ -215,7 +218,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            var expiredKeys = _storage.GetExpiredKeys();
+            var expiredKeys = _cacheStorage.GetExpiredKeys();
 
             error = CacheRetrievalError.None;
             return expiredKeys;
@@ -232,9 +235,9 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            _storage.Clear();
+            _cacheStorage.Clear();
 
-            _stats.ClearMetrics();
+            _metrics.ClearMetrics();
 
             return true;
         }
@@ -266,7 +269,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
     private void ThrowIfDisposed()
     {
-        if (_disposed) throw new ObjectDisposedException(nameof(LruCache<TKey, TValue>));
+        if (_disposed) throw new ObjectDisposedException(nameof(Cache<TKey, TValue>));
     }
 
     // Following the standard IDisposable pattern rather than a simple Dispose() implementation
@@ -294,11 +297,15 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
     private void OnCustodianItemExpired(object? sender, CacheItemEventArgs<TKey, TValue> item)
     {
+        _metrics.IncrementExpiredCount();
+
         OnItemExpired(item.Key, item.Value);
     }
 
-    private void OnStorageItemEvicted(object? sender, CacheItemEventArgs<TKey, TValue> item)
+    private void OnCacheStorageEvicted(object? sender, CacheItemEventArgs<TKey, TValue> item)
     {
+        _metrics.IncrementEvictionCount();
+
         OnItemEvicted(item.Key, item.Value);
     }
 

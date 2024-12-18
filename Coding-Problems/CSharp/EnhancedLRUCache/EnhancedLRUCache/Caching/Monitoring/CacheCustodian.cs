@@ -1,7 +1,7 @@
-﻿using EnhancedLRUCache.CacheItem;
-using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.Caching.Errors;
+using EnhancedLRUCache.Caching.Payload;
 
-namespace EnhancedLRUCache;
+namespace EnhancedLRUCache.Caching.Monitoring;
 
 public interface ICacheCustodian<TKey, TValue> : IDisposable
 {
@@ -24,6 +24,7 @@ public class CacheCustodian<TKey, TValue>
 ) : ICacheCustodian<TKey, TValue>
     where TKey : notnull
 {
+    private const int MaxKeyRetrievalRetries = 3;
     private Timer? _timer;
 
     private readonly TimeSpan _cleanupInterval = cleanupInterval <= TimeSpan.Zero
@@ -63,12 +64,11 @@ public class CacheCustodian<TKey, TValue>
         {
             try
             {
-                const int maxRetries = 3;
                 var keyFetchAttempt = 0;
 
                 IReadOnlyCollection<TKey> expiredKeys = [];
 
-                while (keyFetchAttempt < maxRetries)
+                while (keyFetchAttempt < MaxKeyRetrievalRetries)
                 {
                     expiredKeys = _cache.GetExpiredKeys(out var error);
 
@@ -76,7 +76,7 @@ public class CacheCustodian<TKey, TValue>
 
                     keyFetchAttempt++;
 
-                    // If no retry interval specified, exit immediately to avoid contention
+                    // Early exit if no retry interval is configured
                     if (!_cleanupFailureRetryInterval.HasValue) return;
 
                     Thread.Sleep(_cleanupFailureRetryInterval.Value);

@@ -1,4 +1,4 @@
-﻿namespace EnhancedLRUCache.CacheItem;
+﻿namespace EnhancedLRUCache.Caching.Payload;
 
 public class CacheItemEventArgs<TKey, TValue>
 (
