@@ -7,6 +7,7 @@ public interface ILruStorage<TKey, TValue>
 {
     public bool ContainsKey(TKey key);
     public bool TryGet(TKey key, out CacheItem<TValue> cacheItem);
+    public bool TryGetWithoutRefresh(TKey key, out CacheItem<TValue> cacheItem);
     public bool TryPut(TKey key, CacheItem<TValue> cacheItem, out CacheAdditionError? error);
     public void Remove(TKey key);
     public void Clear();
@@ -61,6 +62,20 @@ public class LruStorage<TKey, TValue>
 
         cacheItem.RefreshLastAccessed();
 
+        return true;
+    }
+    
+    public bool TryGetWithoutRefresh(TKey key, out CacheItem<TValue> cacheItem)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+
+        if (!_index.TryGetValue(key, out var kvp))
+        {
+            cacheItem = default!;
+            return false;
+        }
+
+        cacheItem = kvp.Value.CacheItem;
         return true;
     }
 

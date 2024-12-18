@@ -177,7 +177,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            var found = _storage.TryGet(key, out var entry);
+            var found = _storage.TryGetWithoutRefresh(key, out var entry);
 
             if (!found)
             {

@@ -76,26 +76,22 @@ public class CacheCustodian<TKey, TValue>
 
                     keyFetchAttempt++;
 
-                    // If no retry interval specified, exit immediately to avoid contention
                     if (!_cleanupFailureRetryInterval.HasValue) return;
-
                     Thread.Sleep(_cleanupFailureRetryInterval.Value);
                 }
 
                 foreach (var key in expiredKeys)
                 {
-                    var successfullyRemoved = _cache.Remove(key, out var value, out _);
-
-                    if (successfullyRemoved)
+                    if (_cache.Remove(key, out var value, out var removeError))
                     {
                         OnItemExpired(key, value);
-                        continue;
                     }
+                    else if (removeError != CacheRemovalError.ItemNotFound)
+                    {
+                        if (!_cleanupFailureRetryInterval.HasValue) return;
 
-                    // Same here - exit immediately if no retry interval
-                    if (!_cleanupFailureRetryInterval.HasValue) return;
-
-                    Thread.Sleep(_cleanupFailureRetryInterval.Value);
+                        Thread.Sleep(_cleanupFailureRetryInterval.Value);
+                    }
                 }
             }
             catch (Exception e)
@@ -108,7 +104,10 @@ public class CacheCustodian<TKey, TValue>
         }
     }
 
-    private void OnItemExpired(TKey key, TValue? value) => ItemExpired?.Invoke(this, new CacheItemEventArgs<TKey, TValue>(key, value, DateTime.UtcNow));
+    private void OnItemExpired(TKey key, TValue? value)
+    {
+        ItemExpired?.Invoke(this, new CacheItemEventArgs<TKey, TValue>(key, value, DateTime.UtcNow));
+    }
 
     public void Stop()
     {
