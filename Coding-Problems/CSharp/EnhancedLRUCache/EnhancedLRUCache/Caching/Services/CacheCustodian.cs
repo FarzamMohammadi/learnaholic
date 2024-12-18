@@ -1,7 +1,7 @@
-﻿using EnhancedLRUCache.CacheItem;
-using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.Caching.CacheItem;
+using EnhancedLRUCache.Caching.Errors;
 
-namespace EnhancedLRUCache;
+namespace EnhancedLRUCache.Caching.Services;
 
 public interface ICacheCustodian<TKey, TValue> : IDisposable
 {

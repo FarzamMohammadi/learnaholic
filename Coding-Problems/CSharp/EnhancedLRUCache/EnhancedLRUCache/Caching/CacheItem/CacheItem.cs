@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace EnhancedLRUCache.CacheItem;
+namespace EnhancedLRUCache.Caching.CacheItem;
 
 public interface ICacheItem
 {

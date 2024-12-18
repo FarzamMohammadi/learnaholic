@@ -1,6 +1,8 @@
-﻿namespace EnhancedLRUCache;
+﻿using EnhancedLRUCache.Caching.CacheItem;
 
-public interface ICacheStats
+namespace EnhancedLRUCache.Caching.Services;
+
+public interface ICacheStats<TValue>
 {
     public void IncrementRequestCount();
     long TotalRequests { get; }
@@ -25,9 +27,11 @@ public interface ICacheStats
     long TotalMemoryBytes { get; }
 
     public void ClearMetrics();
+    
+    void UpdateCountAndMemory(CacheItem<TValue> items);
 }
 
-public class CacheStats : ICacheStats
+public class CacheStats<TValue> : ICacheStats<TValue>
 {
     // The Interlocked class ensures atomic operations for thread-safe counting
     // https://learn.microsoft.com/en-us/dotnet/api/system.threading.interlocked?view=net-9.0
@@ -85,4 +89,24 @@ public class CacheStats : ICacheStats
         Interlocked.Exchange(ref _itemCount, 0);
         Interlocked.Exchange(ref _totalMemory, 0);
     }
+
+    public void UpdateCountAndMemoryOnAddition(CacheItem<TValue> items)
+    {
+        foreach (var item in items)
+        {
+            Interlocked.Add(ref _itemCount, 1);
+            Interlocked.Add(ref _itemCount, 1);
+        }
+    } 
+    
+    public void UpdateCountAndMemoryOnRemoval(CacheItem<TValue> items)
+    {
+        foreach (var item in items)
+        {
+            Interlocked.Add(ref _itemCount, 1);
+            Interlocked.Add(ref _itemCount, 1);
+        }
+    }
+    
+    /// Can we use an event to update counts?
 }

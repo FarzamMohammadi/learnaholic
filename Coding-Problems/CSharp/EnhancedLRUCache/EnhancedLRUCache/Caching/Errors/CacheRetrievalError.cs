@@ -1,4 +1,4 @@
-﻿namespace EnhancedLRUCache.Errors;
+﻿namespace EnhancedLRUCache.Caching.Errors;
 
 public enum CacheRetrievalError
 {

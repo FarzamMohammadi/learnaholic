@@ -1,7 +1,8 @@
-﻿using EnhancedLRUCache.CacheItem;
-using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.Caching.CacheItem;
+using EnhancedLRUCache.Caching.Errors;
+using EnhancedLRUCache.Caching.Services;
 
-namespace EnhancedLRUCache;
+namespace EnhancedLRUCache.Caching;
 
 public interface ILruCache<TKey, TValue> : IDisposable
 {
@@ -100,8 +101,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
                 return false;
             }
 
-            _stats.UpdateItemCount(1);
-            _stats.UpdateMemory(newCacheEntry.Size);
+            _stats.UpdateCountAndMemory([newCacheEntry]);
 
             error = CacheAdditionError.None;
             return true;

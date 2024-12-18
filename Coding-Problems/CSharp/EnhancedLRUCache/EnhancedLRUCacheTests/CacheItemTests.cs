@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using EnhancedLRUCache.CacheItem;
+using EnhancedLRUCache.Caching.CacheItem;
 using Xunit;
 using static System.Threading.Thread;
 

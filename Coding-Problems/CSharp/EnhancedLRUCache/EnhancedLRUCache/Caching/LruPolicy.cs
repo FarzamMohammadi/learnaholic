@@ -1,4 +1,4 @@
-﻿namespace EnhancedLRUCache;
+﻿namespace EnhancedLRUCache.Caching;
 
 public enum TtlPolicy
 {

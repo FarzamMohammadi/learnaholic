@@ -1,4 +1,5 @@
 ﻿using EnhancedLRUCache;
+using EnhancedLRUCache.Caching;
 using Xunit;
 
 namespace EnhancedLRUCacheTests;

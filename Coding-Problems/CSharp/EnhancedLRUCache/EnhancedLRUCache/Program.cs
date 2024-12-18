@@ -1,5 +1,8 @@
-﻿using EnhancedLRUCache;
-using EnhancedLRUCache.Errors;
+﻿using EnhancedLRUCache.Caching;
+using EnhancedLRUCache.Caching.Errors;
+using EnhancedLRUCache.Caching.Services;
+
+namespace EnhancedLRUCache;
 
 class Program
 {
