@@ -14,7 +14,8 @@ public interface ILruStorage<TKey, TValue>
 
     public int Count { get; }
     public long CurrentMemorySize { get; }
-    public bool IsFull { get; }
+    public bool CountIsFull { get; }
+    public bool MemoryIsFull { get; }
 
     event EventHandler<CacheItemEventArgs<TKey, TValue>>? ItemEvicted;
 }
@@ -36,7 +37,8 @@ public class LruStorage<TKey, TValue>
 
     public int Count => _store.Count;
     public long CurrentMemorySize { get; private set; }
-    public bool IsFull => Count >= _maximumItemCount || CurrentMemorySize >= _maximumMemorySize;
+    public bool CountIsFull => Count >= _maximumItemCount;
+    public bool MemoryIsFull => CurrentMemorySize >= _maximumMemorySize;
 
     public bool ContainsKey(TKey key) => _index.ContainsKey(key);
 
@@ -67,12 +69,13 @@ public class LruStorage<TKey, TValue>
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(cacheItem);
 
+        // Class? memory validation
         if (cacheItem.Size > _maximumMemorySize)
         {
             error = CacheAdditionError.MaxMemorySizeExceeded;
             return false;
         }
-        
+
         if (_index.ContainsKey(key))
         {
             RefreshCacheItem(key, cacheItem);
@@ -81,21 +84,13 @@ public class LruStorage<TKey, TValue>
             return true;
         }
 
-        // We prioritize new entry and evict items until enough space is available
-        while (Count > 0 && cacheItem.Size + CurrentMemorySize > _maximumMemorySize) EvictLastEntry();
-
-        // Add failsafe here in case our initial calculation was incorrect (after all, it's all estimation)
-        if (cacheItem.Size + CurrentMemorySize > _maximumMemorySize)
+        if (!TryEvictUntilEnoughMemoryIsAvailable(cacheItem))
         {
             error = CacheAdditionError.MaxMemorySizeExceeded;
             return false;
         }
 
-        // Check if we need to evict for item count BEFORE adding
-        if (_store.Count >= _maximumItemCount)
-        {
-            EvictLastEntry();
-        }
+        if (CountIsFull) EvictLastEntry();
 
         error = CacheAdditionError.None;
 
@@ -105,6 +100,14 @@ public class LruStorage<TKey, TValue>
         CurrentMemorySize += cacheItem.Size;
 
         return true;
+    }
+
+    private bool TryEvictUntilEnoughMemoryIsAvailable(CacheItem<TValue> cacheItem)
+    {
+        while (Count > 0 && cacheItem.Size + CurrentMemorySize > _maximumMemorySize) EvictLastEntry();
+
+        // Add failsafe here in case our initial calculation was incorrect (after all, it's all estimation)
+        return cacheItem.Size + CurrentMemorySize <= _maximumMemorySize;
     }
 
     private void EvictLastEntry()
