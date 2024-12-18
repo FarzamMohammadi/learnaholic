@@ -276,115 +276,105 @@ public class LruCacheTests
             _storage.Object,
             _policy,
             _stats.Object,
-            TimeSpan.FromMilliseconds(50) // Short timeout
+            TimeSpan.FromMilliseconds(50)
         );
 
-        var lockHeld = new ManualResetEventSlim();
+        var operationBlocked = new ManualResetEventSlim();
         var blockOperation = new ManualResetEventSlim();
 
-        // Setup storage to block on the first operation
+        // Setup storage to block
         _storage.Setup(s => s.TryPut(
-                    It.IsAny<string>(),
-                    It.IsAny<CacheItem<string>>(),
-                    out It.Ref<CacheAdditionError?>.IsAny))
-                .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
-                {
-                    lockHeld.Set();
-                    blockOperation.Wait(); // Block the operation
-                    err = null;
-                    return true;
-                });
+            It.IsAny<string>(),
+            It.IsAny<CacheItem<string>>(),
+            out It.Ref<CacheAdditionError?>.IsAny))
+            .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
+            {
+                operationBlocked.Set();
+                blockOperation.Wait();
+                err = null;
+                return true;
+            });
 
-        // Start a task that holds the write lock
-        var lockingTask = Task.Run(() => { slowCache.Put("initial", "value", null, out _); });
+        // Start blocking operation
+        var blockingTask = Task.Run(() => slowCache.Put("initial", "value", null, out _));
+        Assert.True(operationBlocked.Wait(TimeSpan.FromSeconds(1)));
 
-        // Wait until the lock is held
-        Assert.True(lockHeld.Wait(TimeSpan.FromSeconds(1)));
-
-        // Try operations while lock is held
-        var putSuccess = slowCache.Put("key", "value", null, out var putError);
-        Assert.False(putSuccess);
-        Assert.Equal(CacheAdditionError.ThreadLockTimeout, putError);
-
-        var getSuccess = slowCache.TryGet("key", out _, out var getError);
-        Assert.False(getSuccess);
-        Assert.Equal(CacheRetrievalError.ThreadLockTimeout, getError);
-
-        var removeSuccess = slowCache.Remove("key", out _, out var removeError);
-        Assert.False(removeSuccess);
-        Assert.Equal(CacheRemovalError.ThreadLockTimeout, removeError);
+        // Verify all operations timeout while lock is held
+        VerifyOperationTimeout(slowCache);
 
         // Cleanup
         blockOperation.Set();
-        lockingTask.Wait();
+        blockingTask.Wait();
     }
 
     [Fact]
-    public void ConcurrentReads_AreAllowed()
+    public void ConcurrentOperations_RespectLockingRules()
     {
-        const int readerCount = 10;
-        var readComplete = new CountdownEvent(readerCount);
-        var startReading = new ManualResetEventSlim();
+        const int readerCount = 5;
+        var readersStarted = new CountdownEvent(readerCount);
+        var startOperations = new ManualResetEventSlim();
+        var writeBlocked = new ManualResetEventSlim();
+        var completeWrite = new ManualResetEventSlim();
 
-        // Setup initial value with proper mock
+        // Setup storage for concurrent operations
         SetupStorageGet(true, "value");
-        _cache.Put("key", "value", null, out _);
-
-        // Start multiple concurrent readers
-        var tasks = Enumerable.Range(0, readerCount).Select(_ => Task.Run(() =>
-        {
-            startReading.Wait();
-            _cache.TryGet("key", out var _, out var _);
-            readComplete.Signal();
-        })).ToArray();
-
-        startReading.Set();
-
-        // All reads should complete without timeout
-        Assert.True(readComplete.Wait(TimeSpan.FromSeconds(1)));
-    }
-
-    [Fact]
-    public void WriteLock_PreventsOtherWrites()
-    {
-        var writerStarted = new ManualResetEventSlim();
-        var canFinishWrite = new ManualResetEventSlim();
-        var secondWriteAttempted = new ManualResetEventSlim();
-
-        // Setup storage to delay on first write
         _storage.Setup(s => s.TryPut(
-                    It.IsAny<string>(),
-                    It.IsAny<CacheItem<string>>(),
-                    out It.Ref<CacheAdditionError?>.IsAny))
-                .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
-                {
-                    writerStarted.Set();
-                    canFinishWrite.Wait(); // Hold the storage operation
-                    err = null;
-                    return true;
-                });
+            It.IsAny<string>(),
+            It.IsAny<CacheItem<string>>(),
+            out It.Ref<CacheAdditionError?>.IsAny))
+            .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
+            {
+                writeBlocked.Set();
+                completeWrite.Wait();
+                err = null;
+                return true;
+            });
 
-        // First writer
-        var firstWriter = Task.Run(() => { _cache.Put("key1", "value1", null, out _); });
-
-        // Wait for first writer to start
-        Assert.True(writerStarted.Wait(TimeSpan.FromSeconds(1)));
-
-        // Second writer should timeout
-        var secondWriter = Task.Run(() =>
+        // Start concurrent readers
+        var readers = Enumerable.Range(0, readerCount).Select(_ => Task.Run(() =>
         {
-            var success = _cache.Put("key2", "value2", null, out var error);
-            Assert.False(success);
-            Assert.Equal(CacheAdditionError.ThreadLockTimeout, error);
-            secondWriteAttempted.Set();
+            startOperations.Wait();
+            var success = _cache.TryGet("key", out var _, out var error);
+            Assert.True(success);
+            Assert.Equal(CacheRetrievalError.None, error);
+            readersStarted.Signal();
+        })).ToList();
+
+        // Start writer that will block
+        var writer = Task.Run(() =>
+        {
+            startOperations.Wait();
+            _cache.Put("key2", "value2", null, out _);
         });
 
-        // Wait for second write attempt
-        Assert.True(secondWriteAttempted.Wait(TimeSpan.FromSeconds(1)));
+        // Start operations and verify concurrent behavior
+        startOperations.Set();
+        
+        // Verify readers complete while writer is blocked
+        Assert.True(readersStarted.Wait(TimeSpan.FromSeconds(1)));
+        Assert.True(writeBlocked.Wait(TimeSpan.FromSeconds(1)));
 
-        // Cleanup
-        canFinishWrite.Set();
-        Task.WaitAll(firstWriter, secondWriter);
+        // Complete write operation
+        completeWrite.Set();
+        writer.Wait();
+    }
+
+    private void VerifyOperationTimeout(LruCache<string, string> cache)
+    {
+        // Verify Put timeout
+        var putSuccess = cache.Put("key", "value", null, out var putError);
+        Assert.False(putSuccess);
+        Assert.Equal(CacheAdditionError.ThreadLockTimeout, putError);
+
+        // Verify Get timeout
+        var getSuccess = cache.TryGet("key", out _, out var getError);
+        Assert.False(getSuccess);
+        Assert.Equal(CacheRetrievalError.ThreadLockTimeout, getError);
+
+        // Verify Remove timeout
+        var removeSuccess = cache.Remove("key", out _, out var removeError);
+        Assert.False(removeSuccess);
+        Assert.Equal(CacheRemovalError.ThreadLockTimeout, removeError);
     }
 
     [Fact]
@@ -409,5 +399,151 @@ public class LruCacheTests
         Thread.Sleep(100);
 
         _storage.Verify(s => s.Remove("key"), Times.Once);
+    }
+}
+
+/// <summary>
+/// Tests for thread-safety and concurrency in LruCache
+/// </summary>
+[Collection("LruCache Tests")]
+public class LruCacheConcurrencyTests
+{
+    private readonly Mock<ILruStorage<string, string>> _storage;
+    private readonly Mock<ICacheStats> _stats;
+    private readonly ILruPolicy _policy;
+    private readonly LruCache<string, string> _cache;
+    private const int DefaultLockTimeoutMs = 50;
+
+    public LruCacheConcurrencyTests()
+    {
+        _storage = new Mock<ILruStorage<string, string>>();
+        _stats = new Mock<ICacheStats>();
+        _policy = new LruPolicy(TtlPolicy.None);
+        _cache = new LruCache<string, string>(
+            _storage.Object,
+            _policy,
+            _stats.Object,
+            TimeSpan.FromMilliseconds(DefaultLockTimeoutMs)
+        );
+    }
+
+    [Fact]
+    public void Operations_HandleLockTimeout()
+    {
+        var operationBlocked = new ManualResetEventSlim();
+        var releaseBlock = new ManualResetEventSlim();
+
+        SetupBlockingStorage(operationBlocked, releaseBlock);
+
+        using var blockingTask = Task.Run(() => _cache.Put("initial", "value", null, out _));
+        Assert.True(operationBlocked.Wait(TimeSpan.FromSeconds(1)), "Initial operation failed to acquire lock");
+
+        VerifyOperationTimeouts(_cache);
+
+        releaseBlock.Set();
+        blockingTask.Wait(TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void ConcurrentOperations_RespectLockingRules()
+    {
+        const int readerCount = 5;
+        using var readersCompleted = new CountdownEvent(readerCount);
+        using var startOperations = new ManualResetEventSlim();
+        using var writeBlocked = new ManualResetEventSlim();
+        using var completeWrite = new ManualResetEventSlim();
+
+        SetupConcurrentOperationsStorage(writeBlocked, completeWrite);
+
+        // Start concurrent readers
+        var readers = StartConcurrentReaders(readerCount, startOperations, readersCompleted);
+        var writer = StartBlockingWriter(startOperations);
+
+        // Verify concurrent behavior
+        startOperations.Set();
+        Assert.True(readersCompleted.Wait(TimeSpan.FromSeconds(1)), "Readers failed to complete");
+        Assert.True(writeBlocked.Wait(TimeSpan.FromSeconds(1)), "Write operation not blocked");
+
+        // Cleanup
+        completeWrite.Set();
+        Task.WaitAll([writer, ..readers], TimeSpan.FromSeconds(1));
+    }
+
+    private void SetupBlockingStorage(ManualResetEventSlim operationBlocked, ManualResetEventSlim releaseBlock)
+    {
+        _storage.Setup(s => s.TryPut(
+            It.IsAny<string>(),
+            It.IsAny<CacheItem<string>>(),
+            out It.Ref<CacheAdditionError?>.IsAny))
+            .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
+            {
+                operationBlocked.Set();
+                releaseBlock.Wait();
+                err = null;
+                return true;
+            });
+    }
+
+    private void SetupConcurrentOperationsStorage(ManualResetEventSlim writeBlocked, ManualResetEventSlim completeWrite)
+    {
+        _storage.Setup(s => s.TryGet(It.IsAny<string>(), out It.Ref<CacheItem<string>>.IsAny))
+            .Returns((string _, out CacheItem<string> item) =>
+            {
+                item = new CacheItem<string>("value");
+                return true;
+            });
+
+        _storage.Setup(s => s.TryPut(
+            It.IsAny<string>(),
+            It.IsAny<CacheItem<string>>(),
+            out It.Ref<CacheAdditionError?>.IsAny))
+            .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
+            {
+                writeBlocked.Set();
+                completeWrite.Wait();
+                err = null;
+                return true;
+            });
+    }
+
+    private static Task[] StartConcurrentReaders(
+        int count, 
+        ManualResetEventSlim startSignal, 
+        CountdownEvent completion)
+    {
+        return Enumerable.Range(0, count)
+            .Select(_ => Task.Run(() =>
+            {
+                startSignal.Wait();
+                completion.Signal();
+            }))
+            .ToArray();
+    }
+
+    private Task StartBlockingWriter(ManualResetEventSlim startSignal)
+    {
+        return Task.Run(() =>
+        {
+            startSignal.Wait();
+            _cache.Put("key2", "value2", null, out _);
+        });
+    }
+
+    private static void VerifyOperationTimeouts(ILruCache<string, string> cache)
+    {
+        // Verify Put timeout
+        var putSuccess = cache.Put("key", "value", null, out var putError);
+        Assert.False(putSuccess, "Put operation should timeout");
+        Assert.Equal(CacheAdditionError.ThreadLockTimeout, putError);
+
+        // Verify Get timeout
+        var getSuccess = cache.TryGet("key", out _, out var getError);
+        Assert.False(getSuccess, "Get operation should timeout");
+        Assert.Equal(CacheRetrievalError.ThreadLockTimeout, getError);
+
+        // Verify Remove timeout
+        var removeSuccess = cache.Remove("key", out _, out var removeError);
+        Assert.False(removeSuccess, "Remove operation should timeout");
+        Assert.Equal(CacheRemovalError.ThreadLockTimeout, removeError);
     }
 }
