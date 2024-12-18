@@ -119,58 +119,56 @@ public class LruCacheTests
         Assert.Equal(CacheRetrievalError.None, error);
     }
 
-    // [Theory]
-    // [InlineData(true)]  // ItemEvicted
-    // [InlineData(false)] // ItemExpired
-    // public void Events_PropagateCorrectly(bool isEvicted)
-    // {
-    //     var item = new CacheItemEventArgs<string, string>("key", "value", DateTime.UtcNow);
-    //     var eventRaised = false;
-    //
-    //     if (isEvicted)
-    //     {
-    //         _cache.ItemEvicted += (_, _) => eventRaised = true;
-    //         _storage.Raise(s => s.ItemEvicted += null, null, item);
-    //     }
-    //     else
-    //     {
-    //         _cache.ItemExpired += (_, _) => eventRaised = true;
-    //         _custo.Raise(s => s.ItemExpired += null, null, item);
-    //     }
-    //
-    //     Assert.True(eventRaised);
-    // }
+    [Theory]
+    [InlineData(true)]  // ItemEvicted
+    [InlineData(false)] // ItemExpired
+    public void Events_PropagateCorrectly(bool isEvicted)
+    {
+        var eventRaised = false;
+        var testKey = "key";
+        var testValue = "value";
+
+        if (isEvicted)
+        {
+            var eventArgs = new CacheItemEventArgs<string, string>(testKey, testValue, DateTime.UtcNow);
+            _cache.ItemEvicted += (_, _) => eventRaised = true;
+            _storage.Raise(s => s.ItemEvicted += null, this, eventArgs);
+        }
+        else
+        {
+            _cache.ItemExpired += (_, _) => eventRaised = true;
+
+            // Create a valid cache item that expires in the future
+            var expiredItem = new CacheItem<string>(testValue, DateTime.UtcNow.AddMilliseconds(50));
+
+            _storage.Setup(s => s.TryGet(It.IsAny<string>(), out It.Ref<CacheItem<string>>.IsAny))
+                    .Returns((string _, out CacheItem<string> item) =>
+                    {
+                        item = expiredItem;
+                        return true;
+                    });
+
+            // Wait for it to expire
+            Thread.Sleep(51);
+
+            _cache.TryGet(testKey, out _, out _);
+        }
+
+        Assert.True(eventRaised);
+    }
 
     [Fact]
     public void Dispose_PreventsFurtherOperations()
     {
         _cache.Dispose();
+        _cache.Dispose(); // Should handle multiple calls
 
-        Assert.Throws<ObjectDisposedException>(() =>
-            _cache.Put("key", "value", null, out _)
-        );
-        Assert.Throws<ObjectDisposedException>(() =>
-            _cache.TryGet("key", out _, out _)
-        );
-    }
-
-    [Fact]
-    public void Operations_HandleLockTimeout()
-    {
-        var slowCache = new LruCache<string, string>(
-            _storage.Object,
-            _policy,
-            _stats.Object,
-            TimeSpan.FromMilliseconds(1) // Very short timeout
-        );
-
-        // Hold write lock to force timeout
-        _storage.Setup(s => s.TryPut(It.IsAny<string>(), It.IsAny<CacheItem<string>>(), out It.Ref<CacheAdditionError?>.IsAny))
-                .Callback(() => Thread.Sleep(10));
-
-        var putSuccess = slowCache.Put("key", "value", null, out var putError);
-        Assert.False(putSuccess);
-        Assert.Equal(CacheAdditionError.ThreadLockTimeout, putError);
+        // Verify all operations throw ObjectDisposedException
+        Assert.Throws<ObjectDisposedException>(() => _cache.Put("key", "value", null, out _));
+        Assert.Throws<ObjectDisposedException>(() => _cache.TryGet("key", out _, out _));
+        Assert.Throws<ObjectDisposedException>(() => _cache.Remove("key", out _, out _));
+        Assert.Throws<ObjectDisposedException>(() => _cache.GetExpiredKeys(out _));
+        Assert.Throws<ObjectDisposedException>(() => _cache.Clear());
     }
 
     [Theory]
@@ -249,19 +247,6 @@ public class LruCacheTests
         _storage.Setup(s => s.Remove(It.IsAny<string>()));
     }
 
-    // [Fact]
-    // public void Dispose_CleanupsCustodianAndLock()
-    // {
-    //     var custodian = new Mock<ICacheCustodian>();
-    //     // Create cache with mocked custodian
-    //     var cache = new LruCache<string, string>(_storage.Object, _policy, _stats.Object);
-    //
-    //     cache.Dispose();
-    //
-    //     // Verify custodian is disposed
-    //     custodian.Verify(c => c.Dispose(), Times.Once);
-    // }
-
     [Theory]
     [InlineData(null, null, null)] // Default values
     [InlineData(1000, 5000, 1000)] // Custom values
@@ -284,38 +269,145 @@ public class LruCacheTests
         _storage.Verify(s => s.TryPut(It.IsAny<string>(), It.IsAny<CacheItem<string>>(), out It.Ref<CacheAdditionError?>.IsAny));
     }
 
-    // [Fact]
-    // public async Task TryGet_SchedulesExpiredItemRemoval()
-    // {
-    //     var expiredItem = new CacheItem<string>("value") { AbsoluteExpiration = DateTime.UtcNow.AddMinutes(-1) };
-    //     SetupStorageGet(true, expiredItem);
-    //
-    //     _cache.TryGet("key", out _, out _);
-    //
-    //     // Allow time for async removal
-    //     await Task.Delay(100);
-    //
-    //     _storage.Verify(s => s.Remove("key"), Times.Once);
-    // }
+    [Fact]
+    public void Operations_HandleLockTimeout()
+    {
+        var slowCache = new LruCache<string, string>(
+            _storage.Object,
+            _policy,
+            _stats.Object,
+            TimeSpan.FromMilliseconds(50) // Short timeout
+        );
 
-    // [Fact]
-    // public void Dispose_CleansUpResourcesAndPreventsOperations()
-    // {
-    //     var custodian = new Mock<ICacheCustodian>();
-    //     var cache = new LruCache<string, string>(
-    //         _storage.Object,
-    //         _policy,
-    //         _stats.Object
-    //     );
-    //
-    //     cache.Dispose();
-    //     cache.Dispose(); // Should handle multiple calls
-    //
-    //     // Verify operations throw
-    //     Assert.Throws<ObjectDisposedException>(() => cache.Put("key", "value", null, out _));
-    //     Assert.Throws<ObjectDisposedException>(() => cache.TryGet("key", out _, out _));
-    //     Assert.Throws<ObjectDisposedException>(() => cache.Remove("key", out _, out _));
-    //     Assert.Throws<ObjectDisposedException>(() => cache.GetExpiredKeys(out _));
-    //     Assert.Throws<ObjectDisposedException>(() => cache.Clear());
-    // }
+        var lockHeld = new ManualResetEventSlim();
+        var blockOperation = new ManualResetEventSlim();
+
+        // Setup storage to block on the first operation
+        _storage.Setup(s => s.TryPut(
+                    It.IsAny<string>(),
+                    It.IsAny<CacheItem<string>>(),
+                    out It.Ref<CacheAdditionError?>.IsAny))
+                .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
+                {
+                    lockHeld.Set();
+                    blockOperation.Wait(); // Block the operation
+                    err = null;
+                    return true;
+                });
+
+        // Start a task that holds the write lock
+        var lockingTask = Task.Run(() => { slowCache.Put("initial", "value", null, out _); });
+
+        // Wait until the lock is held
+        Assert.True(lockHeld.Wait(TimeSpan.FromSeconds(1)));
+
+        // Try operations while lock is held
+        var putSuccess = slowCache.Put("key", "value", null, out var putError);
+        Assert.False(putSuccess);
+        Assert.Equal(CacheAdditionError.ThreadLockTimeout, putError);
+
+        var getSuccess = slowCache.TryGet("key", out _, out var getError);
+        Assert.False(getSuccess);
+        Assert.Equal(CacheRetrievalError.ThreadLockTimeout, getError);
+
+        var removeSuccess = slowCache.Remove("key", out _, out var removeError);
+        Assert.False(removeSuccess);
+        Assert.Equal(CacheRemovalError.ThreadLockTimeout, removeError);
+
+        // Cleanup
+        blockOperation.Set();
+        lockingTask.Wait();
+    }
+
+    [Fact]
+    public void ConcurrentReads_AreAllowed()
+    {
+        const int readerCount = 10;
+        var readComplete = new CountdownEvent(readerCount);
+        var startReading = new ManualResetEventSlim();
+
+        // Setup initial value with proper mock
+        SetupStorageGet(true, "value");
+        _cache.Put("key", "value", null, out _);
+
+        // Start multiple concurrent readers
+        var tasks = Enumerable.Range(0, readerCount).Select(_ => Task.Run(() =>
+        {
+            startReading.Wait();
+            _cache.TryGet("key", out var _, out var _);
+            readComplete.Signal();
+        })).ToArray();
+
+        startReading.Set();
+
+        // All reads should complete without timeout
+        Assert.True(readComplete.Wait(TimeSpan.FromSeconds(1)));
+    }
+
+    [Fact]
+    public void WriteLock_PreventsOtherWrites()
+    {
+        var writerStarted = new ManualResetEventSlim();
+        var canFinishWrite = new ManualResetEventSlim();
+        var secondWriteAttempted = new ManualResetEventSlim();
+
+        // Setup storage to delay on first write
+        _storage.Setup(s => s.TryPut(
+                    It.IsAny<string>(),
+                    It.IsAny<CacheItem<string>>(),
+                    out It.Ref<CacheAdditionError?>.IsAny))
+                .Returns((string _, CacheItem<string> _, out CacheAdditionError? err) =>
+                {
+                    writerStarted.Set();
+                    canFinishWrite.Wait(); // Hold the storage operation
+                    err = null;
+                    return true;
+                });
+
+        // First writer
+        var firstWriter = Task.Run(() => { _cache.Put("key1", "value1", null, out _); });
+
+        // Wait for first writer to start
+        Assert.True(writerStarted.Wait(TimeSpan.FromSeconds(1)));
+
+        // Second writer should timeout
+        var secondWriter = Task.Run(() =>
+        {
+            var success = _cache.Put("key2", "value2", null, out var error);
+            Assert.False(success);
+            Assert.Equal(CacheAdditionError.ThreadLockTimeout, error);
+            secondWriteAttempted.Set();
+        });
+
+        // Wait for second write attempt
+        Assert.True(secondWriteAttempted.Wait(TimeSpan.FromSeconds(1)));
+
+        // Cleanup
+        canFinishWrite.Set();
+        Task.WaitAll(firstWriter, secondWriter);
+    }
+
+    [Fact]
+    public void TryGet_SchedulesExpiredItemRemoval()
+    {
+        // Create a valid cache item that expires in the future
+        var expiredItem = new CacheItem<string>("value", DateTime.UtcNow.AddMilliseconds(50));
+
+        _storage.Setup(s => s.TryGet(It.IsAny<string>(), out It.Ref<CacheItem<string>>.IsAny))
+                .Returns((string _, out CacheItem<string> item) =>
+                {
+                    item = expiredItem;
+                    return true;
+                });
+
+        // Wait for it to expire
+        Thread.Sleep(51);
+
+        _cache.TryGet("key", out _, out _);
+
+        // Allow time for async removal
+        Thread.Sleep(100);
+
+        _storage.Verify(s => s.Remove("key"), Times.Once);
+    }
 }
