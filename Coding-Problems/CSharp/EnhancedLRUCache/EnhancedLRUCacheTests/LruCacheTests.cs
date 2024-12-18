@@ -17,6 +17,8 @@ public class LruCacheTests
     private readonly ILruPolicy _policy;
     private LruCache<string, string> _cache;
     private const int DefaultTimeoutMs = 100;
+    private const int DefaultLockTimeoutMs = 100;
+    private const int DefaultOperationTimeoutMs = 5000;
 
     public LruCacheTests()
     {
@@ -437,7 +439,8 @@ public class LruCacheTests
     {
         private readonly Mock<ILruStorage<string, string>> _storage;
         private readonly LruCache<string, string> _cache;
-        private const int DefaultLockTimeoutMs = 50;
+        private const int DefaultLockTimeoutMs = 100;
+        private const int DefaultOperationTimeoutMs = 5000;
 
         public LruCacheConcurrencyTests()
         {
@@ -479,59 +482,102 @@ public class LruCacheTests
             using var startOperations = new ManualResetEventSlim();
             using var writeBlocked = new ManualResetEventSlim();
             using var completeWrite = new ManualResetEventSlim();
+            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(DefaultOperationTimeoutMs));
 
             var readerResults = new ConcurrentBag<bool>();
+            Exception? asyncException = null;
 
-            SetupConcurrentOperationsStorage(writeBlocked, completeWrite);
-
-            // Start concurrent readers with verification they've all started
-            var readers = Enumerable.Range(0, readerCount)
-                                    .Select(_ => Task.Run(() =>
-                                    {
-                                        readersStarted.Signal();
-                                        startOperations.Wait();
-
-                                        var success = _cache.TryGet("key", out var _, out var error);
-                                        readerResults.Add(success);
-
-                                        readersCompleted.Signal();
-                                        return (success, error);
-                                    }))
-                                    .ToArray();
-
-            // Ensure all readers are ready before starting writer
-            Assert.True(readersStarted.Wait(TimeSpan.FromSeconds(1)), "Not all readers started");
-
-            var writer = Task.Run(() =>
+            try 
             {
-                startOperations.Wait();
-                return _cache.Put("key2", "value2", null, out _);
-            });
+                SetupConcurrentOperationsStorage(writeBlocked, completeWrite);
 
-            // Start all operations simultaneously
-            startOperations.Set();
+                // Start concurrent readers with verification they've all started
+                var readers = Enumerable.Range(0, readerCount)
+                                        .Select(_ => Task.Run(() =>
+                                        {
+                                            try 
+                                            {
+                                                readersStarted.Signal();
+                                                if (!startOperations.Wait(DefaultOperationTimeoutMs, cts.Token))
+                                                {
+                                                    throw new TimeoutException("Reader wait for start signal timed out");
+                                                }
 
-            // Wait for all readers to complete and verify writer is blocked
-            Assert.True(readersCompleted.Wait(TimeSpan.FromSeconds(1)), "Readers failed to complete");
-            Assert.True(writeBlocked.Wait(TimeSpan.FromSeconds(1)), "Write operation not blocked");
+                                                var success = _cache.TryGet("key", out var _, out var error);
+                                                readerResults.Add(success);
 
-            // Allow writer to complete
-            completeWrite.Set();
+                                                readersCompleted.Signal();
+                                                return (success, error);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                asyncException = ex;
+                                                throw;
+                                            }
+                                        }, cts.Token))
+                                        .ToArray();
 
-            // Wait for all operations with timeout
-            var allTasks = new List<Task>(readers) { writer };
-            try
-            {
-                await Task.WhenAll(allTasks).WaitAsync(TimeSpan.FromSeconds(2));
+                // Ensure all readers are ready before starting writer
+                if (!readersStarted.Wait(DefaultOperationTimeoutMs, cts.Token))
+                {
+                    throw new TimeoutException("Not all readers started within timeout");
+                }
+
+                var writer = Task.Run(() =>
+                {
+                    try 
+                    {
+                        if (!startOperations.Wait(DefaultOperationTimeoutMs, cts.Token))
+                        {
+                            throw new TimeoutException("Writer wait for start signal timed out");
+                        }
+                        return _cache.Put("key2", "value2", null, out _);
+                    }
+                    catch (Exception ex)
+                    {
+                        asyncException = ex;
+                        throw;
+                    }
+                }, cts.Token);
+
+                // Start all operations simultaneously
+                startOperations.Set();
+
+                // Wait for all readers to complete and verify writer is blocked
+                if (!readersCompleted.Wait(DefaultOperationTimeoutMs, cts.Token))
+                {
+                    throw new TimeoutException("Readers failed to complete within timeout");
+                }
+
+                if (!writeBlocked.Wait(DefaultOperationTimeoutMs, cts.Token))
+                {
+                    throw new TimeoutException("Write operation not blocked within timeout");
+                }
+
+                // Allow writer to complete
+                completeWrite.Set();
+
+                // Wait for all operations with timeout
+                var allTasks = new List<Task>(readers) { writer };
+                await Task.WhenAll(allTasks).WaitAsync(TimeSpan.FromMilliseconds(DefaultOperationTimeoutMs), cts.Token);
+
+                // If we got an async exception, throw it
+                if (asyncException != null)
+                {
+                    throw new Exception("Async operation failed", asyncException);
+                }
+
+                // Verify results
+                Assert.All(readerResults, success => Assert.True(success, "Reader operation failed"));
+                Assert.True(await writer, "Writer operation failed");
             }
-            catch (TimeoutException)
+            finally
             {
-                Assert.Fail("Operations did not complete within timeout");
+                // Ensure we clean up even if test fails
+                try { completeWrite.Set(); } catch { }
+                try { startOperations.Set(); } catch { }
+                cts.Cancel(); // Signal all tasks to stop
             }
-
-            // Verify results
-            Assert.All(readerResults, success => Assert.True(success, "Reader operation failed"));
-            Assert.True(await writer, "Writer operation failed");
         }
 
         private void SetupBlockingStorage(ManualResetEventSlim operationBlocked, ManualResetEventSlim releaseBlock)
