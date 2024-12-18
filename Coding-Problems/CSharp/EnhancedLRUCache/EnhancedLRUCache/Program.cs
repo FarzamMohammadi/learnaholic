@@ -23,11 +23,13 @@ class Program
             cleanupInterval: TimeSpan.FromSeconds(5),
             cleanupRetryInterval: TimeSpan.FromSeconds(1)
         );
+        
+        cache.stats.Hits
+            
 
         // Subscribe to events
         cache.ItemExpired += (sender, e) => Console.WriteLine($"Item expired - Key: {e.Key}, Value: {e.Value}, Time: {e.Timestamp}");
         cache.ItemEvicted += (sender, e) => Console.WriteLine($"Item evicted - Key: {e.Key}, Value: {e.Value}, Time: {e.Timestamp}");
-
         try
         {
             // Test 1: Basic Operations
