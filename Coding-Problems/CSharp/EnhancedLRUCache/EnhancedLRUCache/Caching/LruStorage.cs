@@ -72,8 +72,7 @@ public class LruStorage<TKey, TValue>
             error = CacheAdditionError.MaxMemorySizeExceeded;
             return false;
         }
-
-        // Handle update case first - this actually frees memory
+        
         if (_index.ContainsKey(key))
         {
             RefreshCacheItem(key, cacheItem);
