@@ -1,33 +1,29 @@
-﻿namespace EnhancedLRUCache;
+﻿namespace EnhancedLRUCache.Caching.Monitoring;
 
-public interface ICacheStats
+public interface ICacheMetrics
 {
-    public void IncrementRequestCount();
     long TotalRequests { get; }
-
     long CacheHits { get; }
-
-    public void IncrementMissedRequestCount();
     long CacheMisses { get; }
-
     double HitRatio { get; }
-
-    public void IncrementEvictionCount();
     long EvictionCount { get; }
-
-    public void IncrementExpiredCount();
     long ExpiredCount { get; }
-
-    public void UpdateItemCount(int count);
     long CurrentItemCount { get; }
-
-    public void UpdateMemory(long size);
     long TotalMemoryBytes { get; }
-
-    public void ClearMetrics();
 }
 
-public class CacheStats : ICacheStats
+internal interface ICacheMetricsInternal : ICacheMetrics
+{
+    void IncrementRequestCount();
+    void IncrementMissedRequestCount();
+    void IncrementEvictionCount();
+    void IncrementExpiredCount();
+    void ClearMetrics();
+    void AddNewItem(long size);
+    void RemoveItem(long size);
+}
+
+public class CacheMetrics : ICacheMetricsInternal
 {
     // The Interlocked class ensures atomic operations for thread-safe counting
     // https://learn.microsoft.com/en-us/dotnet/api/system.threading.interlocked?view=net-9.0
@@ -70,10 +66,8 @@ public class CacheStats : ICacheStats
     public void IncrementExpiredCount() => Interlocked.Increment(ref _expiredCount);
     public long ExpiredCount => _expiredCount;
 
-    public void UpdateItemCount(int count) => Interlocked.Add(ref _itemCount, count);
     public long CurrentItemCount => _itemCount;
 
-    public void UpdateMemory(long size) => Interlocked.Add(ref _totalMemory, size);
     public long TotalMemoryBytes => _totalMemory;
 
     public void ClearMetrics()
@@ -84,5 +78,17 @@ public class CacheStats : ICacheStats
         Interlocked.Exchange(ref _expiredCount, 0);
         Interlocked.Exchange(ref _itemCount, 0);
         Interlocked.Exchange(ref _totalMemory, 0);
+    }
+
+    public void AddNewItem(long size)
+    {
+        Interlocked.Increment(ref _itemCount);
+        Interlocked.Add(ref _totalMemory, size);
+    }
+
+    public void RemoveItem(long size)
+    {
+        Interlocked.Decrement(ref _itemCount);
+        Interlocked.Add(ref _totalMemory, -1 * size);
     }
 }

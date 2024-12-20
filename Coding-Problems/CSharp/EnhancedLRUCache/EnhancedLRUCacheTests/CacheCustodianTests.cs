@@ -1,6 +1,8 @@
 ﻿using EnhancedLRUCache;
-using EnhancedLRUCache.CacheItem;
-using EnhancedLRUCache.Errors;
+using EnhancedLRUCache.Caching;
+using EnhancedLRUCache.Caching.Errors;
+using EnhancedLRUCache.Caching.Monitoring;
+using EnhancedLRUCache.Caching.Payload;
 using Moq;
 using Xunit;
 using static System.Threading.Thread;

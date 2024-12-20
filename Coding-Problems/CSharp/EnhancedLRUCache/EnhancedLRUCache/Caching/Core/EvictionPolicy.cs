@@ -1,4 +1,4 @@
-﻿namespace EnhancedLRUCache;
+﻿namespace EnhancedLRUCache.Caching.Core;
 
 public enum TtlPolicy
 {
@@ -6,7 +6,7 @@ public enum TtlPolicy
     Sliding = 2   // Items expire after period of non-use
 }
 
-public interface ILruPolicy
+public interface IEvictionPolicy
 {
     public TimeSpan? DefaultTtl { get; }
 
@@ -14,11 +14,11 @@ public interface ILruPolicy
     public bool UsesSlidingExpiration { get; }
 }
 
-public class LruPolicy
+public class EvictionPolicy
 (
     TtlPolicy policy,
     TimeSpan? defaultTtl = null
-) : ILruPolicy
+) : IEvictionPolicy
 {
     public TimeSpan? DefaultTtl { get; } = defaultTtl;
 
