@@ -39,12 +39,12 @@ public class Cache<TKey, TValue> : ILruCache<TKey, TValue>
     public Cache(
         int maxItemCount,
         int maxMemorySize,
-        IEvictionPolicy policy,
+        IEvictionPolicy? policy = null,
         TimeSpan? lockTimeout = null,
         TimeSpan? cleanupInterval = null,
         TimeSpan? cleanupRetryInterval = null)
     {
-        _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+        _policy = policy ?? new EvictionPolicy(TtlPolicy.None);
 
         _lockTimeout = lockTimeout ?? _defaultLockTimout;
 
@@ -95,7 +95,7 @@ public class Cache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            _metrics.IncrementRequestCount();
+            _metrics.IncrementTotalGetAndPutRequestCount();
 
             var itemSuccessfullyAdded = _cacheStorage.TryPut(key, newCacheEntry, out var storageError);
 
@@ -131,11 +131,11 @@ public class Cache<TKey, TValue> : ILruCache<TKey, TValue>
 
         try
         {
-            _metrics.IncrementRequestCount();
+            _metrics.IncrementTotalGetAndPutRequestCount();
 
             if (!_cacheStorage.TryGet(key, out var cacheItem))
             {
-                _metrics.IncrementMissedRequestCount();
+                _metrics.IncrementMissedGetCount();
 
                 error = CacheRetrievalError.ItemNotFound;
                 return false;
@@ -145,7 +145,7 @@ public class Cache<TKey, TValue> : ILruCache<TKey, TValue>
             {
                 OnItemExpired(key, value);
 
-                _metrics.IncrementMissedRequestCount();
+                _metrics.IncrementMissedGetCount();
                 _metrics.IncrementExpiredCount();
 
                 // Schedule async removal of expired item
@@ -154,6 +154,9 @@ public class Cache<TKey, TValue> : ILruCache<TKey, TValue>
                 error = CacheRetrievalError.ItemExpired;
                 return false;
             }
+
+            _metrics.IncrementSuccessfulGetHitCount();
+            cacheItem.RefreshLastAccessed();
 
             value = cacheItem.Value;
 

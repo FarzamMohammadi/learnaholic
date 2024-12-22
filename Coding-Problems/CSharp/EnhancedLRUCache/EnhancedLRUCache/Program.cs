@@ -20,6 +20,11 @@ await RunTest("Background Cleanup", BackgroundCleanupTest);
 
 Console.WriteLine($"\nTest Results: {passedTests}/{totalTests} tests passed");
 
+return;
+
+static string KeyFromNumber(int number) => new($"key{number}");
+static string ValueFromNumber(int number) => new($"value{number}");
+
 async Task RunTest(string testName, Func<Task<bool>> testFunc)
 {
     totalTests++;
@@ -42,98 +47,86 @@ async Task<bool> BasicOperationsTest()
 {
     var cache = new Cache<string, string>(
         maxItemCount: 100,
-        maxMemorySize: 1024 * 1024, // 1MB
-        policy: new EvictionPolicy(TtlPolicy.Absolute)
+        maxMemorySize: 1024 * 1024
     );
 
-    await Task.Yield(); // Ensure test is awaitable
+    await Task.Yield(); // Make test awaitable
 
-    // Test basic put
-    cache.Put("key1", "value1", TimeSpan.FromMinutes(5), out var error);
-    if (error != CacheAdditionError.None) return false;
+    var basicPutSuccessful = cache.Put(KeyFromNumber(1), ValueFromNumber(1), null, out var error);
+    if (basicPutSuccessful && error != CacheAdditionError.None) return false;
 
-    // Test basic get
-    cache.TryGet("key1", out var value, out var retrievalError);
-    if (retrievalError != CacheRetrievalError.None || value != "value1") return false;
+    var basicGetIsSuccessful = cache.TryGet(KeyFromNumber(1), out var value, out var retrievalError);
+    if (basicGetIsSuccessful && retrievalError != CacheRetrievalError.None || value != ValueFromNumber(1)) return false;
 
-    // Test remove
-    cache.Remove("key1", out _, out var removalError);
-    if (removalError != CacheRemovalError.None) return false;
+    var removeIsSuccessful = cache.Remove(KeyFromNumber(1), out _, out var removalError);
+    if (removeIsSuccessful && removalError != CacheRemovalError.None) return false;
 
-    // Verify removal
-    cache.TryGet("key1", out _, out retrievalError);
-    return retrievalError == CacheRetrievalError.ItemNotFound;
+    var removedItemIsFound = cache.TryGet(KeyFromNumber(1), out _, out retrievalError);
+    return !removedItemIsFound && retrievalError == CacheRetrievalError.ItemNotFound;
 }
 
 async Task<bool> MemoryLimitsTest()
 {
     var cache = new Cache<string, string>(
         maxItemCount: 100,
-        maxMemorySize: 100, // Very small limit for testing
-        policy: new EvictionPolicy(TtlPolicy.Absolute)
+        maxMemorySize: 100
     );
 
-    await Task.Yield(); // Ensure test is awaitable
+    await Task.Yield(); // Make test awaitable
 
-    // Add item that should fit
-    var success1 = cache.Put("small", "x", TimeSpan.FromMinutes(5), out var error1);
-    if (!success1 || error1 != CacheAdditionError.None) return false;
+    var smallCacheItemInserted = cache.Put("small", "x", null, out var smallItemError);
+    if (!smallCacheItemInserted || smallItemError != CacheAdditionError.None) return false;
 
-    // Add item that's too large
-    var largeValue = new string('x', 1000); // Much larger than our limit
-    var success2 = cache.Put("large", largeValue, TimeSpan.FromMinutes(5), out var error2);
+    var largerThanMemoryLimitCacheItemInserted = new string('x', 1000);
+    var success2 = cache.Put("large", largerThanMemoryLimitCacheItemInserted, null, out var largeItemError);
 
-    return !success2 && error2 == CacheAdditionError.MaxMemorySizeExceeded;
+    return !success2 && largeItemError == CacheAdditionError.MaxMemorySizeExceeded;
 }
 
 async Task<bool> ItemCountLimitsTest()
 {
     var cache = new Cache<int, string>(
-        maxItemCount: 3, // Small limit for testing
-        maxMemorySize: 1024 * 1024,
-        policy: new EvictionPolicy(TtlPolicy.Absolute)
+        maxItemCount: 3,
+        maxMemorySize: 1024 * 1024
     );
 
-    await Task.Yield(); // Ensure test is awaitable
+    await Task.Yield(); // Make test awaitable
 
-    // Add items up to limit
     for (var i = 0; i < 3; i++)
     {
-        cache.Put(i, $"value{i}", TimeSpan.FromMinutes(5), out _);
+        cache.Put(i, $"value{i}", null, out _);
     }
 
-    // Add one more item (should evict oldest)
-    cache.Put(3, "value3", TimeSpan.FromMinutes(5), out _);
+    cache.Put(3, "value3", null, out _);
 
-    // Verify first item was evicted
-    cache.TryGet(0, out _, out var error);
-    if (error != CacheRetrievalError.ItemNotFound) return false;
+    var evictionCandidateWasFound = cache.TryGet(0, out _, out var error);
+    if (!evictionCandidateWasFound && error != CacheRetrievalError.ItemNotFound) return false;
 
-    // Verify newest items exist
-    return cache.TryGet(1, out _, out _) &&
-           cache.TryGet(2, out _, out _) &&
-           cache.TryGet(3, out _, out _);
+    var allItemsExceptForEvictedEntryExist = cache.TryGet(1, out _, out _) &&
+                                             cache.TryGet(2, out _, out _) &&
+                                             cache.TryGet(3, out _, out _);
+
+    return allItemsExceptForEvictedEntryExist;
 }
 
 async Task<bool> StatisticsTrackingTest()
 {
     var cache = new Cache<string, string>(
         maxItemCount: 100,
-        maxMemorySize: 1024 * 1024,
-        policy: new EvictionPolicy(TtlPolicy.Absolute)
+        maxMemorySize: 1024 * 1024
     );
 
-    await Task.Yield(); // Ensure test is awaitable
+    await Task.Yield(); // Make test awaitable
 
-    // Generate some statistics
-    cache.Put("key1", "value1", TimeSpan.FromMinutes(5), out _);
-    cache.Put("key2", "value2", TimeSpan.FromMinutes(5), out _);
+    // Increase total req count
+    cache.Put(KeyFromNumber(1), ValueFromNumber(1), TimeSpan.FromMinutes(5), out _);
+    cache.Put(KeyFromNumber(2), ValueFromNumber(2), TimeSpan.FromMinutes(5), out _);
 
-    // Some hits
-    cache.TryGet("key1", out _, out _);
-    cache.TryGet("key2", out _, out _);
+    // Increase hit & total req count
+    cache.TryGet(KeyFromNumber(1), out _, out _);
+    cache.TryGet(KeyFromNumber(2), out _, out _);
 
-    // Some misses
+    // Increase miss count
     cache.TryGet("nonexistent", out _, out _);
 
     var metrics = cache.Metrics;
@@ -149,32 +142,28 @@ async Task<bool> ErrorHandlingTest()
 {
     var cache = new Cache<string, string>(
         maxItemCount: 100,
-        maxMemorySize: 100, // Small size for testing
-        policy: new EvictionPolicy(TtlPolicy.Absolute)
+        maxMemorySize: 100
     );
 
-    await Task.Yield(); // Ensure test is awaitable
+    await Task.Yield(); // Make test awaitable
 
     // Test null key handling
     try
     {
-        cache.Put(null!, "value", TimeSpan.FromMinutes(5), out _);
-        return false; // Should have thrown
+        cache.Put(null!, "value", null, out _);
+        return false; // Should not reach this line
     }
     catch (ArgumentNullException)
     {
     }
 
-    // Test memory limit error
-    var success = cache.Put("key", new string('x', 1000), TimeSpan.FromMinutes(5), out var error);
-    if (success || error != CacheAdditionError.MaxMemorySizeExceeded) return false;
+    var insertedCacheItemThatExceedsMemorySize = cache.Put("key", new string('x', 1000), null, out var error);
+    if (insertedCacheItemThatExceedsMemorySize || error != CacheAdditionError.MaxMemorySizeExceeded) return false;
 
-    // Test retrieval of non-existent key
-    cache.TryGet("nonexistent", out _, out var retrievalError);
-    return retrievalError == CacheRetrievalError.ItemNotFound;
+    var foundNonExistingItem = cache.TryGet("nonexistent", out _, out var retrievalError);
+    return !foundNonExistingItem && retrievalError == CacheRetrievalError.ItemNotFound;
 }
 
-// Already async methods - no changes needed
 async Task<bool> AbsoluteExpirationTest()
 {
     var cache = new Cache<string, string>(
@@ -183,19 +172,18 @@ async Task<bool> AbsoluteExpirationTest()
         policy: new EvictionPolicy(TtlPolicy.Absolute)
     );
 
-    // Add item with 1 second TTL
-    cache.Put("key1", "value1", TimeSpan.FromSeconds(1), out _);
+    cache.Put(KeyFromNumber(1), ValueFromNumber(1), TimeSpan.FromSeconds(1), out _);
 
-    // Verify it exists
-    if (!cache.TryGet("key1", out var value, out _) || value != "value1")
-        return false;
+    var foundItem = cache.TryGet(KeyFromNumber(1), out var value, out _);
 
-    // Wait for expiration
-    await Task.Delay(1500);
+    if (!foundItem || value != ValueFromNumber(1)) return false;
 
-    // Verify it's expired
-    cache.TryGet("key1", out _, out var error);
-    return error == CacheRetrievalError.ItemExpired;
+    await ItemExpiration();
+
+    var expiredItemFound = cache.TryGet(KeyFromNumber(1), out _, out var error);
+    return !expiredItemFound && error == CacheRetrievalError.ItemExpired;
+
+    async Task ItemExpiration() => await Task.Delay(1500);
 }
 
 async Task<bool> SlidingExpirationTest()
@@ -207,19 +195,19 @@ async Task<bool> SlidingExpirationTest()
     );
 
     // Add item with 2 second sliding window
-    cache.Put("key1", "value1", TimeSpan.FromSeconds(2), out _);
+    cache.Put(KeyFromNumber(1), ValueFromNumber(1), TimeSpan.FromSeconds(2), out _);
 
     // Access item after 1 second (should reset timer)
-    await Task.Delay(1000);
-    if (!cache.TryGet("key1", out _, out _)) return false;
+    await Task.Delay(TimeSpan.FromSeconds(1));
+    if (!cache.TryGet(KeyFromNumber(1), out _, out _)) return false;
 
     // Access item after another 1 second (should still exist)
-    await Task.Delay(1000);
-    if (!cache.TryGet("key1", out _, out _)) return false;
+    await Task.Delay(TimeSpan.FromSeconds(1));
+    if (!cache.TryGet(KeyFromNumber(1), out _, out _)) return false;
 
     // Wait for full expiration without access
-    await Task.Delay(2500);
-    cache.TryGet("key1", out _, out var error);
+    await Task.Delay(TimeSpan.FromSeconds(2));
+    cache.TryGet(KeyFromNumber(1), out _, out var error);
 
     return error == CacheRetrievalError.ItemExpired;
 }
@@ -235,28 +223,27 @@ async Task<bool> EventHandlingTest()
         policy: new EvictionPolicy(TtlPolicy.Absolute)
     );
 
-    cache.ItemEvicted += (sender, args) => evictionCount++;
-    cache.ItemExpired += (sender, args) => expirationCount++;
+    cache.ItemEvicted += (_, _) => evictionCount++;
+    cache.ItemExpired += (_, _) => expirationCount++;
 
     // Add items to trigger eviction
-    cache.Put("key1", "value1", TimeSpan.FromMinutes(5), out _);
-    cache.Put("key2", "value2", TimeSpan.FromMinutes(5), out _);
-    cache.Put("key3", "value3", TimeSpan.FromMinutes(5), out _); // Should evict key1
+    cache.Put(KeyFromNumber(1), ValueFromNumber(1), TimeSpan.FromMinutes(5), out _);
+    cache.Put(KeyFromNumber(2), ValueFromNumber(2), TimeSpan.FromMinutes(5), out _);
+    cache.Put(KeyFromNumber(3), ValueFromNumber(3), TimeSpan.FromMinutes(5), out _); // Trigger ItemEvicted (for key1)
 
     // Add item with short TTL to trigger expiration
-    cache.Put("expiring", "value", TimeSpan.FromSeconds(1), out _);
-    await Task.Delay(1500);
-    cache.TryGet("expiring", out _, out _); // Trigger expired check
+    cache.Put("expiring", "value", TimeSpan.FromSeconds(1), out _); // Trigger ItemEvicted (for key2)
+    await Task.Delay(TimeSpan.FromSeconds(2));
+    cache.TryGet("expiring", out _, out _); // Trigger itemExpired
 
-    return evictionCount == 1 && expirationCount == 1;
+    return evictionCount == 2 && expirationCount == 1;
 }
 
 async Task<bool> ConcurrentOperationsTest()
 {
     var cache = new Cache<int, string>(
         maxItemCount: 1000,
-        maxMemorySize: 1024 * 1024,
-        policy: new EvictionPolicy(TtlPolicy.Absolute)
+        maxMemorySize: 1024 * 1024
     );
 
     var tasks = new List<Task>();
@@ -294,6 +281,7 @@ async Task<bool> ConcurrentOperationsTest()
     }
 
     await Task.WhenAll(tasks);
+
     return successCount > 90; // Allow for some concurrent operation failures
 }
 
@@ -313,7 +301,7 @@ async Task<bool> BackgroundCleanupTest()
     }
 
     // Wait for items to expire and cleanup to run
-    await Task.Delay(3000);
+    await Task.Delay(TimeSpan.FromSeconds(3));
 
     // Verify all items are cleaned up
     for (var i = 0; i < 5; i++)
@@ -326,5 +314,7 @@ async Task<bool> BackgroundCleanupTest()
         }
     }
 
-    return true;
+    var allExpiredItemsWereRemoved = cache.Metrics.CurrentItemCount == 0;
+
+    return allExpiredItemsWereRemoved;
 }

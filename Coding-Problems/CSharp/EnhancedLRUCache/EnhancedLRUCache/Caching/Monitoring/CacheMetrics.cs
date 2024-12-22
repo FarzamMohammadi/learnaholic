@@ -14,8 +14,9 @@ public interface ICacheMetrics
 
 internal interface ICacheMetricsInternal : ICacheMetrics
 {
-    void IncrementRequestCount();
-    void IncrementMissedRequestCount();
+    void IncrementTotalGetAndPutRequestCount();
+    public void IncrementSuccessfulGetHitCount();
+    void IncrementMissedGetCount();
     void IncrementEvictionCount();
     void IncrementExpiredCount();
     void ClearMetrics();
@@ -28,27 +29,21 @@ public class CacheMetrics : ICacheMetricsInternal
     // The Interlocked class ensures atomic operations for thread-safe counting
     // https://learn.microsoft.com/en-us/dotnet/api/system.threading.interlocked?view=net-9.0
 
-    private long _totalRequests;
-    private long _cacheMisses;
-    private long _evictionCount;
-    private long _expiredCount;
-    private long _itemCount;
-    private long _totalMemory;
+    private long _totalRequests; // Calls to GET + PUT
+    private long _cacheHits;     // Calls to GET when item is found
+    private long _cacheMisses;   // Calls to GET when item is not found
+    private long _evictionCount; // Evicted due to cache memory or count restrictions
+    private long _expiredCount;  // Evicted due to TTL configuration
+    private long _itemCount;     // Current cache item count
+    private long _totalMemory;   // Current cache memory size
 
-    public void IncrementRequestCount() => Interlocked.Increment(ref _totalRequests);
+    public void IncrementTotalGetAndPutRequestCount() => Interlocked.Increment(ref _totalRequests);
     public long TotalRequests => _totalRequests;
 
-    public long CacheHits
-    {
-        get
-        {
-            var requests = TotalRequests;
-            var misses = CacheMisses;
-            return requests - misses;
-        }
-    }
+    public void IncrementSuccessfulGetHitCount() => Interlocked.Increment(ref _cacheHits);
+    public long CacheHits => _cacheHits;
 
-    public void IncrementMissedRequestCount() => Interlocked.Increment(ref _cacheMisses);
+    public void IncrementMissedGetCount() => Interlocked.Increment(ref _cacheMisses);
     public long CacheMisses => _cacheMisses;
 
     public double HitRatio

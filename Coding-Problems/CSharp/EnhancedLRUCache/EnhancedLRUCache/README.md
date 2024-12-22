@@ -80,9 +80,3 @@ if (cache.TryGet("key", out var value))
 ICacheStats stats = cache.GetStatistics();
 Console.WriteLine($"Hit ratio: {stats.HitRatio:P2}");
 ```
-
-## Notes
-
-- Implements IDisposable pattern for proper cleanup of background workers and locks
-- Supports monitoring and debugging through comprehensive statistics interface
-- Thread-safe implementation suitable for high-concurrency scenarios

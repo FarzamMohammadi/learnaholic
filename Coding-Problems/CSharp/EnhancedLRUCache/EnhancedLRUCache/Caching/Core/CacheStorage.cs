@@ -56,8 +56,6 @@ public class CacheStorage<TKey, TValue>
 
         cacheItem = kvp.Value.CacheItem;
 
-        cacheItem.RefreshLastAccessed();
-
         return true;
     }
 
