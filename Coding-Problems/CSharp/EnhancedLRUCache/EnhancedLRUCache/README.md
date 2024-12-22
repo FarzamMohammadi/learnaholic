@@ -24,10 +24,10 @@ A thread-safe, generic LRU (Least Recently Used) cache implementation with TTL s
 ## Core API
 
 ```csharp
-void Put<TKey, TValue>(TKey key, TValue value, TimeSpan? ttl = null);
-bool TryGet<TKey, TValue>(TKey key, out TValue value);
-void Remove<TKey>(TKey key);
-void Clear();
+bool Put(TKey key, TValue value, TimeSpan? ttl, out CacheAdditionError error);
+bool TryGet(TKey key, out TValue? value, out CacheRetrievalError error);
+bool Remove(TKey key, out TValue? value, out CacheRemovalError error);
+bool Clear();
 ```
 
 ## Statistics Interface
