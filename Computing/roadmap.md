@@ -4,6 +4,7 @@
   - [Learning Progression Overview](#learning-progression-overview)
   - [Foundation Path 1: Computer Hardware \& Architecture](#foundation-path-1-computer-hardware--architecture)
     - [Core Topics](#core-topics)
+      - [Evolution of Digital Logic](#evolution-of-digital-logic)
       - [CPU Architecture](#cpu-architecture)
       - [Memory Systems](#memory-systems)
       - [System Architecture](#system-architecture)
@@ -168,9 +169,16 @@ This roadmap follows a deliberate sequential order, with each concept building u
 
 ---
 
-## Foundation Path 1: Computer Hardware & Architecture
+## [Foundation Path 1: Computer Hardware & Architecture](./P1-Computer%20Hardware%20&%20Architecture.md)
 
 ### Core Topics
+
+#### Evolution of Digital Logic
+- **Fundamental Switching Technologies**
+  - Relays and their limitations
+  - Vacuum tubes and early computers
+  - Transistors and modern computing
+  - Impact on digital computing development
 
 #### CPU Architecture
 - **Basic CPU Components**
