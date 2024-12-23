@@ -4,7 +4,7 @@
   - [Learning Progression Overview](#learning-progression-overview)
   - [Foundation Path 1: Computer Hardware \& Architecture](#foundation-path-1-computer-hardware--architecture)
     - [Core Topics](#core-topics)
-      - [Evolution of Digital Logic](#evolution-of-digital-logic)
+      - [Digital Logic Fundamentals](#digital-logic-fundamentals)
       - [CPU Architecture](#cpu-architecture)
       - [Memory Systems](#memory-systems)
       - [System Architecture](#system-architecture)
@@ -173,12 +173,50 @@ This roadmap follows a deliberate sequential order, with each concept building u
 
 ### Core Topics
 
-#### Evolution of Digital Logic
-- **Fundamental Switching Technologies**
-  - Relays and their limitations
-  - Vacuum tubes and early computers
-  - Transistors and modern computing
-  - Impact on digital computing development
+#### [Digital Logic Fundamentals](./P1-Computer%20Hardware%20&%20Architecture.md/#digital-logic-fundamentals)
+- [**Evolution of Computing Components**](./P1-Computer%20Hardware%20&%20Architecture.md/#evolution-of-computing-components)
+    - Relays
+    - Vacuum Tubes
+    - Transistors
+    - Integrated Circuits
+  
+- [**Modern Semiconductor Evolution**](./P1-Computer%20Hardware%20&%20Architecture.md/#modern-semiconductor-evolution)
+  - Current Manufacturing Process
+  - Current Challenges & Future
+
+- [**Binary & Boolean Algebra**](./P1-Computer%20Hardware%20&%20Architecture.md/#binary--boolean-algebra)
+  - Why Computers Use Binary
+  - Boolean Algebra & Operations
+
+- **Hardware Implementation**
+  - Transistor-level implementation
+    - How transistors create logic gates
+    - Power and timing considerations
+  - Circuit optimization
+    - Minimizing gate count
+    - Reducing propagation delay
+    - Power efficiency techniques
+
+- **Logic Gates**
+  - Fundamental gates (AND, OR, NOT)
+  - Universal gates (NAND, NOR)
+  - Composite gates (XOR, XNOR)
+  - Truth tables and Boolean expressions
+  - Gate-level minimization
+
+- **Digital Circuit Design**
+  - **Combinational Circuits**
+    - Building blocks (multiplexers, decoders)
+    - Arithmetic circuits (adders, ALU)
+    - Design methodology and optimization
+    - Timing and propagation delay
+  
+  - **Sequential Circuits**
+    - Latches and flip-flops
+    - Registers and counters
+    - State machines
+    - Clock domains and timing
+    - Synchronous design principles
 
 #### CPU Architecture
 - **Basic CPU Components**
