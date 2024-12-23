@@ -21,71 +21,28 @@
 
 ## Completed Challenges
 
-1. [x] [**LRU (Least Recently Used) Cache**](../Coding-Problems/LRUCache/README.md)
+1. [x] [**LRU (Least Recently Used) Cache**](./LRUCache/README.md)
     - Implement PUT and GET methods with O(1) operations
     - Handle capacity limits and eviction
     - Consider thread safety and performance
 
-2. [x] [**IP Request Validator**](../Coding-Problems/IPRequestValidator/README.md)
+2. [x] [**IP Request Validator**](./IPRequestValidator/README.md)
     - Implement IsValid(byte[]) for IP validation
     - Track requests within rolling 1M window
     - Limit to 5 requests per IP
     - Handle concurrent requests efficiently
 
-## New Challenges
-
-### Cache & Memory Systems
-
-3. [ ] **Enhanced LRU Cache**
+3. [x] [**Enhanced LRU Cache**](./EnhancedLRUCache/EnhancedLRUCache/README.md)
     - Implement LRU Cache with TTL support
     - Add different eviction policies
     - Include statistics tracking (hits/misses)
     - Handle concurrent access
+    
     Problem: Extend the basic LRU Cache to support TTL and multiple eviction policies
-    
-    Key Requirements:
-    - Implement generic cache with type parameters: TKey and TValue
-    - Support maximum item count AND total memory size limits
-    - Implement TTL (Time To Live) with these features:
-        * Absolute expiration (items expire at specific datetime)
-        * Sliding expiration (items expire after period of non-use)
-        * Support both at the same time
-    - Support item-level AND cache-level TTL settings
-    
-    Core Operations:
-    ```csharp
-    void Put<TKey, TValue>(TKey key, TValue value, TimeSpan? ttl = null);
-    bool TryGet<TKey, TValue>(TKey key, out TValue value);
-    void Remove<TKey>(TKey key);
-    void Clear();
-    ```
 
-    Statistics Interface:
-    ```csharp
-    public interface ICacheStats
-    {
-        long TotalRequests { get; }
-        long CacheHits { get; }
-        long CacheMisses { get; }
-        double HitRatio { get; }
-        long EvictionCount { get; }
-        long ExpiredCount { get; }
-        long CurrentItemCount { get; }
-        long TotalMemoryBytes { get; }
-    }
-    ```
+## New Challenges
 
-    Thread Safety Requirements:
-    - All operations must be thread-safe
-    - Support concurrent reads
-    - Support concurrent writes with proper locking strategy
-    - Consider using ReaderWriterLockSlim for better performance
-
-    Advanced Features:
-    - Implement background cleanup for expired items
-    - Support registration of eviction callbacks
-    - Add monitoring hooks for cache events (hits, misses, evictions)
-    - Consider implementing IDisposable for cleanup
+### Cache & Memory Systems
 
 4. [ ] **LRU + LFU Hybrid Cache**
     - Support both LRU and LFU eviction policies
