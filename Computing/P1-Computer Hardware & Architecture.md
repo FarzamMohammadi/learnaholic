@@ -13,6 +13,8 @@
 
 ## Digital Logic Fundamentals
 
+- [Relay vs Vacuum Tube vs Transistor](https://images.app.goo.gl/9sBsLCKZoj3zP5H86)
+
 ### Evolution of Computing Components
 - **Relays (1930s-40s)**
   - Electromechanical switches that used electromagnets to physically move metal contacts, making or breaking electrical connections
