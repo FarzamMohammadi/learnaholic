@@ -1,10 +1,12 @@
 - [Foundation Path 1: Computer Hardware \& Architecture](#foundation-path-1-computer-hardware--architecture)
   - [Digital Logic Fundamentals](#digital-logic-fundamentals)
     - [Evolution of Computing Components](#evolution-of-computing-components)
+      - [Resources](#resources)
     - [Modern Semiconductor Evolution](#modern-semiconductor-evolution)
       - [Current Manufacturing Process](#current-manufacturing-process)
       - [Current Challenges \& Future](#current-challenges--future)
     - [Binary \& Boolean Algebra](#binary--boolean-algebra)
+      - [Resources](#resources-1)
       - [Why Computers Use Binary](#why-computers-use-binary)
       - [Boolean Algebra \& Operations](#boolean-algebra--operations)
 
@@ -13,9 +15,12 @@
 
 ## Digital Logic Fundamentals
 
+### Evolution of Computing Components
+
+#### Resources
+- [Early Computing: Crash Course Computer Science #1](https://youtu.be/O5nskjZ_GoI?si=hiBF9Q2kLwn-iArr)
 - [Relay vs Vacuum Tube vs Transistor](https://images.app.goo.gl/9sBsLCKZoj3zP5H86)
 
-### Evolution of Computing Components
 - **Relays (1930s-40s)**
   - Electromechanical switches that used electromagnets to physically move metal contacts, making or breaking electrical connections
   - Think of them like electronic versions of light switches, but automated
@@ -84,6 +89,10 @@
    - Quantum computing integration
 
 ### Binary & Boolean Algebra
+
+#### Resources
+- [Boolean Logic & Logic Gates: Crash Course Computer Science #3](https://youtu.be/gI-qXk7XojA?si=7oMEJqcCfaMBXf8f)
+- [Representing Numbers and Letters with Binary: Crash Course Computer Science #4](https://youtu.be/1GSjbWt0c9M?si=76DMIlhWAblNlcnh)
 
 #### Why Computers Use Binary
 - **Binary vs Multi-State Systems**
