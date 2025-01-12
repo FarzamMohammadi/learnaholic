@@ -1,26 +1,35 @@
 - [Foundation Path 1: Computer Hardware \& Architecture](#foundation-path-1-computer-hardware--architecture)
   - [Digital Logic Fundamentals](#digital-logic-fundamentals)
+      - [Supplementary Resources](#supplementary-resources)
     - [Evolution of Computing Components](#evolution-of-computing-components)
-      - [Resources](#resources)
     - [Modern Semiconductor Evolution](#modern-semiconductor-evolution)
       - [Current Manufacturing Process](#current-manufacturing-process)
       - [Current Challenges \& Future](#current-challenges--future)
     - [Binary \& Boolean Algebra](#binary--boolean-algebra)
-      - [Resources](#resources-1)
+      - [Supplementary Resources](#supplementary-resources-1)
       - [Why Computers Use Binary](#why-computers-use-binary)
       - [Boolean Algebra \& Operations](#boolean-algebra--operations)
+  - [Hardware Implementation](#hardware-implementation)
+    - [Transistor-level implementation](#transistor-level-implementation)
+    - [Supplementary Resources](#supplementary-resources-2)
+      - [Transistors as Binary Switches](#transistors-as-binary-switches)
+  - [Understanding Transistor Physics for Computer Science](#understanding-transistor-physics-for-computer-science)
+    - [The Physics Behind Binary States](#the-physics-behind-binary-states)
+    - [CMOS Technology and Complementary Operation](#cmos-technology-and-complementary-operation)
+    - [Timing and Power Considerations](#timing-and-power-considerations)
+    - [Critical Software Implications](#critical-software-implications)
 
 
 # Foundation Path 1: Computer Hardware & Architecture
 
 ## Digital Logic Fundamentals
 
-### Evolution of Computing Components
-
-#### Resources
+#### Supplementary Resources
 - [Early Computing: Crash Course Computer Science #1](https://youtu.be/O5nskjZ_GoI?si=hiBF9Q2kLwn-iArr)
+- [Electronic Computing: Crash Course Computer Science #2](https://youtu.be/LN0ucKNX0hc?si=ds4qlzPHKg8qYzZF)
 - [Relay vs Vacuum Tube vs Transistor](https://images.app.goo.gl/9sBsLCKZoj3zP5H86)
 
+### Evolution of Computing Components
 - **Relays (1930s-40s)**
   - Electromechanical switches that used electromagnets to physically move metal contacts, making or breaking electrical connections
   - Think of them like electronic versions of light switches, but automated
@@ -90,7 +99,7 @@
 
 ### Binary & Boolean Algebra
 
-#### Resources
+#### Supplementary Resources
 - [Boolean Logic & Logic Gates: Crash Course Computer Science #3](https://youtu.be/gI-qXk7XojA?si=7oMEJqcCfaMBXf8f)
 - [Representing Numbers and Letters with Binary: Crash Course Computer Science #4](https://youtu.be/1GSjbWt0c9M?si=76DMIlhWAblNlcnh)
 
@@ -216,3 +225,201 @@
     - **Double Negation**: Negating a negation restores the original value
       - Boolean Logic: ¬(¬A) = A
       - C++ Comparison: `!!A == A`
+
+## Hardware Implementation
+
+### Transistor-level implementation
+
+### Supplementary Resources
+- [Making logic gates from transistors](https://youtu.be/sTu3LwpF6XI?si=MasDp_FmYeV4fkue)
+- [Logic gates - From transistors to logic gates NAND, AND, NOR, OR, NOT, XOR how computers work PART 1
+](https://youtu.be/HaBMAD-Dr8M?si=5Ohj3rXq8Y1hzMrB)
+- [Logic Gates simulation - how computers work part 1 - Building Scott's CPU - NAND AND OR XOR-](https://youtu.be/IjQznrdjH9s?si=YgV7OJs9bLdgZcgx)
+
+```mermaid
+graph TD
+  A[Physical Transistor] --> B[Logic Gates]
+  B --> C[Boolean Operations]
+  C --> D[Software Instructions]
+
+  subgraph "Hardware Layer"
+  A
+  note1["NMOS/PMOS Switches"]
+  end
+
+  subgraph "Logic Layer"
+  B
+  note2["AND, OR, NOT"]
+  end
+
+  subgraph "Abstract Layer"
+  C
+  note3["&&, ||, !"]
+  end
+
+  subgraph "Software Layer"
+  D
+  note4["if, while, bool"]
+  end
+```
+
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- NMOS Transistor -->
+  <g transform="translate(100,50)">
+    <text x="0" y="0">NMOS Transistor</text>
+    <line x1="50" y1="30" x2="50" y2="130" stroke="black" stroke-width="2"/>
+    <line x1="30" y1="60" x2="70" y2="60" stroke="black" stroke-width="2"/>
+    <line x1="30" y1="100" x2="70" y2="100" stroke="black" stroke-width="2"/>
+    <line x1="50" y1="30" x2="100" y2="30" stroke="black" stroke-width="2"/>
+    <line x1="50" y1="130" x2="100" y2="130" stroke="black" stroke-width="2"/>
+    <text x="110" y="35">Drain (D)</text>
+    <text x="110" y="135">Source (S)</text>
+    <text x="0" y="80">Gate (G)</text>
+  </g>
+
+  <!-- PMOS Transistor -->
+  <g transform="translate(300,50)">
+    <text x="0" y="0">PMOS Transistor</text>
+    <line x1="50" y1="30" x2="50" y2="130" stroke="black" stroke-width="2"/>
+    <line x1="30" y1="60" x2="70" y2="60" stroke="black" stroke-width="2"/>
+    <line x1="30" y1="100" x2="70" y2="100" stroke="black" stroke-width="2"/>
+    <circle cx="50" cy="80" r="5" fill="none" stroke="black"/>
+    <line x1="50" y1="30" x2="100" y2="30" stroke="black" stroke-width="2"/>
+    <line x1="50" y1="130" x2="100" y2="130" stroke="black" stroke-width="2"/>
+    <text x="110" y="35">Source (S)</text>
+    <text x="110" y="135">Drain (D)</text>
+    <text x="0" y="80">Gate (G)</text>
+  </g>
+
+  <!-- NOT Gate Implementation -->
+  <g transform="translate(500,50)">
+    <text x="0" y="0">NOT Gate Implementation</text>
+    <!-- VDD -->
+    <line x1="50" y1="30" x2="50" y2="130" stroke="black" stroke-width="2"/>
+    <text x="30" y="25">VDD</text>
+    <!-- PMOS -->
+    <line x1="50" y1="50" x2="100" y2="50" stroke="black" stroke-width="2"/>
+    <circle cx="75" cy="50" r="5" fill="none" stroke="black"/>
+    <!-- Output -->
+    <line x1="100" y1="50" x2="100" y2="110" stroke="black" stroke-width="2"/>
+    <text x="110" y="80">Output</text>
+    <!-- NMOS -->
+    <line x1="50" y1="110" x2="100" y2="110" stroke="black" stroke-width="2"/>
+    <!-- GND -->
+    <text x="30" y="135">GND</text>
+    <!-- Input -->
+    <line x1="20" y1="80" x2="40" y2="80" stroke="black" stroke-width="2"/>
+    <text x="0" y="85">In</text>
+  </g>
+
+  <!-- State Transitions -->
+  <g transform="translate(100,250)">
+    <text x="0" y="0">Voltage States and Transitions</text>
+    <!-- High State -->
+    <rect x="0" y="20" width="100" height="40" fill="none" stroke="black"/>
+    <text x="20" y="45">VDD (1)</text>
+    <!-- Low State -->
+    <rect x="200" y="20" width="100" height="40" fill="none" stroke="black"/>
+    <text x="220" y="45">GND (0)</text>
+    <!-- Transition Arrow -->
+    <line x1="100" y1="40" x2="200" y2="40" stroke="black" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="120" y="30">Switching</text>
+    <text x="110" y="60">~1-2ns delay</text>
+  </g>
+
+  <!-- Arrow Marker -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+        markerWidth="6" markerHeight="6"
+        orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
+    </marker>
+  </defs>
+</svg>
+
+#### Transistors as Binary Switches
+- Transistors are the physical implementation of boolean logic
+- They create the binary foundation that enables software operations
+
+```
+Transistor States → Boolean Operations → Software Impact
+ON  (1)           → Voltage flows      → true
+OFF (0)           → No voltage flow    → false
+```
+
+## Understanding Transistor Physics for Computer Science
+
+Modern transistors (MOSFETs - Metal-Oxide-Semiconductor Field-Effect Transistors) operate on principles that directly enable our binary computations. Here's how they work:
+
+### The Physics Behind Binary States
+
+When we work with boolean operations in software, we're actually manipulating voltage states through transistors. A transistor has three key terminals:
+- **Source (S)**: The reference terminal
+- **Drain (D)**: The output terminal
+- **Gate (G)**: The control terminal
+
+The magic happens through voltage-controlled conductivity:
+```
+Gate Voltage > Threshold → Channel Forms → Current Flows (ON/1)
+Gate Voltage < Threshold → No Channel   → No Current (OFF/0)
+```
+
+### CMOS Technology and Complementary Operation
+
+Modern processors use Complementary Metal-Oxide-Semiconductor (CMOS) technology, which pairs two types of transistors:
+1. **NMOS (N-channel)**:
+   - Conducts when gate voltage is HIGH
+   - Fast switching, but weak at pulling UP
+   - Used for pulling output DOWN to ground
+
+2. **PMOS (P-channel)**:
+   - Conducts when gate voltage is LOW
+   - Slower switching, but good at pulling UP
+   - Used for pulling output UP to VDD
+
+This complementary arrangement ensures:
+- Low power consumption (only draws significant power during switching)
+- High noise immunity (clear separation between voltage levels)
+- Robust operation across temperature ranges
+
+### Timing and Power Considerations
+
+The timing characteristics of transistors directly impact software execution:
+
+1. **Propagation Delay**:
+```
+Signal Propagation Time = RC × ln(VDD/VTH)
+Where:
+- RC is the circuit's time constant
+- VDD is supply voltage
+- VTH is threshold voltage
+```
+
+2. **Power Dissipation**:
+```
+Total Power = Dynamic Power + Static Power
+Dynamic Power = C × V² × f
+Where:
+- C is capacitance
+- V is voltage swing
+- f is switching frequency
+```
+
+### Critical Software Implications
+
+Understanding transistor behavior helps explain key software phenomena:
+
+1. **Clock Speed Limitations**:
+   - Maximum frequency limited by transistor switching time
+   - Heat generation increases with frequency
+   - Explains why we hit frequency walls in modern CPUs
+
+2. **Power Management**:
+   - Dynamic voltage and frequency scaling
+   - Sleep states and power gating
+   - Impact on battery life and performance
+
+3. **Temperature Effects**:
+   - Leakage current doubles every 10°C
+   - Affects reliability and performance
+   - Explains thermal throttling in laptops

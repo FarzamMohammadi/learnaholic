@@ -188,10 +188,10 @@ This roadmap follows a deliberate sequential order, with each concept building u
   - Why Computers Use Binary
   - Boolean Algebra & Operations
 
-- **Hardware Implementation**
+- [**Hardware Implementation**](./P1-Computer%20Hardware%20&%20Architecture.md/#hardware-implementation)
   - Transistor-level implementation
     - How transistors create logic gates
-    - Power and timing considerations
+    - Timing and power considerations
   - Circuit optimization
     - Minimizing gate count
     - Reducing propagation delay
