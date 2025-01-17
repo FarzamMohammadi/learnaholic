@@ -18,6 +18,29 @@
     - [CMOS Technology and Complementary Operation](#cmos-technology-and-complementary-operation)
     - [Timing and Power Considerations](#timing-and-power-considerations)
     - [Critical Software Implications](#critical-software-implications)
+  - [Logic Gates](#logic-gates)
+    - [Supplementary Resources](#supplementary-resources-3)
+    - [Introduction to Logic Gates](#introduction-to-logic-gates)
+      - [Gate Categories Overview](#gate-categories-overview)
+    - [Fundamental Gates (AND, OR, NOT)](#fundamental-gates-and-or-not)
+      - [Common Characteristics](#common-characteristics)
+      - [AND Gate](#and-gate)
+      - [OR Gate](#or-gate)
+      - [NOT Gate (Inverter)](#not-gate-inverter)
+    - [Universal Gates (NAND, NOR)](#universal-gates-nand-nor)
+      - [Why They're Universal](#why-theyre-universal)
+      - [NAND Gate](#nand-gate)
+      - [NOR Gate](#nor-gate)
+    - [Composite Gates (XOR, XNOR)](#composite-gates-xor-xnor)
+      - [XOR Gate (Exclusive OR)](#xor-gate-exclusive-or)
+      - [XNOR Gate (Exclusive NOR)](#xnor-gate-exclusive-nor)
+    - [Gate-Level Optimization](#gate-level-optimization)
+      - [Why Optimization Matters](#why-optimization-matters)
+      - [Minimization Techniques](#minimization-techniques)
+    - [Practical Implications](#practical-implications)
+      - [Circuit Design](#circuit-design)
+      - [Performance Impact](#performance-impact)
+      - [Best Practices](#best-practices)
 
 
 # Foundation Path 1: Computer Hardware & Architecture
@@ -231,9 +254,6 @@
 ### Transistor-level implementation
 
 ### Supplementary Resources
-- [Making logic gates from transistors](https://youtu.be/sTu3LwpF6XI?si=MasDp_FmYeV4fkue)
-- [Logic gates - From transistors to logic gates NAND, AND, NOR, OR, NOT, XOR how computers work PART 1
-](https://youtu.be/HaBMAD-Dr8M?si=5Ohj3rXq8Y1hzMrB)
 - [Logic Gates simulation - how computers work part 1 - Building Scott's CPU - NAND AND OR XOR-](https://youtu.be/IjQznrdjH9s?si=YgV7OJs9bLdgZcgx)
 
 ```mermaid
@@ -423,3 +443,298 @@ Understanding transistor behavior helps explain key software phenomena:
    - Leakage current doubles every 10°C
    - Affects reliability and performance
    - Explains thermal throttling in laptops
+
+## Logic Gates
+
+### Supplementary Resources
+- [Making logic gates from transistors](https://youtu.be/sTu3LwpF6XI?si=MasDp_FmYeV4fkue)
+- [Logic gates - From transistors to logic gates NAND, AND, NOR, OR, NOT, XOR how computers work PART 1
+](https://youtu.be/HaBMAD-Dr8M?si=5Ohj3rXq8Y1hzMrB)
+
+### Introduction to Logic Gates
+
+Logic gates are the fundamental building blocks of digital circuits, forming the basis of all digital computers and electronic devices. They are physical implementations of boolean logic operations, taking binary inputs (0/1) and producing binary outputs based on specific rules.
+
+Think of logic gates as tiny decision-makers in your computer:
+- Just like a light switch can be ON/OFF
+- Logic gates make YES/NO decisions based on their inputs
+- These simple decisions, when combined, enable complex computations
+
+#### Gate Categories Overview
+
+Gates can be classified into three main categories:
+
+1. **Fundamental Gates**
+   - The basic building blocks (AND, OR, NOT)
+   - Like primary colors in painting, they form the basis of all other gates
+   - Directly represent basic boolean operations
+
+2. **Universal Gates**
+   - The versatile builders (NAND, NOR)
+   - Can create any other type of logic gate
+   - Most efficient for manufacturing and implementation
+
+3. **Composite Gates**
+   - The specialized tools (XOR, XNOR)
+   - Built from combinations of other gates
+   - Optimized for specific common operations
+
+### Fundamental Gates (AND, OR, NOT)
+
+#### Common Characteristics
+- Direct implementation of basic boolean operations
+- Building blocks for all digital circuits
+- Simple and intuitive behavior
+- Clear relationship to everyday logic
+
+#### AND Gate
+1. **Operation**
+   - Output is 1 (TRUE) only if ALL inputs are 1
+   - Acts like multiplication: 1 × 1 = 1, but 1 × 0 = 0
+   ```
+   Truth Table:
+   A  B  | Output
+   0  0  |   0
+   0  1  |   0
+   1  0  |   0
+   1  1  |   1
+   ```
+
+2. **Physical Implementation**
+   - Uses series PMOS in pull-up network
+   - Uses parallel NMOS in pull-down network
+   - Requires 6 transistors for 2-input AND
+
+3. **Common Applications**
+   - Password verification (all conditions must be met)
+   - Safety interlocks (all checks must pass)
+   - Multi-factor authentication
+   - Memory address decoding
+
+#### OR Gate
+1. **Operation**
+   - Output is 1 if ANY input is 1
+   - Acts like addition with a maximum of 1: 1 + 1 = 1
+   ```
+   Truth Table:
+   A  B  | Output
+   0  0  |   0
+   0  1  |   1
+   1  0  |   1
+   1  1  |   1
+   ```
+
+2. **Physical Implementation**
+   - Uses parallel PMOS in pull-up network
+   - Uses series NMOS in pull-down network
+   - Requires 6 transistors for 2-input OR
+
+3. **Common Applications**
+   - Alarm systems (any sensor triggers alarm)
+   - Error detection (any error flags issue)
+   - Interrupt handling
+   - Multiple input detection
+
+#### NOT Gate (Inverter)
+1. **Operation**
+   - Simplest gate: inverts input
+   - Output is opposite of input
+   ```
+   Truth Table:
+   Input | Output
+    0    |   1
+    1    |   0
+   ```
+
+2. **Physical Implementation**
+   - Single PMOS and NMOS transistor
+   - Most efficient gate design
+   - Critical for signal restoration
+
+3. **Common Applications**
+   - Signal inversion
+   - Level restoration in long chains
+   - Clock signal generation
+   - Enable/disable logic
+
+### Universal Gates (NAND, NOR)
+
+#### Why They're Universal
+- Can create ANY other logic gate using only NAND or only NOR
+- More efficient to manufacture than fundamental gates
+- Optimal for CMOS implementation
+- Foundation of modern digital circuits
+
+#### NAND Gate
+1. **Operation**
+   - NOT of AND operation
+   - Output is 0 only if ALL inputs are 1
+   ```
+   Truth Table:
+   A  B  | Output
+   0  0  |   1
+   0  1  |   1
+   1  0  |   1
+   1  1  |   0
+   ```
+
+2. **Implementation Advantages**
+   - Fewer transistors than separate AND-NOT
+   - Better power characteristics
+   - Natural fit for CMOS technology
+   - Industry standard building block
+
+3. **Creating Other Gates with NAND**
+   ```
+   NOT(A) = NAND(A,A)
+   AND(A,B) = NOT(NAND(A,B))
+   OR(A,B) = NAND(NAND(A,A), NAND(B,B))
+   ```
+
+4. **Common Applications**
+   - Memory cells (SRAM)
+   - Basic building block for complex functions
+   - Level restoration
+   - Logic synthesis
+
+#### NOR Gate
+1. **Operation**
+   - NOT of OR operation
+   - Output is 1 only if ALL inputs are 0
+   ```
+   Truth Table:
+   A  B  | Output
+   0  0  |   1
+   0  1  |   0
+   1  0  |   0
+   1  1  |   0
+   ```
+
+2. **Implementation Considerations**
+   - Alternative universal gate
+   - Requires more area than NAND
+   - Slower due to stacked PMOS
+
+3. **Creating Other Gates with NOR**
+   ```
+   NOT(A) = NOR(A,A)
+   OR(A,B) = NOT(NOR(A,B))
+   AND(A,B) = NOR(NOR(A,A), NOR(B,B))
+   ```
+
+4. **Common Applications**
+   - Set-Reset latches
+   - Zero detection
+   - Priority encoders
+   - Power-on reset circuits
+
+### Composite Gates (XOR, XNOR)
+
+#### XOR Gate (Exclusive OR)
+1. **Operation**
+   - Output is 1 when inputs are DIFFERENT
+   - Key component in arithmetic circuits
+   ```
+   Truth Table:
+   A  B  | Output
+   0  0  |   0
+   0  1  |   1
+   1  0  |   1
+   1  1  |   0
+   ```
+
+2. **Implementation**
+   ```
+   Boolean Expression: A⊕B = (A·B̄) + (Ā·B)
+   ```
+   - Can be built using AND, OR, NOT gates
+   - Often implemented as optimized circuit
+   - Critical for performance optimization
+
+3. **Key Applications**
+   - Binary addition
+   - Parity checking
+   - Error detection
+   - Phase comparison
+   - Data encryption
+
+#### XNOR Gate (Exclusive NOR)
+1. **Operation**
+   - Output is 1 when inputs are THE SAME
+   - Complement of XOR operation
+   ```
+   Truth Table:
+   A  B  | Output
+   0  0  |   1
+   0  1  |   0
+   1  0  |   0
+   1  1  |   1
+   ```
+
+2. **Implementation**
+   ```
+   Boolean Expression: A⊙B = (A·B) + (Ā·B̄)
+   ```
+   - Complement of XOR
+   - Built from XNOR or combination of basic gates
+   - Optimized for equality comparison
+
+3. **Key Applications**
+   - Equality comparators
+   - Error checking
+   - Pattern matching
+   - Phase alignment detection
+
+### Gate-Level Optimization
+
+#### Why Optimization Matters
+- Reduces power consumption
+- Improves speed
+- Saves chip area
+- Enhances reliability
+
+#### Minimization Techniques
+1. **Boolean Algebra**
+   - Uses algebraic rules to simplify expressions
+   - Example: AB + AB̄ = A(B + B̄) = A·1 = A
+   - Foundation for automated optimization
+
+2. **Karnaugh Maps (K-maps)**
+   - Visual method for minimization
+   - Groups adjacent 1s or 0s
+   - Best for up to 4-5 variables
+   - Shows optimal groupings visually
+
+3. **Implementation Considerations**
+   - Gate count vs. delay tradeoff
+   - Power consumption optimization
+   - Area constraints
+   - Manufacturability
+
+### Practical Implications
+
+#### Circuit Design
+- Choose appropriate gates based on:
+  - Speed requirements
+  - Power constraints
+  - Area limitations
+  - Manufacturing process
+
+#### Performance Impact
+- Gate delays add up in chains
+- Critical path determines maximum speed
+- Power consumption depends on switching activity
+- Layout affects overall performance
+
+#### Best Practices
+1. **Design Rules**
+   - Minimize gate levels when possible
+   - Use universal gates for efficiency
+   - Consider power and timing constraints
+   - Plan for testability
+
+2. **Common Pitfalls**
+   - Excessive gate chains
+   - Ignoring power considerations
+   - Poor layout optimization
+   - Inadequate timing margins

@@ -192,17 +192,14 @@ This roadmap follows a deliberate sequential order, with each concept building u
   - Transistor-level implementation
     - How transistors create logic gates
     - Timing and power considerations
-  - Circuit optimization
-    - Minimizing gate count
-    - Reducing propagation delay
-    - Power efficiency techniques
 
-- **Logic Gates**
+- [**Logic Gates**](./P1-Computer%20Hardware%20&%20Architecture.md/#logic-gates)
   - Fundamental gates (AND, OR, NOT)
   - Universal gates (NAND, NOR)
   - Composite gates (XOR, XNOR)
   - Truth tables and Boolean expressions
   - Gate-level minimization
+  - Practical Implications
 
 - **Digital Circuit Design**
   - **Combinational Circuits**
