@@ -41,6 +41,10 @@
       - [Circuit Design](#circuit-design)
       - [Performance Impact](#performance-impact)
       - [Best Practices](#best-practices)
+    - [How computers calculate](#how-computers-calculate)
+- [8-Bit Ripple Carry Adder](#8-bit-ripple-carry-adder)
+- [8-BIT RIPPLE CARRY ADDER](#8-bit-ripple-carry-adder-1)
+      - [Basic Arithmetic Operations](#basic-arithmetic-operations)
 
 
 # Foundation Path 1: Computer Hardware & Architecture
@@ -738,3 +742,222 @@ Gates can be classified into three main categories:
    - Ignoring power considerations
    - Poor layout optimization
    - Inadequate timing margins
+
+
+### How computers calculate
+
+```mermaid
+graph TD
+    A[Binary Inputs] --> B[Half Adder]
+    B --> C[Sum Output]
+    B --> D[Carry Output]
+    
+    subgraph "Half Adder Implementation"
+    E[XOR Gate] --> C
+    F[AND Gate] --> D
+    end
+    
+    subgraph "Full Adder"
+    G[Half Adder 1] --> H[Half Adder 2]
+    I[Carry In] --> H
+    H --> J[Final Sum]
+    H --> K[Carry Out]
+    end
+
+    style B fill:#f9f,stroke:#333
+    style G fill:#bbf,stroke:#333
+    style H fill:#bbf,stroke:#333
+```
+
+# 8-Bit Ripple Carry Adder
+
+# 8-BIT RIPPLE CARRY ADDER
+
+```
+Inputs        Logic Blocks                                                     Outputs
+--------     -------------                                                    ---------
+A0 ──┐      ┌─────────┐
+B0 ──┴─────►│  HALF   │──────────────────────────────────────────────────────────► sum0
+            │  ADDER  │
+            └────┬────┘
+                 ▼ carry₀
+A1 ──┐           ┌────────┐
+B1 ──┴──────────►│  FULL  │──────────────────────────────────────────────────────► sum1
+                 │  ADDER │
+                 └────┬───┘
+                      ▼ carry₁
+A2 ──┐                ┌────────┐
+B2 ──┴───────────────►│  FULL  │─────────────────────────────────────────────────► sum2
+                      │  ADDER │
+                      └────┬───┘
+                           ▼ carry₂
+A3 ──┐                     ┌────────┐
+B3 ──┴──────────────────►  │  FULL  │────────────────────────────────────────────► sum3
+                           │  ADDER │
+                           └────┬───┘
+                                ▼ carry₃
+A4 ──┐                          ┌────────┐
+B4 ──┴─────────────────────────►│  FULL  │───────────────────────────────────────► sum4
+                                │  ADDER │
+                                └────┬───┘
+                                     ▼ carry₄
+A5 ──┐                               ┌────────┐
+B5 ──┴──────────────────────────────►│  FULL  │──────────────────────────────────► sum5
+                                     │  ADDER │
+                                     └────┬───┘
+                                          ▼ carry₅
+A6 ──┐                                    ┌────────┐
+B6 ──┴───────────────────────────────────►│  FULL  │─────────────────────────────► sum6
+                                          │  ADDER │
+                                          └────┬───┘
+                                               ▼ carry₆
+A7 ──┐                                         ┌────────┐
+B7 ──┴──────────────────────────────────────►  │  FULL  │────────────────────────► sum7
+                                               │  ADDER │► carry₇
+                                               └────────┘
+```
+
+Each stage processes one bit position, with carry bits propagating from right to left (least to most significant bit). The half adder handles the first position (A0, B0), while full adders handle subsequent positions (A1-B1 through A7-B7).
+
+#### Basic Arithmetic Operations
+
+1. Addition (Build from AND + XOR gates):
+
+- Half adder: Handles 2 bits
+  
+  ```
+  A  B  | Sum Carry
+  0  0  |  0    0
+  0  1  |  1    0
+  1  0  |  1    0
+  1  1  |  0    1
+  ```
+
+- Full adder: Adds 3 bits (includes carry)
+  - Uses two half adders + OR gate
+    - The first half adder handles A + B (new addition), but then we need another half adder to handle that result + Cin (the previous carry). The OR gate at the end combines carries from both operations
+      - First half adder: A + B → Sum1 + Carry1
+      - Second half adder: Sum1 + Cin (Carry in) → Final Sum + Carry2
+      - OR gate: Carry1 OR Carry2 → Final Carry
+  - Enables multi-bit addition
+    
+  ```
+  A  B  Cin | Sum Carry
+  0  0   0  |  0    0
+  0  0   1  |  1    0
+  0  1   0  |  1    0
+  0  1   1  |  0    1
+  1  0   0  |  1    0
+  1  0   1  |  0    1
+  1  1   0  |  0    1
+  1  1   1  |  1    1
+  ```
+
+2. Subtraction
+- Implemented as addition with 2's complement
+- Process:
+  1. Inverts bits (NOT gates)
+  2. Add 1
+  3. Add numbers 
+
+- Example walkthrough to subtract 3 from 5 (5-3):
+  1. Convert 3 to 2's complement:
+     - 3 = 0011
+     - Invert: 1100
+     - Add 1: 1101
+
+  2. Add to 5:
+     ```
+       0101 (5)
+     + 1101 (-3)
+     -------
+       0010 (2)
+     ```
+  
+  The overflow bit is discarded in 4-bit arithmetic.
+
+3. Multiplication:
+- Series of shifts and additions
+- Example: 5 × 3 (101 × 011)
+```
+    101   (5)
+  × 011   (3)  We look at each bit of 011 from right to left
+   ----- 
+
+1. Right bit (1):
+    101     (1 × 101 = 101, write directly)
+
+2. Middle bit (1):
+    1010    (1 × 101 = 101, shift left one position)
+            (shift adds a 0)
+
+3. Left bit (0):
+    0000     (0 × 101 = 000, shift left two positions)
+
+4. Add all rows:
+    101
+    1010
+    0000
+    -----
+    1111     (15 in decimal)
+```
+
+The shift left operation is like multiplying by powers of 2:
+- First position: ×1 (2⁰)
+- Second position: ×2 (2¹)
+- Third position: ×4 (2²)
+
+This follows the same pattern as decimal multiplication, but using powers of 2 instead of 10.
+
+4. Division:
+- Repeated subtraction and shift operations
+- Uses comparator circuits built from logic gates
+- Example: 6 (0110) ÷ 3 (0011)
+```
+Step 1: Can 0011 go into 0110?
+0110 (6)
+0011 (3)
+----
+0011 (Write 1 in result)
+
+Step 2: Can 0011 go into remaining 0011?
+0011 (3)
+0011 (3)
+----
+0000 (Write 1 in result)
+
+Final result: 0010 (2)
+```
+
+```
+Step 1: Compare 0110 (6) with 0011 (3)
+0110  |0011
+Can we subtract 0011 from 0110? Yes, because 6 > 3
+0110   First number
+0011   Subtract this
+----
+0011   Remainder
+Write 1 in answer (because subtraction was possible)
+Answer so far: 1
+
+Step 2: Look at remainder 0011
+0011  |0011
+Can we subtract 0011 from 0011? Yes, because 3 = 3
+0011   Remainder from step 1
+0011   Subtract this
+----
+0000   New remainder
+Write 1 in answer
+Answer so far: 11 (which is 0010 in 4-bit binary)
+
+Since remainder is 0, we're done.
+Final answer: 0010 (2 in decimal)
+```
+
+It works like decimal long division:
+1. Try to subtract divisor (3)
+2. If successful, write 1 in answer
+3. Use remainder for next step
+4. Repeat until remainder is 0 or smaller than divisor
+
+This ends up counting how many times 3 goes into 6, which is 2 (0010 in binary).

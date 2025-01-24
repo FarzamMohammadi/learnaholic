@@ -200,6 +200,7 @@ This roadmap follows a deliberate sequential order, with each concept building u
   - Truth tables and Boolean expressions
   - Gate-level minimization
   - Practical Implications
+  - How computers calculate
 
 - **Digital Circuit Design**
   - **Combinational Circuits**
