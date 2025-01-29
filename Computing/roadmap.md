@@ -202,88 +202,67 @@ This roadmap follows a deliberate sequential order, with each concept building u
   - Practical Implications
   - How computers calculate
 
-- **Digital Circuit Design**
-  - **Combinational Circuits**
-    - Building blocks (multiplexers, decoders)
-    - Arithmetic circuits (adders, ALU)
-    - Design methodology and optimization
-    - Timing and propagation delay
-  
-  - **Sequential Circuits**
-    - Latches and flip-flops
-    - Registers and counters
-    - State machines
-    - Clock domains and timing
-    - Synchronous design principles
-
 #### CPU Architecture
 - **Basic CPU Components**
-  - Arithmetic Logic Unit (ALU)
-  - Control Unit
-  - Registers and their types
-  - Clock and timing systems
-  - Instruction pipeline stages
+  - ALU: How computers do math
+  - Control Unit: The CPU's traffic director
+  - Registers: Fast temporary storage
+  - Clock: How everything stays in sync
+  - Instruction pipeline: Assembly line for commands
 
 - **Modern CPU Features**
-  - Superscalar execution
-  - Out-of-order processing
-  - Branch prediction
-  - Speculative execution
-  - Hardware multithreading
-  - SIMD instructions
-  - Vector processing units
+  - Superscalar execution: Doing multiple things at once
+  - Out-of-order processing: Smart reordering for speed
+  - Branch prediction: Guessing program flow
+  - Hardware multithreading: Real parallel execution
+  - SIMD instructions: Processing multiple data at once
 
 - **Advanced Architectures**
-  - ARM vs x86_64 comparison
-  - RISC-V architecture
-  - Big.LITTLE design (ARM)
-  - Apple Silicon (M1/M2/M3)
-  - AMD Zen architecture
-  - Hardware virtualization support
+  - ARM vs x86: Why your laptop and phone are different
+  - RISC-V: The open-source future
+  - Apple Silicon: Why M1/M2/M3 changed the game
+  - Modern design trends:
+    - Big.LITTLE: Fast cores + efficient cores
+    - Hardware specialization (ML, graphics)
 
 #### Memory Systems
 - **Memory Hierarchy**
-  - Registers
-  - L1/L2/L3 Cache
-  - Main Memory (RAM)
-  - Virtual Memory
-  - Secondary Storage
+  - Why we need different types of memory
+  - Registers: Lightning-fast but tiny
+  - Cache (L1/L2/L3): Fast but limited
+  - Main Memory (RAM): The working space
+  - Virtual Memory: Using disk as extra RAM
 
 - **Cache Systems**
-  - Cache line operations
-  - Cache coherency protocols (MESI, MOESI)
-  - Write-back vs write-through
-  - Replacement policies
-  - False sharing problems
-  - Cache-friendly programming
+  - Why caches matter for performance
+  - How programs can be cache-friendly
+  - Common caching strategies
+  - When caches become a problem
 
 - **Memory Technologies**
-  - SRAM vs DRAM
-  - DDR generations (DDR4, DDR5)
-  - Non-volatile memory
-  - Memory controllers
-  - ECC memory
+  - RAM vs Cache: Why different types exist
+  - Modern memory features developers should know
+  - How memory affects program performance
 
 #### System Architecture
 - **Bus Systems**
-  - System bus architecture
-  - PCIe generations
-  - DMA operations
-  - Interrupt handling
-  - IOMMU virtualization
+  - How components talk to each other
+  - Why data transfer speed matters
+  - Basic I/O operations
+  - Interrupts: How hardware gets attention
 
 - **Peripheral Systems**
-  - Storage controllers
-  - Network controllers
-  - GPU architecture
-  - Specialized accelerators
+  - Storage: How programs interact with drives
+  - Network: Basic hardware communication
+  - GPU: Graphics and parallel computing
+  - Modern accelerators: AI and specialized tasks
 
 #### Power Management
 - **Power Features**
-  - Dynamic voltage and frequency scaling
-  - Power states (C-states, P-states)
-  - Thermal management
-  - Energy efficiency techniques
+  - Why power matters in modern computing
+  - How programs affect battery life
+  - Temperature and performance relationship
+  - Writing energy-efficient code
 
 ### Hands-on Projects
 1. **CPU Simulator**
