@@ -1037,3 +1037,296 @@ int result2 = (y + (1<<2)-1) >> 2;  // -12/4 = -3 (rounded toward zero)
   - Integer constants (default type)
   - Library functions (might use unsigned unexpectedly)
   - Overflow conditions
+
+# 2.4 Floating Point
+
+## Historical Context & Introduction
+- Before 1985: Each computer manufacturer had their own floating-point formats
+- 1985: IEEE Standard 754 became the universal standard
+  - Originated from Intel's 8087 chip design for the 8086 processor
+  - Designed with help from Berkeley professor William Kahan
+  - Now used by virtually all computers, improving program portability
+
+## 2.4.1 Fractional Binary Numbers
+
+### Decimal vs Binary Fractions
+- Decimal fractions example: 12.34₁₀
+  - 1 × 10¹ + 2 × 10⁰ + 3 × 10⁻¹ + 4 × 10⁻² = 12.34
+
+- Binary fractions example: 101.11₂
+  - 1 × 2² + 0 × 2¹ + 1 × 2⁰ + 1 × 2⁻¹ + 1 × 2⁻² = 5.75₁₀
+
+### Key Properties
+- Binary point (like decimal point) separates whole and fractional parts
+- Moving binary point left divides by 2 (like decimal point and 10)
+- Moving binary point right multiplies by 2
+- Some numbers cannot be represented exactly in binary
+  - Example: 1/5 (0.2 in decimal) requires an infinite binary representation
+  - Similar to how 1/3 needs infinite decimal places (0.333...)
+
+## 2.4.2 IEEE Floating-Point Format
+
+### Basic Structure
+Numbers are represented as: V = (-1)ˢ × M × 2ᴱ
+- s = sign bit (0 for positive, 1 for negative)
+- M = significand (a fractional value between 1 and 2, or between 0 and 1)
+- E = exponent (weights the value by a power of 2)
+
+### Format Types
+1. Single Precision (32 bits total)
+   - 1 bit: Sign
+   - 8 bits: Exponent
+   - 23 bits: Fraction
+
+2. Double Precision (64 bits total)
+   - 1 bit: Sign
+   - 11 bits: Exponent
+   - 52 bits: Fraction
+
+### Three Categories of Values in IEEE Floating-Point
+
+1. Normalized Values
+   * Most common case: exponent field between all 0s and all 1s
+   * Format: (-1)ˢ × (1 + fraction) × 2^(exp - bias)
+   * 8-bit simplified format (1 sign, 4 exponent, 3 fraction bits, bias=7): 
+      ```
+      Example Value: 1.5 (decimal)
+      Binary: 0 1000 100
+
+      Detailed Calculation:
+      Sign bit (s) = 0 → (-1)⁰ = +1
+      Exponent = 1000₂ = 8 → 8 - 7(bias) = 1
+      Fraction = 100₂ = 0.5 (because 1/2)
+
+      Final math:
+      1.5 = 1 × (1 + 0.5) × 2¹
+      = 1 × 1.5 × 2
+      = 1.5 × 2
+      = 3
+      ```
+
+2. Denormalized Values
+   * Used when exponent field is all zeros (very small numbers)
+   * Format: (-1)ˢ × (0 + fraction) × 2^(1 - bias)
+      ```
+      Example 1 - Zero:
+      Binary: 0 0000 000
+
+      Calculation:
+      Sign = 0 → positive
+      Exponent = 0 → denormalized
+      Fraction = 0
+      Result: +0.0
+
+      Example 2 - Tiny Number:
+      Binary: 0 0000 001
+
+      Detailed Calculation:
+      Sign bit (s) = 0 → (-1)⁰ = +1 (positive)
+      Exponent = 0000 → denormalized → use 2^(-6) (1 - bias)
+      Fraction = 001₂ = 1/8
+
+      Final math:
+      = 1 × (0 + 1/8) × 2^(-6)
+      = 1/8 × 1/64
+      = 1/512 (smallest positive number in this format)
+      ```
+
+3. Special Values
+   * Exponent field all ones (11...1)
+   * Examples:
+    ```
+    Example 1 - Positive Infinity:
+    Binary: 0 1111 000
+
+    Breakdown:
+    - Sign = 0 → positive
+    - Exponent = 1111 → special value
+    - Fraction = 000 → infinity
+
+    Example 2 - NaN (Not a Number):
+    Binary: 0 1111 100
+
+    Breakdown:
+    - Sign = 0 (ignored for NaN)
+    - Exponent = 1111 → special value
+    - Fraction = 100 → non-zero means NaN
+
+    Example 3 - Negative Infinity:
+    Binary: 1 1111 000
+
+    Breakdown:
+    - Sign = 1 → negative
+    - Exponent = 1111 → special value
+    - Fraction = 000 → infinity
+    ```
+
+Practical Uses:
+- Normalized: Regular numbers like 1.0, 2.5, -3.75
+- Denormalized: Very small numbers close to zero, and zero itself
+- Special Values: 
+  - ∞: Results of division by zero or very large computations
+  - NaN: Results of invalid operations like 0/0 or √-1
+
+You're right - let me combine both the original conceptual notes with the detailed examples for a complete understanding:
+
+## 2.4.3 Rounding
+
+### Overview
+Floating-point arithmetic can only approximate real arithmetic due to limited precision. When exact representation isn't possible, we need systematic methods to find the "closest" matching value that can be represented.
+
+### Four Rounding Modes
+
+1. Round-to-even (Default Mode)
+- Also called round-to-nearest
+- Finds the closest matching value
+- For halfway cases, rounds to the number with an even least significant digit
+- Purpose: Avoids statistical bias in large computations
+- Most commonly used mode in practice
+
+```
+Examples with decimals:
+1.4 → 1.0
+1.6 → 2.0
+1.5 → 2.0 (halfway case, 2 is even)
+2.5 → 2.0 (halfway case, 2 is even)
+3.5 → 4.0 (halfway case, 4 is even)
+-1.5 → -2.0 (halfway case, -2 is even)
+
+Binary Examples (rounding to integer):
+1.1000₂ (1.5₁₀) → 10₂ (2₁₀) 
+10.1000₂ (2.5₁₀) → 10₂ (2₁₀)
+11.1000₂ (3.5₁₀) → 100₂ (4₁₀)
+```
+
+2. Round-toward-zero
+- Rounds positive numbers downward and negative numbers upward
+- Creates value ˆx where |ˆx| ≤ |x|
+- Useful for certain numerical bounds
+
+```
+Basic Rule: Always round toward 0 (truncate)
+
+Decimal Examples:
+1.8 → 1.0
+1.2 → 1.0
+-1.8 → -1.0
+-1.2 → -1.0
+
+Binary Examples:
+1.1100₂ (1.75₁₀) → 1₂ (1₁₀)
+10.1100₂ (2.75₁₀) → 10₂ (2₁₀)
+-10.1100₂ (-2.75₁₀) → -10₂ (-2₁₀)
+```
+
+3. Round-down (toward negative infinity)
+- Rounds both positive and negative numbers downward
+- Creates value x⁻ where x⁻ ≤ x
+- Useful for establishing lower bounds
+
+```
+Basic Rule: Always round down
+
+Decimal Examples:
+1.1 → 1.0
+1.8 → 1.0
+-1.1 → -2.0
+-1.8 → -2.0
+
+Binary Examples:
+1.1100₂ (1.75₁₀) → 1₂ (1₁₀)
+-1.1100₂ (-1.75₁₀) → -10₂ (-2₁₀)
+```
+
+4. Round-up (toward positive infinity)
+- Rounds both positive and negative numbers upward
+- Creates value x⁺ where x ≤ x⁺
+- Useful for establishing upper bounds
+
+```
+Basic Rule: Always round up
+
+Decimal Examples:
+1.1 → 2.0
+1.8 → 2.0
+-1.1 → -1.0
+-1.8 → -1.0
+
+Binary Examples:
+1.1100₂ (1.75₁₀) → 10₂ (2₁₀)
+-1.1100₂ (-1.75₁₀) → -1₂ (-1₁₀)
+```
+
+### Importance of Round-to-Even
+- Rounds up ~50% of the time and down ~50% of the time
+
+The default round-to-even mode helps avoid systematic bias in computations:
+
+```
+Consider large dataset rounding:
+Regular rounding up at .5:
+1.5 → 2
+2.5 → 3
+3.5 → 4
+4.5 → 5
+Average shifts upward
+
+Round-to-even:
+1.5 → 2
+2.5 → 2
+3.5 → 4
+4.5 → 4
+Average stays balanced
+```
+
+### Practical Applications
+
+```
+Banking Example (rounding to cents):
+$1.235 rounded four ways:
+- Round-to-even: $1.24 
+- Round-toward-zero: $1.23
+- Round-down: $1.23
+- Round-up: $1.24
+
+Binary Precision Example:
+1.0101₂ (1.3125₁₀) to 3 fractional bits:
+- Round-to-even: 1.010₂ (1.25₁₀)
+- Round-toward-zero: 1.010₂ (1.25₁₀)
+- Round-down: 1.010₂ (1.25₁₀)
+- Round-up: 1.011₂ (1.375₁₀)
+```
+
+## 2.4.4 Operations
+
+### Key Properties
+- Not exactly like real number arithmetic
+- Addition (+f) and multiplication (*f) have special rules
+- Operations may produce:
+  - Normal results
+  - Infinity (from overflow)
+  - NaN (from undefined operations)
+
+### Important Differences from Real Arithmetic
+1. Not associative
+   - (a +f b) +f c might ≠ a +f (b +f c)
+   - Example: (3.14 + 1e10) - 1e10 = 0.0, but 3.14 + (1e10 - 1e10) = 3.14
+
+2. Not distributive
+   - a *f (b +f c) might ≠ (a *f b) +f (a *f c)
+
+3. Can have rounding errors
+   - Results are approximations of exact mathematical results
+
+## 2.4.5 Floating Point in C
+
+### Types
+- float: Single precision (32 bits)
+- double: Double precision (64 bits)
+- long double: Extended precision (implementation dependent)
+
+### Type Conversion Rules
+- int to float: May round, cannot overflow
+- int/float to double: Exact preservation
+- double to float: May overflow or round
+- float/double to int: Rounds toward zero, may overflow
