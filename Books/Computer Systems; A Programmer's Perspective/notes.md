@@ -836,7 +836,6 @@ double           |    8   |    8
 - When converting back to a larger type, C will fill in the higher order bits appropriately based on whether the number is signed (sign extension) or unsigned (zero extension).
 - Always ensure the destination type has enough bits to represent the value to avoid unintended truncation.
 
-
 # 2.2.8 Advice on Signed vs. Unsigned
 
 ## Implicit Casting Issues
@@ -871,76 +870,170 @@ double           |    8   |    8
 - Consider the consequences of type conversions, especially in critical code paths, such as security checks or memory operations.
 
 # 2.3 Integer Arithmetic
-It can be surprising, whether you're a new or seasoned programmer, to find that adding two positive numbers yields a negative result. Similarly, the comparison `x < y` may differ from `x-y < 0`. These quirks stem from the finite nature of computer arithmetic.
+
+## Key Concept
+In computers, integer arithmetic isn't exactly like regular math because computers have limited space to store numbers. This leads to some surprising behaviors, like:
+- Adding two positive numbers can give a negative result
+- `x < y` might give a different result than `x-y < 0`
+- These oddities come from the finite (limited) nature of computer arithmetic
 
 ## 2.3.1 Unsigned Addition
-- `0 <= x, y <= 2^w - 1`: Nonnegative integers represented by w-bits.
-- `Sum range: 0 <= x + y <= 2^(w+1) - 2`, may need w+1 bits.
-- **Modular arithmetic**: Unsigned addition is sum modulo 2^w.
-- **Overflow**: Occurs when sum is 2^w or more.
-- **Overflow detection**: If result `s < x`, then overflow occurred.
-- **Abelian group properties**: Commutative, associative, has identity (0), every element has an inverse.
 
-## Modular Addition in Programming
-- **C behavior**: Doesn't signal errors on overflow.
-- **Inverse calculation**: For non-zero `x`, inverse is `2^w - x`.
+### Basic Concepts
+- For unsigned numbers with w bits:
+  - Each number x or y must be between 0 and 2^w - 1
+  - Their sum (x + y) could need w+1 bits to represent fully
+  - When the sum is too big for w bits, we get overflow
 
-## Unsigned Addition Simplified
-- Imagine having only `w` blocks to build numbers.
-- The total can stretch up to 2 blocks past the limit (`2^(w+1) - 2`).
-- If you have more than `w` blocks, you start from 0 again (that's like modular arithmetic).
-- **Overflow**: When your number pile needs more blocks than you have.
-- **Spotting Overflow**: If your total (`s`) is less than what you started with (`x`), you've got overflow.
-- **Special Math Group**: Think of it as a club where you can swap, combine, or remove blocks and still play by the rules.
+### How It Works
+- Computer performs "modular arithmetic": sum is calculated as (x + y) mod 2^w
+- Overflow occurs when sum ≥ 2^w
+- You can detect overflow by checking if the sum is less than one of the original numbers
+  - If `s = x + y` and `s < x`, then overflow occurred
 
-## Modular Addition in Programming Simplified
-- In language C, it won't complain if you overflow.
-- To find the block that balances another so the total is zero, if it's not the starting block (0), then subtract the block number from 2 times your block limit (`2^w - x`).
+### Real-World Example
+```c
+unsigned char a = 250;  // 8 bits max (0 to 255)
+unsigned char b = 10;
+unsigned char sum = a + b;  // Expected: 260, Actual: 4 (260 mod 256)
+// Overflow occurred because 260 is too big for 8 bits
+```
 
-## Key Takeaways
-- Finite nature of computer arithmetic can cause unexpected results (e.g., positive sum yielding negative).
-- Fixed-precision arithmetic in languages like C can differ from mathematical operations.
-- Detection of overflow is crucial for reliability in programs.
+## 2.3.2 Two's-Complement Addition
 
-## 2.3.2  Two’s-Complement Addition
-- **Two's-Complement**: A way for computers to understand negative and positive numbers.
-- **Range**: Each number can range from very negative (-2^(w-1)) to very positive (2^(w-1)-1).
-- **Adding**: When you add two numbers:
-  - **No overflow**: If the sum is not too big or too small, it’s just the regular sum.
-  - **Positive overflow**: If the sum is too big, it wraps around to negative.
-  - **Negative overflow**: If the sum is too small, it wraps around to positive.
-- **Detecting Overflow**: Check if the sign of the result is not what you expect (negative when it should be positive or vice versa).
+### Basic Concepts
+- For signed numbers with w bits:
+  - Numbers range from -2^(w-1) to 2^(w-1) - 1
+  - Their sum needs w+1 bits for full representation
+  - Two types of overflow can occur:
+    1. Positive overflow: when sum is too positive (sum > 2^(w-1) -1)
+    2. Negative overflow: when sum is too negative (sum < -2^(w-1))
 
-## Two’s-Complement Addition with 4-Bit Numbers
+#### Overflow Detection
 
-- **Understanding 4-Bit Limits**: A 4-bit number can only hold values from -8 to 7.
-- **Normal Addition**: If you add any two numbers within the limits (-8 to 7) and the sum stays within these limits, the sum is accurate.
-- **Overflow in Addition**:
-  - **Positive Overflow**: If the sum of two positive numbers is 8 or more, it's too big for 4 bits. The sum loops around and becomes negative.
-  - **Negative Overflow**: If the sum of two negative numbers is less than -8, it's too small for 4 bits. The sum loops around and becomes positive.
-- **Examples**:
-  - `-8 + (-5)` gives `3` due to negative overflow. `-13` is out of range, so it loops and lands on `3`.
-    ```plaintext
-    -8 = 1000 (4-bit two's complement)
-    -5 = 1011 (4-bit two's complement)
+1. Adding two positives:
+   - If result is negative → Positive overflow occurred
+   - Example (4-bit): 5 + 4 = [0101 + 0100 = 1001 = -7]
+   - We know this overflowed because 5 + 4 should be 9, not -7
 
-      1000
-    + 1011
-    -------
-    (1)0011 (5-bit result with overflow bit)
-    Discard the overflow bit to fit into 4 bits: 0011 = 3
+2. Adding two negatives:
+   - If result is positive → Negative overflow occurred
+   - Example (4-bit): -5 + (-4) = [1011 + 1100 = 0111 = 7]
+   - We know this overflowed because -5 + (-4) should be -9, not 7
+
+3. Adding a positive and a negative:
+   - Cannot overflow! The result will always be representable
+   - This is because the true mathematical sum will always be between the two operands
+   - Example (4-bit): 5 + (-4) = [0101 + 1100 = 0001 = 1]
+   - Example (4-bit): -5 + 6 = [1011 + 0110 = 0001 = 1]
+
+We can detect overflow by looking at the operands (x, y) and result (s):
+```c
+int x, y;         // operands
+int s = x + y;    // sum
+int overflow =    // overflow detection
+    ((x > 0 && y > 0 && s <= 0) ||     // positive + positive
+     (x < 0 && y < 0 && s >= 0));      // negative + negative
+```
+## 2.3.3 Two's-Complement Negation
+
+### Basic Rules
+- For most numbers: negation is achieved by finding the number's additive inverse
+  - How to Negate a Number
+    1. Flip all bits (1s become 0s, 0s become 1s)
+    2. Add 1 to the result
+
+ - 4-bit Examples:
+
+    ```
+    Negating 3:
+    0011  (3)
+    1100  (flip bits)
+    1101  (add 1)
+    = -3
+
+    Negating -3:
+    1101  (-3)
+    0010  (flip bits)
+    0011  (add 1)
+    = 3
     ```
 
-  - `5 + 5` gives `-6` due to positive overflow. `10` is out of range, so it subtracts 16 (the total number of values in 4 bits) and lands on `-6`.
-    ```plaintext
-    5 = 0101 (4-bit two's complement)
-    5 = 0101 (4-bit two's complement)
-
-      0101
-    + 0101
-    -------
-    1010 (4-bit result, no need to discard bits)
-
-    The result 1010 in two's complement equals -6.
+- Special case: most negative number (TMin) is its own negative
+  - Example: in 4 bits, -8 is its own negative because +8 can't be represented
     ```
-- **Identifying Overflow**: If adding two negatives gives a positive, or two positives give a negative, there's an overflow.
+    Trying to negate -8:
+    1000  (-8)
+    0111  (flip bits)
+    1000  (add 1)
+    = -8  (back to same number!)
+    ```
+
+  - This happens because:
+    - In 4 bits, numbers range from -8 to 7
+    - When we try to get +8, it doesn't fit
+    - So -8 ends up being its own negative
+
+  - 6-bit Example:
+    ```
+    Regular case (negating 12):
+    001100  (12)
+    110011  (flip bits)
+    110100  (add 1)
+    = -12
+
+    Special case (negating -32):
+    100000  (-32)
+    011111  (flip bits)
+    100000  (add 1)
+    = -32   (same number!)
+    ```
+
+## 2.3.4 and 2.3.5 Unsigned and Two's-Complement Multiplication
+
+### Key Points
+- Result might need up to 2w bits (double the original size)
+- Computer truncates result to w bits (keeps only lower half)
+- Both unsigned and signed multiplication give same bit-level results
+- Special cases to watch out for:
+  - Multiplying large numbers can cause overflow
+  - Result might be correct in one interpretation (signed/unsigned) but wrong in another
+
+## 2.3.6 Multiplying by Constants
+
+### Optimization Techniques
+- Multiplication is slower than addition and shifting
+- Compilers optimize multiplication by constants using shifts and adds
+- Example: x * 14 can be written as:
+  - `(x << 3) + (x << 2) + (x << 1)`  // x * 8 + x * 4 + x * 2
+  - Or better: `(x << 4) - (x << 1)`   // x * 16 - x * 2
+
+## 2.3.7 Dividing by Powers of Two
+
+### Methods
+- Division by 2^k can be done with right shifts
+- Unsigned numbers: use logical right shift
+- Signed numbers: use arithmetic right shift
+- For negative numbers: need to add bias before shifting to round correctly
+
+### Example
+```c
+// Divide by 4 (2^2):
+unsigned x = 12;
+unsigned result = x >> 2;  // 12/4 = 3
+
+int y = -12;
+int result2 = (y + (1<<2)-1) >> 2;  // -12/4 = -3 (rounded toward zero)
+```
+
+## 2.3.8 Final Thoughts
+
+### Important Points
+- Computer arithmetic is really modular arithmetic due to limited word size
+- Operations can overflow
+- Two's-complement is clever: same hardware works for both signed and unsigned
+- Unsigned numbers can cause unexpected behavior
+- Be careful with:
+  - Integer constants (default type)
+  - Library functions (might use unsigned unexpectedly)
+  - Overflow conditions
