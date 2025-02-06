@@ -1330,3 +1330,65 @@ Binary Precision Example:
 - int/float to double: Exact preservation
 - double to float: May overflow or round
 - float/double to int: Rounds toward zero, may overflow
+
+Based on the summary of Chapter 2, here are the key points organized for future reference:
+
+# Chapter 2 Summary - Computer Data Representation & Arithmetic
+
+## Data Storage & Encoding
+- Computers store all data as bits (binary), organized in byte sequences
+- Different encodings exist for:
+  - Integers (signed/unsigned)
+  - Real numbers (floating-point)
+  - Character strings
+- Byte ordering varies by machine (endianness)
+
+## C Language Implementation
+- Designed for flexibility across different machines
+- Word sizes: 
+  - Typically 32-bit
+  - Trend toward 64-bit
+- Common implementations use:
+  - Two's-complement for integers
+  - IEEE format for floating-point
+
+## Integer Arithmetic Characteristics
+- Finite length causes overflow
+- Properties that hold true:
+  - Associativity
+  - Commutativity 
+  - Distributivity
+- Example optimization: `7*x` can be computed as `(x<<3)-x`
+
+## Floating-Point (IEEE 754)
+- Represents numbers as: x × 2^y
+- Common formats:
+  - Single precision (32 bits)
+  - Double precision (64 bits)
+- Special values:
+  - ±Infinity
+  - Not-a-Number (NaN)
+- Limited precision and range
+- Does not follow standard mathematical properties (e.g., associativity)
+
+## Critical Programming Considerations
+1. Type Casting
+   - Between signed/unsigned: Bit pattern typically unchanged
+   - Can lead to unexpected behavior if not careful
+
+2. Bit-Level Operations
+   - Useful patterns: `~x+1` equals `-x` in two's-complement
+   - Masking: Generate k ones using `(1<<k)-1`
+
+3. Arithmetic Safety
+   - Watch for overflow in integer operations
+   - Example: `x*x` can be negative due to overflow
+   - Floating-point requires careful handling due to precision limits
+
+## Security and Portability
+- Word sizes and numeric encodings vary by machine
+- C standards intentionally avoid specifying these details
+- Careful coding needed to ensure:
+  - Cross-platform compatibility
+  - Security against overflow vulnerabilities
+  - Proper handling of implicit type conversions
