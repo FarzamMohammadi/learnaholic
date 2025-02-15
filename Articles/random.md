@@ -1,0 +1,1 @@
+[NASA's rules for software development](https://www.cs.otago.ac.nz/cosc345/resources/nasa-10-rules.htm)
