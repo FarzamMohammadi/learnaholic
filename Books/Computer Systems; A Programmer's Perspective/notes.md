@@ -1,5 +1,7 @@
 # Computer Systems: A Programmer's Perspective by Randal E. Bryant & David R. O'Hallaron
 
+full course: https://www.cs.cmu.edu/afs/cs/academic/class/15213-f17/www/schedule.html
+
 # 1 - A Tour of Computer Systems
 
 # 1.1 Information Is Bits + Context
