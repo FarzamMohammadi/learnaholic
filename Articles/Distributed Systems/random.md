@@ -1,0 +1,1 @@
+- https://paper-notes.zhjwpku.com/assets/pdfs/paxos_for_system_builders.pdf
