@@ -1,1 +1,2 @@
-[NASA's rules for software development](https://www.cs.otago.ac.nz/cosc345/resources/nasa-10-rules.htm)
+- [NASA's rules for software development](https://www.cs.otago.ac.nz/cosc345/resources/nasa-10-rules.htm)
+- https://www.justinmath.com/advice-on-upskilling/
