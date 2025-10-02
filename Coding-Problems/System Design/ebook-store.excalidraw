@@ -3506,8 +3506,8 @@
     {
       "id": "ciV6lszmnZ05-EFlN6JM2",
       "type": "text",
-      "x": 4486.269271379636,
-      "y": 1403.9733587646485,
+      "x": 588.5188746511199,
+      "y": 1186.8238531494142,
       "width": 473.93988037109375,
       "height": 48.6,
       "angle": 0,
@@ -3523,11 +3523,11 @@
       "index": "b1K",
       "roundness": null,
       "seed": 226171831,
-      "version": 65,
-      "versionNonce": 897534227,
+      "version": 132,
+      "versionNonce": 1238776255,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1759428682457,
+      "updated": 1759432827107,
       "link": null,
       "locked": false,
       "text": "Diagram 2: Systems Diagram",
@@ -3610,8 +3610,8 @@
     {
       "id": "bVpQUxLvSs2AhQF_4d4d6",
       "type": "rectangle",
-      "x": 2881.8603665903497,
-      "y": 1839.9667124448488,
+      "x": 2949.1347399627452,
+      "y": 1801.2056243914633,
       "width": 364.1403198242187,
       "height": 161.2110137939453,
       "angle": 0,
@@ -3629,8 +3629,8 @@
         "type": 3
       },
       "seed": 1925160477,
-      "version": 540,
-      "versionNonce": 155986301,
+      "version": 574,
+      "versionNonce": 224045343,
       "isDeleted": false,
       "boundElements": [
         {
@@ -3640,17 +3640,21 @@
         {
           "id": "j_HYEInpgim0-09k4rSJC",
           "type": "arrow"
+        },
+        {
+          "id": "uFa-80SFqLtaNpwlOirMP",
+          "type": "arrow"
         }
       ],
-      "updated": 1759430620163,
+      "updated": 1759432995799,
       "link": null,
       "locked": false
     },
     {
       "id": "6xAmRiYv9nXXM89sqQgH0",
       "type": "text",
-      "x": 2937.948562391131,
-      "y": 1898.0722193418214,
+      "x": 3005.2229357635265,
+      "y": 1859.311131288436,
       "width": 251.96392822265625,
       "height": 45,
       "angle": 0,
@@ -3666,11 +3670,11 @@
       "index": "b1T",
       "roundness": null,
       "seed": 817877629,
-      "version": 538,
-      "versionNonce": 274985437,
+      "version": 571,
+      "versionNonce": 260451647,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1759430620163,
+      "updated": 1759432995799,
       "link": null,
       "locked": false,
       "text": "Search Service",
@@ -3864,7 +3868,7 @@
       "version": 207,
       "versionNonce": 1484440019,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759429129400,
       "link": null,
       "locked": false,
@@ -3969,36 +3973,6 @@
       "lineHeight": 1.25
     },
     {
-      "id": "07IiRh7eUf9dXikWt607K",
-      "type": "rectangle",
-      "x": 517.0755818257012,
-      "y": 1005.7656562094971,
-      "width": 3119.140853881836,
-      "height": 235.77476501464844,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "b1j",
-      "roundness": {
-        "type": 3
-      },
-      "seed": 351571581,
-      "version": 115,
-      "versionNonce": 747530813,
-      "isDeleted": false,
-      "boundElements": [],
-      "updated": 1759428999034,
-      "link": null,
-      "locked": false
-    },
-    {
       "id": "ohtnj0GrCMnZiqoXU6icK",
       "type": "text",
       "x": 416.5676930317559,
@@ -4021,7 +3995,7 @@
       "version": 203,
       "versionNonce": 1144755603,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430703026,
       "link": null,
       "locked": false,
@@ -4146,7 +4120,7 @@
       "version": 118,
       "versionNonce": 1917290067,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430492037,
       "link": null,
       "locked": false,
@@ -4198,7 +4172,7 @@
       "version": 75,
       "versionNonce": 655256435,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430457228,
       "link": null,
       "locked": false,
@@ -4250,7 +4224,7 @@
       "version": 70,
       "versionNonce": 330728723,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430457228,
       "link": null,
       "locked": false,
@@ -4363,9 +4337,9 @@
       "id": "j_HYEInpgim0-09k4rSJC",
       "type": "arrow",
       "x": 2216.482188904322,
-      "y": 2113.069470913258,
-      "width": 660.6444813505459,
-      "height": 159.16109114463552,
+      "y": 2109.678439911487,
+      "width": 727.9188547229414,
+      "height": 191.96652923128977,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -4379,11 +4353,11 @@
       "index": "b2A",
       "roundness": null,
       "seed": 1385151069,
-      "version": 244,
-      "versionNonce": 103001661,
+      "version": 277,
+      "versionNonce": 636235103,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1759430620163,
+      "boundElements": [],
+      "updated": 1759432995799,
       "link": null,
       "locked": false,
       "points": [
@@ -4392,8 +4366,8 @@
           0
         ],
         [
-          660.6444813505459,
-          -159.16109114463552
+          727.9188547229414,
+          -191.96652923128977
         ]
       ],
       "lastCommittedPoint": null,
@@ -4434,7 +4408,7 @@
       "version": 243,
       "versionNonce": 1978057725,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430618797,
       "link": null,
       "locked": false,
@@ -4486,7 +4460,7 @@
       "version": 303,
       "versionNonce": 1769095965,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430625196,
       "link": null,
       "locked": false,
@@ -4577,7 +4551,7 @@
       "version": 220,
       "versionNonce": 1612423869,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430625196,
       "link": null,
       "locked": false,
@@ -4613,8 +4587,8 @@
         "type": 2
       },
       "seed": 669222429,
-      "version": 452,
-      "versionNonce": 853256989,
+      "version": 453,
+      "versionNonce": 1041260703,
       "isDeleted": false,
       "boundElements": [
         {
@@ -4624,9 +4598,13 @@
         {
           "id": "aqen_Tu4oe0A7V3nEvQ7r",
           "type": "arrow"
+        },
+        {
+          "id": "uFa-80SFqLtaNpwlOirMP",
+          "type": "arrow"
         }
       ],
-      "updated": 1759430622477,
+      "updated": 1759432981830,
       "link": null,
       "locked": false
     },
@@ -4690,7 +4668,7 @@
       "version": 116,
       "versionNonce": 452836797,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430622560,
       "link": null,
       "locked": false,
@@ -4742,7 +4720,7 @@
       "version": 143,
       "versionNonce": 376177555,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430588622,
       "link": null,
       "locked": false,
@@ -4855,7 +4833,7 @@
       "version": 29,
       "versionNonce": 1782317405,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759430607873,
       "link": null,
       "locked": false,
@@ -4920,6 +4898,60 @@
       "originalText": "Questions:\n\n 1. Inlcude Auth, purchase and other transacitons into one (Scalable) API?\n    - Or separate them? Does auth need to be scaled separetly from Purchase and other transacitons?\n    - Best answered by requirements and work environment?\n\n\n Single API (Auth + Purchases + Transactions together)\n\n  Pros:\n  - ✅ Simpler: One codebase, one deployment, one monitoring system\n  - ✅ Faster development: Share code, models, utilities easily\n  - ✅ Lower latency: No network calls between components (in-process calls)\n  - ✅ Easier transactions: Database transactions across auth/purchases work naturally\n  - ✅ Less infrastructure: Fewer servers, load balancers, configs to manage\n  - ✅ Cheaper: One set of instances instead of three\n\n  Cons:\n  - ❌ Wasteful scaling: Auth needs 50k req/s but purchases need 5k req/s → you scale everything for auth's needs\n  - ❌ Resource contention: Heavy purchase processing starves lightweight auth requests\n  - ❌ Blast radius: One bug/memory leak crashes auth AND purchases\n  - ❌ Deploy risk: Deploying purchase feature risks breaking auth\n  - ❌ Team bottleneck: All teams must coordinate deploys\n\n  ---\n  3 Separate Services (Auth | Purchases | Transactions)\n\n  Pros:\n  - ✅ Independent scaling: Scale auth to 50k req/s, purchases to 5k req/s separately\n  - ✅ Failure isolation: Auth down? Purchases still work for cached sessions\n  - ✅ Independent deploys: Ship purchase features without touching auth\n  - ✅ Team autonomy: Each team owns their service, faster velocity\n  - ✅ Optimized resources: Auth uses small CPU-optimized instances, Purchases use memory-optimized\n  - ✅ Technology choice: Auth in Go (fast), Purchases in Python (rich libs)\n\n  Cons:\n  - ❌ Complexity: 3x codebases, deployments, monitoring, logging\n  - ❌ Network latency: Service-to-service calls add 10-50ms each\n  - ❌ Distributed transactions: Hard to maintain consistency across services\n  - ❌ More expensive: More load balancers, more instances, more overhead\n  - ❌ Debugging harder: Trace requests across multiple services\n  - ❌ Operational burden: 3x oncall rotations, 3x alerting configs\n\n\n\nBeyond Cost - Why separate scaling matters:\n\n  1. Resource Contention\n\n  - Auth: Needs CPU (validate JWT, hash checks) - quick in/out\n  - Purchases: Needs memory + DB connections (complex transactions) - slow\n  - Problem: In one API, slow purchase requests hog threads/connections, starving fast auth requests\n  - Result: Auth gets slow even though it should be fast\n\n  2. Blast Radius / Failure Isolation\n\n  - Purchase code has a memory leak → crashes the API\n  - Consolidated: Auth goes down too (entire system dead)\n  - Separated: Only purchases affected, users can still browse/login\n\n  3. Deploy Independence\n\n  - Need to ship urgent purchase fraud fix\n  - Consolidated: Must redeploy entire API (risk breaking auth)\n  - Separated: Deploy purchase service only, zero risk to auth\n\n  4. Performance Optimization\n\n  - Auth: Benefits from in-memory cache (Redis), small instances, optimized for latency\n  - Purchases: Needs database connections, larger instances, optimized for throughput\n  - Consolidated: Can't optimize for both - one compromises the other\n\n  5. Traffic Patterns\n\n  - Auth: Steady 50k req/s all day\n  - Purchases: Spiky (Black Friday = 50k req/s, normal day = 5k req/s)\n  - Consolidated: Must provision for peak of BOTH combined\n  - Separated: Each auto-scales independently for its own peaks\n\n  Summary:\n\n  Cost is one factor, but performance isolation, failure isolation, and operational flexibility are equally (or more) important at scale.\n",
       "autoResize": false,
       "lineHeight": 1.25
+    },
+    {
+      "id": "uFa-80SFqLtaNpwlOirMP",
+      "type": "arrow",
+      "x": 2948.0496029089045,
+      "y": 1817.5811160321978,
+      "width": 197.34453764986256,
+      "height": 157.74033828895062,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b2Z",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 759614047,
+      "version": 64,
+      "versionNonce": 1541220735,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1759432995799,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -197.34453764986256,
+          -157.74033828895062
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bVpQUxLvSs2AhQF_4d4d6",
+        "focus": -0.36172181966458467,
+        "gap": 3.4597963848021878
+      },
+      "endBinding": {
+        "elementId": "wN4WA--OkmkjtNRaPsXmf",
+        "focus": -0.052533973735365794,
+        "gap": 1.4784505516797986
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
     }
   ],
   "appState": {
