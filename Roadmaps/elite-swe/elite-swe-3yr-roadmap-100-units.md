@@ -1,7 +1,9 @@
 # The Elite Software Engineer's 3-Year Learning Roadmap
 ## From Solid Foundation to Big Tech Leadership: 100 Learning Units
 
-This roadmap transforms a software engineer with 3+ years of practical experience into an elite engineer capable of building any software, landing top-paying positions at FAANG companies, and leading engineering teams at startups. Built on research from MIT/CMU/Stanford curricula, FAANG engineering blogs, Staff Engineer resources, competitive programming champions, and hundreds of industry experts.
+This roadmap transforms a software engineer with 3+ years of practical experience into an elite engineer capable of building any software, landing top-paying positions at FAANG companies, and leading engineering teams at startups. Built on research from MIT/CMU/Stanford curricula, FAANG engineering blogs, [Staff Engineer resources](https://staffeng.com/guides/learning-materials/), competitive programming champions, and hundreds of industry experts.
+
+**Methodology:** Resources selected based on [Teach Yourself CS](https://teachyourselfcs.com/) recommendations, [MIT 6.824](https://pdos.csail.mit.edu/6.824/) curriculum, competitive programming champion advice from [Codeforces community](https://codeforces.com/blog/entry/53341), and industry expert consensus.
 
 ---
 
@@ -21,20 +23,20 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Deep understanding of how computers actually work; ability to write performance-aware code
 
 ### Unit 3-4: Operating Systems Theory (OSTEP)
-- **Resource:** "Operating Systems: Three Easy Pieces" by Arpaci-Dusseau (FREE online) + exercises
+- **Resource:** ["Operating Systems: Three Easy Pieces"](https://pages.cs.wisc.edu/~remzi/OSTEP/) by Arpaci-Dusseau (FREE online) + exercises
 - **Time:** 4 weeks, 10-15 hours/week (60-80 hours)
 - **Type:** Textbook + Exercises
 - **What You'll Learn:** Virtualization (processes, memory), concurrency (threads, locks), persistence (files, storage)
-- **Why Best:** Modern, readable approach to OS concepts. Complements CS:APP perfectly. Most popular modern OS textbook.
+- **Why Best:** Modern, readable approach to OS concepts. Complements CS:APP perfectly. [Recommended by teachyourselfcs.com](https://teachyourselfcs.com/) as most popular modern OS textbook.
 - **Outcome:** Understand processes, threads, scheduling, memory management, file systems
 
 ### Unit 5-7: MIT 6.S081 Operating System Engineering (Labs)
-- **Resource:** MIT 6.S081 course materials + xv6 RISC-V OS
+- **Resource:** [MIT 6.S081 course materials](https://pdos.csail.mit.edu/6.S081/2021/overview.html) + xv6 RISC-V OS
 - **Time:** 6 weeks, 15-20 hours/week (120-150 hours)
 - **Type:** Hands-on OS Implementation
 - **What You'll Learn:** Build real OS kernel features - system calls, page tables, traps, lazy allocation, copy-on-write fork, multithreading, file systems
 - **Labs:** System calls, page tables, traps, lazy allocation, COW fork, multithreading, locks, file system, mmap
-- **Why Best:** Actually implement kernel code. Robert Morris is legendary. Goes beyond theory to real implementation.
+- **Why Best:** Actually implement kernel code. Robert Morris is legendary. Goes beyond theory to real implementation. [Highly regarded by CS DIY wiki](https://csdiy.wiki/en/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081/).
 - **Prerequisites:** Strong C, CS:APP, OSTEP theory
 - **Outcome:** Can write kernel-level code; deep understanding of OS internals
 
@@ -94,12 +96,12 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Master data structures beyond basic CS curriculum
 
 ### Unit 17-18: Interview Preparation Intensive
-- **Resource:** "Cracking the Coding Interview" + LeetCode (150 problems)
+- **Resource:** ["Cracking the Coding Interview"](https://www.amazon.com/Cracking-Coding-Interview-Programming-Questions/dp/0984782850) + [LeetCode](https://leetcode.com/) (150 problems)
 - **Time:** 4 weeks, 12-15 hours/week (70-90 hours)
 - **Type:** Book + Practice + Mock Interviews
 - **What You'll Learn:** Interview patterns, system design basics, behavioral questions
 - **Practice:** LeetCode Medium (100 problems), Easy (50 problems)
-- **Mock Interviews:** Pramp.com (FREE) - 5+ sessions
+- **Mock Interviews:** [Pramp.com](https://www.pramp.com/) (FREE) - 5+ sessions
 - **Why Best:** CTCI is industry standard. LeetCode for targeted practice. Pramp for real interview simulation.
 - **Outcome:** Can pass FAANG phone screens; comfortable with coding interviews
 
@@ -108,32 +110,32 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 ## Quarter 3: Distributed Systems Fundamentals (9 units)
 
 ### Unit 19-20: Distributed Systems Theory (DDIA)
-- **Resource:** "Designing Data-Intensive Applications" by Martin Kleppmann
+- **Resource:** ["Designing Data-Intensive Applications"](https://dataintensive.net/) by Martin Kleppmann
 - **Time:** 6 weeks, 10-12 hours/week (80-100 hours)
 - **Type:** Textbook (deep reading + note-taking)
 - **What You'll Learn:** Reliability, scalability, maintainability, data models, replication, partitioning, transactions, consistency, consensus, batch/stream processing
-- **Why Best:** THE definitive book on distributed systems. "This book should be required reading" - Google/Facebook engineers. Bridges theory and practice perfectly.
+- **Why Best:** THE definitive book on distributed systems. ["This book should be required reading"](https://www.goodreads.com/book/show/23463279-designing-data-intensive-applications) - Google/Facebook engineers. Bridges theory and practice perfectly. [Recommended by teachyourselfcs.com](https://teachyourselfcs.com/).
 - **Prerequisites:** Operating systems, networking basics
 - **Outcome:** Understand distributed systems fundamentals; make informed tradeoff decisions
 
 ### Unit 21-23: MIT 6.824 Distributed Systems Labs - MapReduce & Raft
-- **Resource:** MIT 6.824 course materials (Lectures 1-8 + Labs 1-2)
+- **Resource:** [MIT 6.824 course materials](https://pdos.csail.mit.edu/6.824/) (Lectures 1-8 + Labs 1-2)
 - **Time:** 8 weeks, 12-18 hours/week (140-180 hours)
 - **Type:** Course + Implementation Labs
 - **What You'll Learn:** 
   - Lab 1 (2 weeks): Build MapReduce in Go
   - Lab 2A-C (6 weeks): Implement Raft consensus (leader election, log replication, persistence)
-- **Why Best:** Gold standard for learning distributed systems. "Torturing but transformative" - consistent student feedback.
+- **Why Best:** Gold standard for learning distributed systems. "Torturing but transformative" - consistent student feedback. [Taught by Robert Morris (MIT)](https://teachyourselfcs.com/).
 - **Prerequisites:** DDIA reading for context
 - **Outcome:** Built fault-tolerant distributed systems from scratch; deep understanding of consensus
 
 ### Unit 24: Classic Distributed Systems Papers
-- **Resource:** Key papers - MapReduce, GFS, Bigtable, Dynamo, Raft, Paxos
+- **Resource:** Key papers - [MapReduce](https://backendology.com/2018/09/19/distributed-systems-course-introduction/), GFS, Bigtable, Dynamo, [Raft](https://thesquareplanet.com/blog/students-guide-to-raft/), Paxos
 - **Time:** 2 weeks, 8-10 hours/week (20-25 hours)
 - **Type:** Research Papers
 - **What You'll Learn:** How Google, Amazon, and others built massive-scale systems
 - **Reading Order:** Time/Clocks (Lamport) → GFS → MapReduce → Bigtable → Dynamo → Paxos Made Simple → Raft
-- **Why Best:** Original sources show thinking behind major systems. Papers We Love provides community context.
+- **Why Best:** Original sources show thinking behind major systems. [Papers We Love](https://github.com/papers-we-love/papers-we-love) provides community context. [Rutgers reading list](https://www.cs.rutgers.edu/~pxk/417/readinglist.html) provides curation.
 - **Outcome:** Can read research papers; understand design decisions at major tech companies
 
 ### Unit 25: Networking for Distributed Systems
@@ -158,7 +160,7 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 ## Quarter 4: Database Internals & First AI Infrastructure (9 units)
 
 ### Unit 28-29: Database Internals Theory
-- **Resource:** "Database Internals" by Alex Petrov + selected DDIA chapters
+- **Resource:** ["Database Internals"](https://www.databass.dev/) by Alex Petrov + selected DDIA chapters
 - **Time:** 5 weeks, 10-12 hours/week (70-80 hours)
 - **Type:** Textbook
 - **What You'll Learn:** Storage engines (B-Trees, LSM Trees), indexing, query processing, transaction processing, distributed databases
@@ -166,11 +168,11 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Understand how databases work internally, not just how to use them
 
 ### Unit 30-32: CMU Database Systems (15-445 Projects)
-- **Resource:** CMU 15-445 course + BusTub project
+- **Resource:** [CMU 15-445 course](https://www.csd.cmu.edu/course/15721/s24) + BusTub project
 - **Time:** 6 weeks, 15-18 hours/week (120-140 hours)
 - **Type:** Course + Implementation
 - **What You'll Build:** Buffer pool manager, B+ tree, query executors, query optimizer, concurrency control
-- **Why Best:** Build actual DBMS from scratch. Andy Pavlo is legendary instructor. Real-world codebase experience.
+- **Why Best:** Build actual DBMS from scratch. [Andy Pavlo is legendary instructor](https://www.cs.cmu.edu/~pavlo/). Real-world codebase experience. [Recommended by teachyourselfcs.com](https://teachyourselfcs.com/).
 - **Outcome:** Deep practical understanding of database implementation
 
 ### Unit 33: SQL & Database Design Mastery
@@ -253,7 +255,7 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 ## Quarter 6: AI/ML Foundations (Mathematics & Core ML) (8 units)
 
 ### Unit 46-47: Linear Algebra for ML
-- **Resource:** Gilbert Strang's "Linear Algebra and Learning from Data" + MIT 18.065 lectures
+- **Resource:** Gilbert Strang's ["Linear Algebra and Learning from Data"](https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/) + MIT 18.065 lectures
 - **Time:** 5 weeks, 10-12 hours/week (70-80 hours)
 - **Type:** Textbook + Video Lectures + Exercises
 - **What You'll Learn:** Matrix computations for ML, SVD, PCA, neural network math
@@ -262,15 +264,15 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Deep understanding of math underlying ML algorithms
 
 ### Unit 48: Probability & Statistics for ML
-- **Resource:** Murphy's "Probabilistic Machine Learning: Introduction" Chapters 1-5 + exercises
+- **Resource:** Murphy's ["Probabilistic Machine Learning: Introduction"](https://probml.github.io/pml-book/book1.html) Chapters 1-5 + exercises
 - **Time:** 3 weeks, 10-12 hours/week (40-50 hours)
 - **Type:** Textbook (FREE online)
 - **What You'll Learn:** Probability foundations, distributions, Bayesian methods for ML
-- **Why Best:** Most comprehensive modern ML text. FREE online. Endorsed by Chris Bishop, Max Welling, Daphne Koller.
+- **Why Best:** Most comprehensive modern ML text. FREE online. [Endorsed by Chris Bishop, Max Welling, Daphne Koller](https://mitpress.mit.edu/9780262046824/probabilistic-machine-learning/).
 - **Outcome:** Solid probability foundations for ML
 
 ### Unit 49-51: Core Machine Learning Theory
-- **Resource:** Murphy's "Probabilistic Machine Learning: Introduction" Chapters 6-15 + Stanford CS229 lectures
+- **Resource:** Murphy's ["Probabilistic Machine Learning: Introduction"](https://probml.github.io/pml-book/book1.html) Chapters 6-15 + [Stanford CS229 lectures](https://see.stanford.edu/Course/CS229)
 - **Time:** 6 weeks, 12-15 hours/week (100-120 hours)
 - **Type:** Textbook + Video Lectures
 - **What You'll Learn:** Linear models, neural networks, training, regularization, optimization, kernels, trees, clustering
@@ -279,7 +281,7 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Rigorous ML foundations; understand why algorithms work
 
 ### Unit 52-53: Deep Learning Foundations
-- **Resource:** "Deep Learning" by Goodfellow, Bengio, Courville (FREE online) Chapters 1-9 + Stanford CS231n
+- **Resource:** ["Deep Learning"](http://www.d2l.ai/chapter_attention-mechanisms-and-transformers/index.html) by Goodfellow, Bengio, Courville (FREE online) Chapters 1-9 + [Stanford CS231n](https://explorecourses.stanford.edu/search?view=catalog&filter-coursestatus-Active=on&page=0&catalog=&academicYear=&q=CS229.+Machine+Learning&collapse=)
 - **Time:** 4 weeks, 12-15 hours/week (60-80 hours)
 - **Type:** Textbook + Course
 - **What You'll Learn:** Feedforward networks, CNNs, regularization, optimization, backpropagation
@@ -292,16 +294,16 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 ## Quarter 7: AI Infrastructure & Systems (10 units)
 
 ### Unit 54-56: Advanced GPU Programming & Optimization
-- **Resource:** "Programming Massively Parallel Processors" 4th Ed by Kirk & Hwu + NVIDIA DLI courses
+- **Resource:** ["Programming Massively Parallel Processors"](https://www.sciencedirect.com/book/9780124159334/cuda-programming) 4th Ed by Kirk & Hwu + [NVIDIA DLI courses](https://courses.nvidia.com/courses/course-v1:DLI+C-AC-01+V1/about)
 - **Time:** 6 weeks, 12-15 hours/week (100-120 hours)
 - **Type:** Textbook + Official Training
 - **What You'll Learn:** Advanced CUDA, memory optimization, Tensor Cores, performance tuning, kernel fusion
 - **Labs:** Optimized matrix multiplication, convolution, custom CUDA kernels
-- **Why Best:** By NVIDIA's chief scientist. Industry standard. Official DLI training is hands-on.
+- **Why Best:** By NVIDIA's chief scientist. Industry standard. [Official DLI training](https://www.olcf.ornl.gov/cuda-training-series/) is hands-on.
 - **Outcome:** Can write optimized CUDA code for ML workloads
 
 ### Unit 57-58: PyTorch Distributed Training
-- **Resource:** PyTorch Distributed documentation + tutorials + DeepSpeed tutorials
+- **Resource:** [PyTorch Distributed documentation](https://docs.pytorch.org/tutorials/beginner/dist_overview.html) + tutorials + [DeepSpeed tutorials](https://www.deepspeed.ai/tutorials/megatron/)
 - **Time:** 4 weeks, 12-15 hours/week (60-80 hours)
 - **Type:** Documentation + Hands-on Implementation
 - **What You'll Learn:** DDP, FSDP, tensor parallelism, pipeline parallelism, ZeRO optimizer
@@ -310,16 +312,16 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Can train models on multiple GPUs/nodes
 
 ### Unit 59-60: Distributed Training Systems (Papers & Implementation)
-- **Resource:** Megatron-LM, DeepSpeed ZeRO, Horovod papers + implementations
+- **Resource:** [Megatron-LM](https://people.eecs.berkeley.edu/~matei/papers/2021/sc_megatron_lm.pdf), [DeepSpeed ZeRO](https://arxiv.org/abs/1802.05799), Horovod papers + implementations
 - **Time:** 4 weeks, 10-12 hours/week (50-60 hours)
 - **Type:** Research Papers + Code Study
 - **What You'll Learn:** 3D parallelism (data + tensor + pipeline), memory optimization, gradient synchronization
-- **Key Papers:** Megatron-LM SC 2021, ZeRO SC 2020, Megatron-Turing NLG 530B
+- **Key Papers:** [Megatron-LM SC 2021](https://people.eecs.berkeley.edu/~matei/papers/2021/sc_megatron_lm.pdf), ZeRO SC 2020, [Megatron-Turing NLG 530B](https://arxiv.org/abs/2201.11990)
 - **Why Best:** Learn from NVIDIA and Microsoft's training of 500B+ parameter models
 - **Outcome:** Understand state-of-the-art distributed training
 
 ### Unit 61: Transformers & Modern Deep Learning
-- **Resource:** "Attention Is All You Need" paper + Stanford CS224N + annotated transformer
+- **Resource:** ["Attention Is All You Need"](https://arxiv.org/abs/1706.03762) paper + Stanford CS224N + annotated transformer
 - **Time:** 2 weeks, 10-12 hours/week (25-30 hours)
 - **Type:** Paper + Course + Code Study
 - **What You'll Learn:** Self-attention, multi-head attention, transformers, BERT, GPT architecture
@@ -327,7 +329,7 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Understand transformer architecture; foundation models
 
 ### Unit 62-63: Inference Optimization & Serving
-- **Resource:** TensorRT documentation + ONNX Runtime + TorchServe tutorials
+- **Resource:** [TensorRT documentation](https://developer.nvidia.com/blog/speeding-up-deep-learning-inference-using-tensorflow-onnx-and-tensorrt/) + ONNX Runtime + [TorchServe tutorials](https://github.com/pytorch/serve)
 - **Time:** 4 weeks, 10-12 hours/week (50-60 hours)
 - **Type:** Documentation + Hands-on
 - **What You'll Learn:** Model optimization, quantization (INT8, FP16), TensorRT engine, inference serving
@@ -340,16 +342,16 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 ## Quarter 8: Production Engineering & Architecture (8 units)
 
 ### Unit 64-65: Site Reliability Engineering
-- **Resource:** "Site Reliability Engineering" by Google (FREE online) + "The Site Reliability Workbook"
+- **Resource:** ["Site Reliability Engineering" by Google](https://sre.google/books/) (FREE online) + "The Site Reliability Workbook"
 - **Time:** 4 weeks, 10-12 hours/week (50-60 hours)
 - **Type:** Books
 - **What You'll Learn:** SLOs, error budgets, monitoring, alerting, incident response, on-call, capacity planning
-- **Why Best:** Google's SRE practices that run the largest systems in the world. Industry standard.
+- **Why Best:** Google's SRE practices that run the largest systems in the world. Industry standard. [Recommended by teachyourselfcs.com](https://teachyourselfcs.com/).
 - **Case Studies:** Google production systems, outage post-mortems
 - **Outcome:** Understand how to run reliable production systems at scale
 
 ### Unit 66: Observability Engineering
-- **Resource:** "Observability Engineering" by Majors, Fong-Jones, Miranda
+- **Resource:** ["Observability Engineering"](https://www.oreilly.com/library/view/observability-engineering/9781492076438/) by Majors, Fong-Jones, Miranda
 - **Time:** 2 weeks, 10-12 hours/week (25-30 hours)
 - **Type:** Book
 - **What You'll Learn:** Difference between monitoring and observability, structured events, debugging complex systems, SLO-based alerting
@@ -357,7 +359,7 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Can debug production systems effectively
 
 ### Unit 67-68: Software Architecture & System Design
-- **Resource:** "Patterns of Enterprise Application Architecture" by Martin Fowler + martinfowler.com articles
+- **Resource:** ["Patterns of Enterprise Application Architecture"](https://martinfowler.com/books/eaa.html) by Martin Fowler + martinfowler.com articles
 - **Time:** 4 weeks, 10-12 hours/week (50-60 hours)
 - **Type:** Book + Online Articles
 - **What You'll Learn:** Architectural patterns, layering, domain logic patterns, data source patterns, web presentation
@@ -365,7 +367,7 @@ This roadmap transforms a software engineer with 3+ years of practical experienc
 - **Outcome:** Can design well-architected systems
 
 ### Unit 69: System Design Interview Mastery
-- **Resource:** "Grokking the System Design Interview" + ByteByteGo + practice
+- **Resource:** ["Grokking the System Design Interview"](https://www.designgurus.io/course/grokking-the-system-design-interview) + ByteByteGo + practice
 - **Time:** 2 weeks, 15-20 hours/week (35-45 hours)
 - **Type:** Course + Practice
 - **What You'll Learn:** RESHADED framework, designing at scale (YouTube, Instagram, Uber, etc.)
@@ -784,3 +786,48 @@ The path is demanding but achievable. **Every elite engineer started somewhere.*
 Start today. Pick Unit 1. Build momentum. In 3 years, you'll be the engineer others look up to.
 
 **The journey to elite status begins with a single unit.**
+
+---
+
+# KEY REFERENCES & SOURCES
+
+## Primary Curriculum Resources
+- [Teach Yourself Computer Science](https://teachyourselfcs.com/) - Comprehensive self-taught CS curriculum
+- [MIT 6.S081 Operating System Engineering](https://pdos.csail.mit.edu/6.S081/2021/overview.html)
+- [MIT 6.824 Distributed Systems](https://pdos.csail.mit.edu/6.824/)
+- [CMU 15-445/645 Database Systems](https://www.csd.cmu.edu/course/15721/s24)
+- [Stanford CS229 Machine Learning](https://see.stanford.edu/Course/CS229)
+
+## Competitive Programming Resources
+- [Codeforces Community Guides](https://codeforces.com/blog/entry/53341)
+- [cp-algorithms.com](https://cp-algorithms.com/)
+- AtCoder, Codeforces, TopCoder platforms
+
+## Distributed Systems Resources
+- [Rutgers Distributed Systems Reading List](https://www.cs.rutgers.edu/~pxk/417/readinglist.html)
+- [Students' Guide to Raft](https://thesquareplanet.com/blog/students-guide-to-raft/)
+- [Backendology Distributed Systems Course](https://backendology.com/2018/09/19/distributed-systems-course-introduction/)
+- [Papers We Love](https://github.com/papers-we-love/papers-we-love)
+
+## AI/ML Resources
+- [MIT 18.065 Matrix Methods](https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/)
+- [Kevin Murphy's PML Book](https://probml.github.io/pml-book/book1.html) (FREE)
+- [NVIDIA CUDA Training Series](https://www.olcf.ornl.gov/cuda-training-series/)
+
+## Engineering Leadership
+- [StaffEng.com Resources](https://staffeng.com/guides/learning-materials/)
+- [Martin Fowler's Blog](https://martinfowler.com/)
+- [Will Larson's Blog (Lethain)](https://lethain.com/)
+
+## Books & Free Resources
+- [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/) (FREE)
+- [Crafting Interpreters](https://www.craftinginterpreters.com/) (FREE online)
+- [Google SRE Books](https://sre.google/books/) (FREE)
+- [Designing Data-Intensive Applications](https://dataintensive.net/)
+- [Database Internals](https://www.databass.dev/)
+
+## Community Resources
+- Reddit: r/ExperiencedDevs (filtered), r/cscareerquestions
+- Rands Leadership Slack
+- GitHub awesome lists
+- Engineering blogs from FAANG companies
