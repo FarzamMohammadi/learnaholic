@@ -39,3 +39,7 @@
 # Build outputs
 build/
 *.o
+
+# MacOS
+
+.DS_Store
