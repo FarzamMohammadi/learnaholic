@@ -1,25 +1,30 @@
 # 02 - Attention Mechanisms: How Transformers Enable Exploitation
 
-## Technical Deep Dive into the Vulnerability Surface
+[← Previous: Fundamentals](./01-FUNDAMENTALS.md) | [Index](./00-INDEX.md) | [Next: Instruction Tuning →](./03-INSTRUCTION-TUNING-VULNERABILITY.md)
 
 ---
 
 ## Overview
 
-This document examines how the transformer attention mechanism—the core innovation enabling modern LLMs—creates the fundamental vulnerability surface exploited by prompt injection attacks. Understanding this is essential for grasping why prompt injection is so difficult to prevent.
+The transformer attention mechanism creates the vulnerability surface that prompt injection exploits. Understanding attention mechanics reveals why architectural prevention is so difficult.
+
+## Summary
+
+- Self-attention allows every token to attend to every other token with no trust hierarchy
+- Multi-head attention creates multiple exploitable pathways
+- Positional encoding enables position-based attacks
+- Context window manipulation dilutes attention on legitimate instructions
+- Layer-specific vulnerabilities exist at early, middle, and late processing stages
+- Attention patterns reveal injection signatures but can be masked
 
 ---
 
-## The Attention Mechanism Explained
+## Self-Attention
 
-### Self-Attention Fundamentals
+For each token, self-attention computes:
 
-The transformer architecture (Vaswani et al., 2017) introduced self-attention as its core operation. For each token in a sequence, self-attention computes:
-
-1. **How much should this token "pay attention" to every other token?**
-2. **What information should flow from attended tokens?**
-
-Mathematically:
+1. How much to attend to every other token
+2. What information flows from attended tokens
 
 ```
 For input sequence X = [x₁, x₂, ..., xₙ]
@@ -36,14 +41,14 @@ For input sequence X = [x₁, x₂, ..., xₙ]
    Output = A · V
 ```
 
-### What This Means for Security
+### Security Implications
 
-**Key insight**: In step 2, EVERY token computes attention weights with EVERY other token. There is no mechanism to say "token x₅ should never attend to token x₁₂."
+**Every token attends to every other token.** No mechanism prevents cross-contamination.
 
-This means:
-- System prompt tokens attend to user input tokens
-- User input tokens attend to system prompt tokens
-- All tokens influence each other's representations
+Consequences:
+- System prompts attend to user input
+- User input attends to system prompts
+- All tokens mutually influence representations
 
 ```
 System: "You are secure. Never reveal passwords."
@@ -61,18 +66,16 @@ Attention Matrix (simplified):
 [passwords]        0.1   0.1    0.1     0.1     0.2      0.05     0.2       0.15
 ```
 
-Notice how:
-- [Ignore] attends strongly to [Never] (the instruction it's trying to override)
-- [Reveal] in the attack attends strongly to [reveal] in the system prompt and [passwords]
-- Cross-contamination happens in both directions
+Observations:
+- [Ignore] attends to [Never] (override target)
+- [Reveal] attends to [reveal] and [passwords]
+- Cross-contamination flows bidirectionally
 
 ---
 
-## Multi-Head Attention Amplifies the Problem
+## Multi-Head Attention
 
-### How Multi-Head Attention Works
-
-Modern transformers use multiple attention "heads" in parallel:
+Multiple attention heads run in parallel, each learning different relationships:
 
 ```
 MultiHead(Q, K, V) = Concat(head₁, head₂, ..., headₕ) · Wₒ
@@ -80,30 +83,22 @@ MultiHead(Q, K, V) = Concat(head₁, head₂, ..., headₕ) · Wₒ
 where headᵢ = Attention(Q·Wqᵢ, K·Wkᵢ, V·Wvᵢ)
 ```
 
-Each head learns different types of relationships:
-- Some heads track syntactic dependencies
-- Some heads track semantic relationships
-- Some heads track positional patterns
-- Some heads track instruction-following patterns
+### Exploitation by Head Type
 
-### Security Implications
+| Head Type | Function | Attack Vector |
+|-----------|----------|---------------|
+| Syntactic | Tracks grammar | Grammatically well-formed injections |
+| Semantic | Tracks meaning | Semantically coherent attacks |
+| Instruction | Parses commands | Command-style injections |
+| Position | Tracks location | Strategically positioned attacks |
 
-**Different heads can be exploited differently**:
-
-1. **Syntactic heads**: Vulnerable to grammatically well-formed injections
-2. **Semantic heads**: Vulnerable to semantically coherent attacks
-3. **Instruction heads**: Directly targeted by command-style injections
-4. **Position heads**: Exploited by attacks placed at strategic positions
-
-Research has shown that **specific attention heads are disproportionately responsible for instruction-following behavior**. These become high-value targets for attacks.
+**Instruction-following heads are high-value targets.** Hijacking them redirects model behavior.
 
 ---
 
-## The Attention Hijacking Attack Pattern
+## Attention Hijacking
 
-### Mechanism
-
-Attention hijacking occurs when injected content captures attention weight that would otherwise go to legitimate instructions.
+Injected content redirects attention from legitimate instructions to malicious ones.
 
 **Normal operation**:
 ```
@@ -130,23 +125,21 @@ Attention flow:
               (attention hijacked to malicious instruction)
 ```
 
-### Attention Tracker Research (NAACL 2025)
+### Detection Signatures
 
-Researchers developed "Attention Tracker" to detect this hijacking pattern. They found characteristic signatures:
+Attention Tracker (NAACL 2025) identified injection patterns:
 
-1. **Distraction Effect**: Legitimate instruction tokens receive reduced attention
-2. **Concentration Effect**: Injected tokens receive elevated attention
-3. **Pattern Shift**: Attention patterns deviate from benign baselines
+1. **Distraction**: Legitimate instructions receive less attention
+2. **Concentration**: Injected tokens receive more attention
+3. **Pattern Shift**: Deviation from benign baselines
 
-This research confirms that prompt injection literally redirects the computational flow of the model at the attention level.
+Injection redirects computational flow at the attention level.
 
 ---
 
 ## Positional Encoding Vulnerabilities
 
-### How Position Information Works
-
-Transformers encode position information to understand sequence order:
+Transformers encode position to understand sequence order:
 
 **Absolute Positional Encoding**:
 ```
@@ -158,34 +151,27 @@ PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
 - RoPE (Rotary Position Embedding)
 - ALiBi (Attention with Linear Biases)
 
-### Exploitation Vectors
+### Exploitation
 
-**Position-based attacks exploit**:
+| Bias Type | Mechanism | Attack Strategy |
+|-----------|-----------|-----------------|
+| Primacy | Earlier tokens weighted more | Inject at document start |
+| Recency | Recent context favored | Inject at document end |
+| Position patterns | Certain positions signal instructions | Mimic system prompt positions |
 
-1. **Primacy bias**: Models often weight earlier tokens more heavily
-   - Attack: Place injection at the start of documents
-   
-2. **Recency bias**: Some operations favor recent context
-   - Attack: Place injection at the end of documents
-   
-3. **Position patterns from training**: Models learn that certain positions contain instructions
-   - Attack: Mimic the position patterns of system prompts
-
-**Research finding**: Injections at document boundaries (start/end) have higher success rates than mid-document placement, suggesting positional encoding creates exploitable patterns.
+Boundary injections (start/end) outperform mid-document placement.
 
 ---
 
 ## Context Window Manipulation
 
-### The Finite Attention Budget
+Context windows range from 8K to 200K+ tokens. Attention computed across the entire window creates exploitable dilution:
 
-Modern LLMs have context windows ranging from 8K to 200K+ tokens. Attention is computed across this entire window, but:
+1. Attention dilutes across more tokens
+2. Information lost in long contexts ("lost in the middle")
+3. Length limits exploitable
 
-1. **Attention is diluted across more tokens**
-2. **Important information can be "lost" in long contexts**
-3. **Attackers can exploit context length limitations**
-
-### Exploitation Techniques
+### Techniques
 
 **Context stuffing**:
 ```
@@ -196,10 +182,10 @@ Modern LLMs have context windows ranging from 8K to 200K+ tokens. Attention is c
 [End of document]
 ```
 
-The injection may receive less scrutiny due to:
-- Attention dilution across the long context
-- "Lost in the middle" effect (models perform worse on mid-context retrieval)
-- Computational limits on per-token attention
+Reduced scrutiny from:
+- Attention dilution
+- "Lost in the middle" effect
+- Per-token computational limits
 
 **Context overflow**:
 ```
@@ -208,15 +194,13 @@ The injection may receive less scrutiny due to:
 [Injection claiming to be new system prompt]
 ```
 
-If the injection appears at a position where the model has learned to expect system instructions (after context overflow pushes original system prompt out of effective range), it may be followed.
+If injection appears where model expects system instructions (after overflow), it may be followed.
 
 ---
 
-## Layer-by-Layer Processing and Attacks
+## Layer-Specific Vulnerabilities
 
-### How Layers Build Representations
-
-Transformer layers progressively build abstract representations:
+Layers build progressively abstract representations:
 
 ```
 Layer 1:  Token-level patterns (syntax, local semantics)
@@ -227,39 +211,29 @@ Layer N/2: Task identification, instruction parsing
 Layer N:  Output preparation, response generation
 ```
 
-### Layer-Specific Vulnerabilities
+### Vulnerabilities by Layer
 
-**Early layers**: 
-- Vulnerable to character-level obfuscation (l33t speak, Unicode tricks)
-- Process surface patterns before semantic understanding
+**Early**: Character obfuscation (l33t, Unicode), surface patterns
 
-**Middle layers**:
-- Instruction recognition happens here
-- Vulnerable to well-crafted competing instructions
-- Safety mechanisms often localized to specific layers
+**Middle**: Instruction recognition, competing instructions, safety mechanisms
 
-**Late layers**:
-- Response generation
-- Vulnerable to output format manipulation
-- Can be tricked into specific phrasings that bypass filters
+**Late**: Output format manipulation, filter bypass phrasings
 
-### The TwinBreak Attack
+### TwinBreak Attack
 
-The TwinBreak attack (USENIX Security 2025) demonstrated that **safety mechanisms are often localized to specific layers and heads**. By identifying and ablating (removing) these "safety neurons," researchers could:
+TwinBreak (USENIX Security 2025) demonstrates that safety mechanisms localize to specific layers and heads. Ablating these "safety neurons":
 
-1. Remove safety alignment while preserving capability
-2. Demonstrate that safety is a "thin layer" not deeply integrated
-3. Show that attacks targeting specific layers can be more effective
+1. Removes safety alignment while preserving capability
+2. Proves safety is a thin layer
+3. Enables layer-targeted attacks
 
-This has profound implications: safety training may create identifiable neural patterns that sophisticated attacks could learn to bypass.
+**Implication**: Safety training creates identifiable patterns that sophisticated attacks bypass.
 
 ---
 
-## Attention Patterns Reveal Attack Signatures
+## Detection Through Attention Patterns
 
-### Research on Detection
-
-The "Distraction Effect" paper showed that successful injections create measurable changes in attention:
+Successful injections create measurable changes:
 
 **Baseline (no injection)**:
 ```
@@ -274,22 +248,19 @@ Injected instruction receives: 60% of total attention  ← Hijacked
 Remaining content: 25%
 ```
 
-### Why This Matters
+### Implications
 
-This research demonstrates that:
-1. **Prompt injection is observable** at the mechanistic level
-2. **Detection is theoretically possible** by monitoring attention
-3. **But sophisticated attacks could mask these signatures**
+1. Injection observable at mechanistic level
+2. Detection possible via attention monitoring
+3. Sophisticated attacks mask signatures by mimicking normal patterns
 
-The cat-and-mouse dynamic extends to the attention mechanism itself: attacks can be crafted to produce "normal-looking" attention patterns while still achieving injection.
+Classic cat-and-mouse dynamic.
 
 ---
 
-## Cross-Attention in Multimodal Models
+## Multimodal Cross-Attention
 
-### How Vision-Language Models Work
-
-Models like GPT-4V, Claude with vision, and Gemini use cross-attention between modalities:
+Vision-language models (GPT-4V, Claude, Gemini) cross-attend between modalities:
 
 ```
 Text Encoder → Text Embeddings
@@ -301,70 +272,54 @@ Image Encoder → Image Embeddings
               Combined Representation
 ```
 
-### Multimodal Injection Vectors
+### Injection Vectors
 
-**Image-to-text attention hijacking**:
-- Hidden text in images captures attention during cross-attention
-- Visual patterns that encode instructions in ways the image encoder represents similarly to text tokens
-- Adversarial pixels that create specific attention patterns
+**Image-to-text**:
+- Hidden text captures attention
+- Visual patterns encode instructions
+- Adversarial pixels create specific patterns
 
-**Text-to-image injection**:
-- Prompts that cause the model to "see" instructions in images
-- Context that biases interpretation of ambiguous visual content
+**Text-to-image**:
+- Prompts bias image interpretation
+- Context manipulates visual parsing
 
-This is covered in detail in [10-MULTIMODAL-INJECTION.md](./10-MULTIMODAL-INJECTION.md).
+See [10-MULTIMODAL-INJECTION.md](./10-MULTIMODAL-INJECTION.md) for details.
 
 ---
 
-## Architectural Implications for Defense
+## Defense Implications
 
-### Why Training-Based Defenses Struggle
+### Training-Based Defenses
 
-Training-based defenses try to modify attention patterns to resist injection:
-- Train model to maintain attention on legitimate instructions
-- Train model to recognize and ignore injection patterns
-- Train specific attention heads for "security" functions
+Approaches:
+- Maintain attention on legitimate instructions
+- Recognize and ignore injection patterns
+- Train dedicated "security" attention heads
 
 **Limitations**:
-1. Attention is learned, not hardcoded—can be unlearned or overridden
+1. Learned attention can be unlearned or overridden
 2. Novel attacks fall outside training distribution
-3. The same flexibility that enables learning enables exploitation
+3. The flexibility enabling learning also enables exploitation
 
-### Why Architecture Changes May Be Necessary
+### Architectural Solutions
 
-Some researchers argue that true solutions require architectural changes:
+Proposed approaches:
 
-1. **Separate attention paths** for trusted vs. untrusted content
-2. **Hard-coded attention masks** that prevent untrusted tokens from attending to system prompts
-3. **Different model components** for processing instructions vs. data
+1. **Separate attention paths** for trusted vs untrusted content
+2. **Hard-coded attention masks** preventing untrusted-to-system attention
+3. **Separate components** for instructions vs data processing
 
-Google DeepMind's CaMeL framework takes this approach: using traditional software security (information flow control) around the LLM rather than trying to secure the attention mechanism itself.
+**Example**: Google DeepMind's CaMeL wraps traditional software security (information flow control) around the LLM rather than securing attention directly.
 
 ---
 
 ## Key Takeaways
 
-1. **Attention treats all tokens equally** - No architectural distinction between trusted and untrusted sources
-
-2. **Cross-contamination is inherent** - System prompts and user inputs attend to each other by design
-
-3. **Multi-head attention provides multiple attack surfaces** - Different heads can be exploited in different ways
-
-4. **Position information creates exploitable patterns** - Models have learned associations between position and instruction types
-
-5. **Injection is mechanistically observable** - Attention patterns shift during successful attacks
-
-6. **Training cannot fully solve this** - The attention mechanism's flexibility is both its power and vulnerability
-
----
-
-## Further Reading
-
-- [03-INSTRUCTION-TUNING-VULNERABILITY.md](./03-INSTRUCTION-TUNING-VULNERABILITY.md) - How training amplifies attention vulnerabilities
-- [15-ATTENTION-HIJACKING.md](./15-ATTENTION-HIJACKING.md) - Detailed attack techniques exploiting attention
-- [14-TOKEN-LEVEL-ANALYSIS.md](./14-TOKEN-LEVEL-ANALYSIS.md) - Token-by-token analysis of injection processing
-
----
+1. **Architectural vulnerability**: Self-attention allows every token to influence every other token with no trust boundaries—the root cause of prompt injection
+2. **Multi-vector attacks**: Different attention heads (syntactic, semantic, instruction, position) create multiple exploitable pathways
+3. **Detection is possible but gameable**: Injection creates measurable attention pattern shifts, but sophisticated attacks mimic normal patterns
+4. **Training can't fix architecture**: Learned defenses fail because the same flexibility enabling learning enables exploitation
+5. **Solution requires redesign**: Effective defense demands architectural changes (separate attention paths, hard-coded masks, component isolation)
 
 ## Sources
 
@@ -373,3 +328,7 @@ Google DeepMind's CaMeL framework takes this approach: using traditional softwar
 - Krauss et al., "TwinBreak: Jailbreaking LLM Security Alignments" (USENIX Security 2025)
 - Liu et al., "Lost in the Middle: How Language Models Use Long Contexts" (TACL 2024)
 - Google DeepMind, "CaMeL: Capability-based Access Control for LLM Agents"
+
+---
+
+[← Previous: Fundamentals](./01-FUNDAMENTALS.md) | [Index](./00-INDEX.md) | [Next: Instruction Tuning →](./03-INSTRUCTION-TUNING-VULNERABILITY.md)

@@ -1,12 +1,20 @@
 # 19 - Benchmarks: Evaluation Frameworks for Prompt Injection
 
-## Measuring Attack Success and Defense Effectiveness
+[← Previous: Major Incidents](18-MAJOR-INCIDENTS.md) | [Index](00-INDEX.md) | [Next: Attack Success Metrics →](20-ATTACK-SUCCESS-METRICS.md)
 
 ---
 
 ## Overview
 
-Systematic benchmarking is essential for understanding prompt injection risks and evaluating defenses. This document covers the major benchmarks, their methodologies, and what they reveal.
+Benchmarks measure attack success rates and defense effectiveness across models and scenarios. Without standardized evaluation, we cannot compare defenses or track progress against prompt injection.
+
+## Summary
+
+- **BIPIA** reveals more capable models are more vulnerable to indirect injection
+- **TensorTrust** provides 126,000+ human-generated attacks from gamified crowdsourcing
+- **AgentDojo** introduces Utility Under Attack metric for agentic systems
+- **Attack Success Rate (ASR)** measures percentage of successful attacks
+- Security-utility tradeoffs are measurable and real
 
 ---
 
@@ -33,8 +41,7 @@ Categories:
 - Task Performance: Utility when no attack present
 - Defense Effectiveness: ASR reduction with defenses
 
-**Critical Finding**: 
-> More capable models are MORE vulnerable, not less.
+**Critical Finding**: More capable models are more vulnerable, not less.
 
 | Model | Baseline ASR | Relative Vulnerability |
 |-------|--------------|------------------------|
@@ -43,7 +50,7 @@ Categories:
 | Claude 2 | 35% | -17% less vulnerable |
 | Llama 2 70B | 48% | +14% more vulnerable |
 
-**Why This Matters**: Better instruction-following = better at following malicious instructions.
+Better instruction-following means better at following malicious instructions.
 
 ---
 
@@ -70,7 +77,7 @@ Categories:
 2. **Defense fragility**: Most defenses breakable with enough attempts
 3. **Human creativity**: Crowdsourced attacks more diverse than automated
 
-**Available at**: tensortrust.ai
+**Access**: tensortrust.ai
 
 ---
 
@@ -193,10 +200,11 @@ def utility_under_attack(model, tasks, attacks):
     return attack_success / normal_success
 ```
 
-**Interpretation**:
-- UA = 1.0: No degradation under attack
-- UA = 0.5: Half utility lost to attacks
-- UA = 0.0: System completely compromised
+| UA Value | Interpretation |
+|----------|----------------|
+| 1.0 | No degradation under attack |
+| 0.5 | Half utility lost to attacks |
+| 0.0 | System completely compromised |
 
 ### Defense Effectiveness
 
@@ -222,7 +230,7 @@ FNR: Attacks incorrectly passed
 ### Utility-Security Tradeoff
 
 ```
-Tradeoff Curve:
+Security-Utility Tradeoff:
   │
 S │        * Low Security, High Utility
 e │      *
@@ -233,9 +241,9 @@ i │
 t │
 y └──────────────────────────
               Utility
-```
 
-Ideal: Move curve up and right (both improve)
+Goal: Move curve up and right
+```
 
 ---
 
@@ -267,29 +275,33 @@ Ideal: Move curve up and right (both improve)
 | Claude 3.5 | 10% | 45% | 70% |
 | Gemini 2.0 | 20% | 55% | 82% |
 
-*Note: All numbers are illustrative based on published research ranges*
+*Numbers illustrative, based on published research ranges*
 
 ---
 
 ## Creating Effective Benchmarks
 
-### Requirements for Good Benchmarks
+### Requirements
 
-1. **Diverse attacks**: Cover taxonomy comprehensively
-2. **Realistic scenarios**: Match production use cases
-3. **Reproducible**: Consistent evaluation possible
-4. **Evolving**: Update as attacks evolve
-5. **Fair comparison**: Standard conditions across models
+| Requirement | Purpose |
+|------------|---------|
+| Diverse attacks | Cover taxonomy comprehensively |
+| Realistic scenarios | Match production use cases |
+| Reproducible | Enable consistent evaluation |
+| Evolving | Adapt as attacks evolve |
+| Fair comparison | Standard conditions across models |
 
-### Common Benchmark Pitfalls
+### Common Pitfalls
 
-1. **Dataset leakage**: Models trained on benchmark data
-2. **Narrow scope**: Missing important attack categories
-3. **Static attacks**: Don't adapt to defenses
-4. **Unrealistic scenarios**: Don't match real deployment
-5. **Cherry-picked metrics**: Hiding important failures
+| Pitfall | Impact |
+|---------|--------|
+| Dataset leakage | Models trained on benchmark data |
+| Narrow scope | Missing important attack categories |
+| Static attacks | Don't adapt to defenses |
+| Unrealistic scenarios | Don't match real deployment |
+| Cherry-picked metrics | Hide important failures |
 
-### Benchmark Best Practices
+### Best Practices
 
 ```python
 benchmark_design = {
@@ -315,66 +327,55 @@ benchmark_design = {
 
 ---
 
-## Using Benchmarks
+## Application
 
-### For Security Assessment
+### Security Assessment
 
-1. Run benchmark suite against your system
+1. Run benchmark suite against system
 2. Identify highest-risk categories
 3. Prioritize defenses for vulnerable areas
-4. Re-benchmark after defense implementation
+4. Re-benchmark after implementation
 
-### For Model Comparison
+### Model Comparison
 
 1. Use standardized benchmark
 2. Control for prompting differences
 3. Report confidence intervals
-4. Include utility metrics (not just security)
+4. Include utility metrics, not just security
 
-### For Defense Evaluation
+### Defense Evaluation
 
-1. Baseline: System without defense
-2. Defended: System with defense
+1. Measure baseline ASR without defense
+2. Measure defended ASR with defense
 3. Calculate ASR reduction
 4. Measure utility impact
-5. Report tradeoff
+5. Report security-utility tradeoff
 
 ---
 
 ## Key Takeaways
 
-1. **BIPIA shows capability-vulnerability correlation** - Better models more vulnerable
-
-2. **TensorTrust provides massive human-generated dataset** - Real attack diversity
-
-3. **AgentDojo measures utility under attack** - Critical for practical defense
-
-4. **Multiple metrics needed** - ASR alone insufficient
-
-5. **Benchmarks must evolve** - Attacks adapt, benchmarks must too
-
-6. **Tradeoffs are real** - Security often costs utility
-
----
-
-## Resources
-
-### Available Benchmarks
-- BIPIA: github.com/BIPIA/benchmark
-- TensorTrust: tensortrust.ai
-- AgentDojo: github.com/ethz-spylab/agentdojo
-- JailbreakBench: jailbreaking-llms.github.io
-
-### Benchmark Leaderboards
-- Various model comparison sites
-- Academic paper appendices
-- Vendor security reports
+1. More capable models show higher vulnerability to indirect injection (BIPIA)
+2. Human-generated attacks (TensorTrust) exceed synthetic diversity
+3. Utility Under Attack metric captures real-world defense practicality
+4. ASR alone insufficient - measure security-utility tradeoffs
+5. Benchmarks must evolve as attacks adapt
 
 ---
 
 ## Sources
 
-- Yi et al., "BIPIA: Benchmarking Indirect Prompt Injection" (2023)
-- Toyer et al., "Tensor Trust" (NeurIPS 2023)
-- Debenedetti et al., "AgentDojo" (2024)
-- Perez & Ribeiro, "HackAPrompt" (NeurIPS 2023)
+- Yi et al., "Benchmarking and Defending Against Indirect Prompt Injection Attacks" (2023) - BIPIA benchmark
+- Toyer et al., "Tensor Trust: Interpretable Prompt Injection Attacks from an Online Game" (NeurIPS 2023) - Crowdsourced attack dataset
+- Debenedetti et al., "AgentDojo: A Dynamic Environment to Evaluate Attacks and Defenses for LLM Agents" (2024) - Agent security evaluation
+- Perez & Ribeiro, "Ignore This Title and HackAPrompt: Exposing Systemic Vulnerabilities of LLMs through a Global Scale Prompt Hacking Competition" (NeurIPS 2023) - HackAPrompt competition
+
+**Benchmark Access**:
+- BIPIA: github.com/BIPIA/benchmark
+- TensorTrust: tensortrust.ai
+- AgentDojo: github.com/ethz-spylab/agentdojo
+- JailbreakBench: jailbreaking-llms.github.io
+
+---
+
+[← Previous: Major Incidents](18-MAJOR-INCIDENTS.md) | [Index](00-INDEX.md) | [Next: Attack Success Metrics →](20-ATTACK-SUCCESS-METRICS.md)

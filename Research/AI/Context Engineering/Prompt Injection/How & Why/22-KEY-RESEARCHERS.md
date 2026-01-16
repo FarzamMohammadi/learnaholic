@@ -1,6 +1,19 @@
-# 22 - Key Researchers: Notable Contributors to Prompt Injection Research
+# 22 - Key Researchers
 
-## Individuals and Teams Advancing the Field
+[← Previous](21-KEY-PAPERS.md) | [Index](00-INDEX.md)
+
+---
+
+## Overview
+
+This document catalogs the individuals, teams, and institutions driving prompt injection research. From independent researchers who first identified the vulnerability to industry labs developing defenses, these contributors shape our understanding of LLM security.
+
+## Summary
+
+- Independent researchers coined the term and demonstrated first attacks
+- Academic labs formalized attack methodologies and created benchmarks
+- Industry teams develop defenses while disclosing vulnerabilities through responsible channels
+- Research spans security, ML safety, and adversarial machine learning communities
 
 ---
 
@@ -8,248 +21,126 @@
 
 ### Simon Willison
 
-**Role**: Developer advocate, AI security researcher
-**Affiliation**: Independent (formerly Django co-creator)
-**Contribution**: Coined "prompt injection" term, extensive documentation
+Independent researcher and Django co-creator. Coined "prompt injection" in September 2022 and maintains extensive documentation through simonwillison.net and Substack. Developed the "Lethal Trifecta" framework for agent risk assessment. Advocates for developing software with the assumption that prompt injection "isn't fixed now and won't be fixed for the foreseeable future."
 
-**Key Work**:
-- Named the vulnerability (September 2022)
-- Ongoing blog coverage of attacks and defenses
-- "Lethal Trifecta" framework for agent risk assessment
-- Advocacy for realistic security expectations
-
-**Notable Quotes**:
-> "Develop software with the assumption that this issue isn't fixed now and won't be fixed for the foreseeable future."
-
-**Resources**: simonwillison.net, Substack newsletter
-
----
+**Impact**: Established terminology and raised mainstream awareness.
 
 ### Johann Rehberger
 
-**Role**: Security researcher, red teamer
-**Affiliation**: Independent / Wunderwuzzi
-**Contribution**: "Month of AI Bugs" daily vulnerability disclosures
-
-**Key Work**:
-- Discovered markdown image exfiltration
-- ChatGPT plugin vulnerabilities
-- Cross-plugin attacks
-- Ongoing vulnerability research on major systems
-
-**Impact**: Responsible for many patches in production systems
+Security researcher at Wunderwuzzi. Runs "Month of AI Bugs" with daily vulnerability disclosures. Discovered markdown image exfiltration and cross-plugin attacks in ChatGPT. Multiple responsible disclosures led to patches in production systems.
 
 **Resources**: embracethered.com
 
----
-
 ### Riley Goodside
 
-**Role**: Prompt engineer, researcher
-**Affiliation**: Scale AI (staff prompt engineer)
-**Contribution**: First public prompt injection demonstrations
-
-**Key Work**:
-- September 2022 demonstrations that went viral
-- Ongoing exploration of prompt engineering limits
-- Creative attack discovery
-
-**Impact**: Brought prompt injection to mainstream awareness
+Staff prompt engineer at Scale AI. Posted first viral prompt injection demonstrations in September 2022. Ongoing exploration of prompt engineering limits and creative attack discovery brought the vulnerability to mainstream awareness.
 
 ---
 
 ## Academic Researchers
 
 ### Kai Greshake
+*Saarland University*
 
-**Affiliation**: Saarland University
-**Contribution**: Lead author of foundational indirect injection paper
-
-**Key Work**:
-- "Not what you've signed up for" (2023)
-- Formalized indirect prompt injection
-- Demonstrated real-world attacks
-
----
+Lead author of "Not what you've signed up for" (2023), which formalized indirect prompt injection and demonstrated real-world attack vectors.
 
 ### Andy Zou
+*Carnegie Mellon University*
 
-**Affiliation**: CMU
-**Contribution**: Lead author of GCG adversarial suffix paper
-
-**Key Work**:
-- "Universal and Transferable Adversarial Attacks"
-- Introduced gradient-based attack methodology
-- Demonstrated transfer attacks
-
-**Impact**: Changed the paradigm from manual to automated attacks
-
----
+Lead author of "Universal and Transferable Adversarial Attacks on Aligned Language Models." Introduced gradient-based GCG attack methodology, shifting the paradigm from manual to automated attacks.
 
 ### Florian Tramèr
+*ETH Zurich*
 
-**Affiliation**: ETH Zurich
-**Contribution**: LLM security research, AgentDojo
-
-**Key Work**:
-- AgentDojo benchmark
-- CaMeL framework
-- Systematic agent security evaluation
-
----
+LLM security researcher. Created AgentDojo benchmark and CaMeL framework for systematic agent security evaluation.
 
 ### Nicholas Carlini
+*Google DeepMind*
 
-**Affiliation**: Google DeepMind
-**Contribution**: Adversarial ML, LLM security
-
-**Key Work**:
-- Co-author on GCG paper
-- Extensive adversarial ML background
-- LLM safety research
-
----
+Adversarial ML researcher. Co-author on GCG paper. Extensive background in adversarial machine learning applied to LLM safety.
 
 ### Edoardo Debenedetti
+*ETH Zurich / Google DeepMind*
 
-**Affiliation**: ETH Zurich / Google DeepMind
-**Contribution**: AgentDojo, CaMeL framework
-
-**Key Work**:
-- Agent security benchmarking
-- Architectural defense proposals
-- Capability-based security for LLMs
-
----
+Developer of AgentDojo and CaMeL framework. Proposes architectural defenses and capability-based security for LLMs.
 
 ### Sam Toyer
+*UC Berkeley CHAI*
 
-**Affiliation**: UC Berkeley (CHAI)
-**Contribution**: TensorTrust benchmark
-
-**Key Work**:
-- Crowdsourced attack collection
-- Gamification of security research
-- Large-scale human-generated dataset
+Creator of TensorTrust benchmark. Pioneered crowdsourced attack collection through gamification, producing large-scale human-generated datasets.
 
 ---
 
 ## Industry Research Teams
 
 ### Anthropic Security Team
+*Key contributors: Amanda Askell, et al.*
 
-**Key Researchers**: Various (Amanda Askell, et al.)
-**Contribution**: Constitutional AI, Claude safety
-
-**Key Work**:
-- Constitutional AI methodology
-- Claude safety training
-- Browser use defense paper (2025)
-- ~1% ASR achievement
-
----
+Developed Constitutional AI methodology and Claude safety training. Published browser use defense paper (2025) achieving ~1% attack success rate.
 
 ### OpenAI Safety Team
+*Key contributors: Eric Wallace, et al.*
 
-**Key Researchers**: Eric Wallace, et al.
-**Contribution**: Instruction hierarchy, model spec
-
-**Key Work**:
-- Instruction Hierarchy paper (2024)
-- Model Spec documentation
-- GPT safety training
-
----
+Produced Instruction Hierarchy paper (2024) and Model Spec documentation. Develops GPT safety training approaches.
 
 ### Google DeepMind Security
 
-**Key Researchers**: Various
-**Contribution**: Gemini defenses, CaMeL
-
-**Key Work**:
-- "Lessons from Defending Gemini" (2025)
-- Adversarial training methodology
-- CaMeL architectural defense
-
----
+Published "Lessons from Defending Gemini Against Prompt Injection" (2025). Developed adversarial training methodology and CaMeL architectural defense.
 
 ### Microsoft Security Research
+*Key contributors: Mark Russinovich, Ahmed Salem, Eldan*
 
-**Key Researchers**: Mark Russinovich, Ahmed Salem, Eldan
-**Contribution**: Crescendo, enterprise security
-
-**Key Work**:
-- Crescendo multi-turn attack paper
-- Azure AI Content Safety
-- Prompt Shield
-
----
+Published Crescendo multi-turn attack paper. Develops Azure AI Content Safety and Prompt Shield for enterprise deployments.
 
 ### Meta AI Security
 
-**Key Researchers**: Various
-**Contribution**: Llama Guard, Purple Llama
-
-**Key Work**:
-- Open-source safety tools
-- Prompt Guard models
-- LlamaFirewall
+Creates open-source safety tools including Llama Guard, Purple Llama, Prompt Guard models, and LlamaFirewall.
 
 ---
 
-## Research Groups and Labs
+## Research Institutions
 
-### CMU Language Technologies Institute
-
-**Focus**: Adversarial attacks on LLMs
-**Key Output**: GCG attack, safety analysis
-
-### ETH Zurich SPY Lab
-
-**Focus**: Agent security, benchmarking
-**Key Output**: AgentDojo, CaMeL
-
-### UC Berkeley CHAI (Center for Human-Compatible AI)
-
-**Focus**: AI alignment, safety
-**Key Output**: TensorTrust, alignment research
-
-### Stanford HAI
-
-**Focus**: AI safety and policy
-**Key Output**: Various safety research
+| Institution | Focus | Key Output |
+|-------------|-------|------------|
+| CMU Language Technologies Institute | Adversarial attacks on LLMs | GCG attack, safety analysis |
+| ETH Zurich SPY Lab | Agent security, benchmarking | AgentDojo, CaMeL |
+| UC Berkeley CHAI | AI alignment, safety | TensorTrust, alignment research |
+| Stanford HAI | AI safety and policy | Cross-domain safety research |
 
 ---
 
-## Bug Bounty Contributors
+## Bug Bounty Community
 
-Various security researchers who've reported vulnerabilities through:
+Anonymous and named security researchers report vulnerabilities through:
 - OpenAI bug bounty program
 - Anthropic vulnerability reporting
-- Google VRP
-- Microsoft MSRC
+- Google Vulnerability Reward Program
+- Microsoft Security Response Center
 
-Many operate anonymously but have significantly improved system security.
+Many operate anonymously but have driven significant security improvements in production systems.
 
 ---
 
-## Following the Field
+## Key Takeaways
 
-### Recommended Follows
-- Simon Willison's Substack/Blog
-- embracethered.com (Rehberger)
-- arXiv cs.CR and cs.CL tags
-- OWASP LLM project
+- Research spans three communities: independent security researchers (attack discovery), academic labs (formalization and benchmarks), and industry teams (defensive development)
+- Simon Willison's naming and advocacy established the field's foundation in September 2022
+- CMU's GCG attack and ETH's AgentDojo represent paradigm shifts in methodology
+- Bug bounty programs surface real-world vulnerabilities faster than academic publication cycles
 
-### Conferences
-- NeurIPS (safety track)
-- ICML (safety workshop)
-- USENIX Security
-- IEEE S&P
-- ACL/EMNLP
-- DEF CON AI Village
+## Sources
 
-### Mailing Lists and Forums
-- ML Safety mailing list
-- AI Security communities
-- OWASP Slack channels
+- Simon Willison - [simonwillison.net](https://simonwillison.net)
+- Johann Rehberger - [embracethered.com](https://embracethered.com)
+- Zou et al. - "Universal and Transferable Adversarial Attacks" (2023)
+- Greshake et al. - "Not what you've signed up for" (2023)
+- Anthropic - Browser use defense paper (2025)
+- OpenAI - Instruction Hierarchy paper (2024)
+- Google DeepMind - "Lessons from Defending Gemini" (2025)
+- Microsoft - Crescendo paper
+- OWASP LLM Project
+- Various conference proceedings: NeurIPS, ICML, USENIX Security, IEEE S&P, ACL/EMNLP, DEF CON AI Village
+
+---
+
+[← Previous](21-KEY-PAPERS.md) | [Index](00-INDEX.md)

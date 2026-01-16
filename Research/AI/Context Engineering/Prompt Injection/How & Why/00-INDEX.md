@@ -1,16 +1,22 @@
-# Prompt Injection: Complete Technical Analysis
+# Prompt Injection: How and Why It Works
 
-## How and Why Prompt Injection Works
+[Next →](01-FUNDAMENTALS.md)
 
-**Research Purpose**: Comprehensive understanding of prompt injection attack mechanisms, vulnerabilities, and the fundamental reasons why LLMs are susceptible—as prerequisite knowledge before exploring prevention strategies.
+---
 
-**Last Updated**: January 2026
+## Overview
+
+This series explores prompt injection attack mechanisms, transformer vulnerabilities, and why LLMs cannot architecturally distinguish instructions from data—prerequisite knowledge for understanding prevention strategies.
+
+## Summary
+
+- 22 modular documents covering fundamentals, attack taxonomy, technical mechanisms, historical context, and evaluation frameworks
+- Addresses the core problem: transformers process all inputs (system prompts, user messages, external data) through identical attention mechanisms
+- Synthesizes academic research, industry publications, security findings, and real-world incidents from 2022-2026
 
 ---
 
 ## Document Structure
-
-This research is organized into modular files for depth and maintainability:
 
 ### Core Foundations
 | File | Description |
@@ -60,46 +66,31 @@ This research is organized into modular files for depth and maintainability:
 
 ---
 
-## Executive Summary
+## The Core Problem
 
-### The Core Problem
+Prompt injection differs fundamentally from traditional software vulnerabilities. SQL injection has parameterized queries that separate code from data. Prompt injection exploits an architectural limitation: transformers process all input tokens through identical attention mechanisms with no distinction between trusted system prompts, semi-trusted user messages, and untrusted external data.
 
-Prompt injection is **fundamentally different from traditional software vulnerabilities**. Unlike SQL injection—solved through parameterized queries that separate code from data—prompt injection exploits an architectural limitation inherent to how Large Language Models process information.
+**The root cause**: All inputs become a unified token stream where models infer intent from context alone.
 
-**The root cause**: Transformers process all input tokens through identical attention mechanisms. There is no architectural distinction between:
-- Developer system prompts (trusted instructions)
-- User messages (semi-trusted input)
-- Retrieved documents (untrusted data)
-- Tool outputs (untrusted data)
+**Why natural language defenses fail**:
 
-All become a unified token stream where the model must infer intent and priority from context alone.
-
-### Why This Matters
-
-1. **No parameterized queries exist for natural language** - Unlike SQL, there's no formal grammar separating commands from data in human language
-
-2. **Instruction-following is the feature, not a bug** - Models are explicitly trained via RLHF to follow instructions helpfully. This same capability enables injection attacks.
-
-3. **More capable models are more vulnerable** - BIPIA benchmark shows a counterintuitive correlation: better instruction-following = better at following malicious instructions
-
-4. **The problem scales with capability** - As LLMs gain tool access (browsing, code execution, email), successful injections have increasingly severe consequences
+1. **No parameterized queries for natural language** - No formal grammar separates commands from data
+2. **Instruction-following enables attacks** - RLHF training for helpfulness also enables following malicious instructions
+3. **Capability increases vulnerability** - BIPIA benchmark shows better instruction-following correlates with higher attack success rates
+4. **Consequences scale with capability** - Tool access (browsing, code execution, email) amplifies injection impact
 
 ### Current State (January 2026)
 
-| Vendor | Best Reported ASR | Context |
+| Vendor | Best Reported ASR | Defense Approach |
 |--------|-------------------|---------|
 | Anthropic (Claude) | ~1% | Browser operations with full defenses |
 | Google (Gemini 2.5) | ~6% | Combined model + runtime defenses |
-| OpenAI (GPT-4) | Varies | Instruction hierarchy reduces but doesn't eliminate |
+| OpenAI (GPT-4) | Varies | Instruction hierarchy |
 | Microsoft (Copilot) | Varies | Multi-layer Azure AI Content Safety |
 
-**Industry consensus**: Complete prevention appears architecturally impossible with current transformer designs. The security model has shifted from "prevent all attacks" to "assume breach, contain damage."
+**Industry consensus**: Complete prevention appears architecturally impossible. Security model shifted from "prevent all attacks" to "assume breach, contain damage."
 
----
-
-## Key Concepts Quick Reference
-
-### Attack Categories
+## Attack Categories
 
 | Category | Vector | Example |
 |----------|--------|---------|
@@ -111,59 +102,49 @@ All become a unified token stream where the model must infer intent and priority
 | **Multimodal** | Non-text inputs | Instructions embedded in images |
 | **Agentic** | Tool/agent exploitation | MCP tool poisoning, inter-agent trust |
 
-### The "Lethal Trifecta" (Simon Willison)
+## The "Lethal Trifecta" (Simon Willison)
 
-A system is critically vulnerable when it has ALL THREE:
-1. ✓ Access to private/sensitive data
-2. ✓ Processes untrusted content
-3. ✓ Can take actions or communicate externally
+Systems are critically vulnerable when combining all three:
+1. Access to private/sensitive data
+2. Processes untrusted content
+3. Can take actions or communicate externally
 
-**Mitigation principle**: Design systems to have at most TWO of these properties.
+**Mitigation principle**: Design systems with at most two properties.
 
-### The Alignment Paradox
+## The Alignment Paradox
 
-> "You cannot make an LLM 'not follow instructions' without breaking its core functionality. The very capability that makes LLMs useful—instruction following—is what makes them vulnerable."
-
-This represents a **fundamental tension** that cannot be resolved through training alone.
+Making an LLM "not follow instructions" breaks its core functionality. Instruction-following is simultaneously the feature and the vulnerability—a fundamental tension training alone cannot resolve.
 
 ---
 
-## Reading Order Recommendation
+## Reading Paths
 
-### For Complete Understanding (Recommended)
-1. Start with [01-FUNDAMENTALS.md](./01-FUNDAMENTALS.md) - Understand the root cause
-2. Read [02-ATTENTION-MECHANISMS.md](./02-ATTENTION-MECHANISMS.md) - Technical foundation
-3. Review [04-TAXONOMY-OVERVIEW.md](./04-TAXONOMY-OVERVIEW.md) - Classification framework
-4. Deep dive into specific attack types (05-13) based on interest
-5. Study [17-HISTORICAL-TIMELINE.md](./17-HISTORICAL-TIMELINE.md) - Evolution context
-6. Examine [19-BENCHMARKS.md](./19-BENCHMARKS.md) - Evaluation methods
+**Complete Understanding**
+1. [01-FUNDAMENTALS.md](./01-FUNDAMENTALS.md) - Root cause
+2. [02-ATTENTION-MECHANISMS.md](./02-ATTENTION-MECHANISMS.md) - Technical foundation
+3. [04-TAXONOMY-OVERVIEW.md](./04-TAXONOMY-OVERVIEW.md) - Classification framework
+4. Attack types (05-13) by interest
+5. [17-HISTORICAL-TIMELINE.md](./17-HISTORICAL-TIMELINE.md) - Evolution
+6. [19-BENCHMARKS.md](./19-BENCHMARKS.md) - Evaluation
 
-### For Quick Technical Overview
+**Quick Technical Overview**
 1. [01-FUNDAMENTALS.md](./01-FUNDAMENTALS.md)
 2. [04-TAXONOMY-OVERVIEW.md](./04-TAXONOMY-OVERVIEW.md)
-3. [11-AGENTIC-ATTACKS.md](./11-AGENTIC-ATTACKS.md) (most relevant for modern systems)
+3. [11-AGENTIC-ATTACKS.md](./11-AGENTIC-ATTACKS.md)
 
-### For Research Context
+**Research Context**
 1. [21-KEY-PAPERS.md](./21-KEY-PAPERS.md)
 2. [17-HISTORICAL-TIMELINE.md](./17-HISTORICAL-TIMELINE.md)
 3. [19-BENCHMARKS.md](./19-BENCHMARKS.md)
 
 ---
 
-## Sources and Methodology
+## Sources
 
-This research synthesizes:
-- **Academic papers** from arXiv, NeurIPS, ICML, ACL, USENIX Security, IEEE S&P
-- **Industry publications** from Anthropic, OpenAI, Google DeepMind, Microsoft Research, Meta
-- **Security researcher work** from Simon Willison, Johann Rehberger, Kai Greshake, and others
-- **Standards bodies** including OWASP LLM Top 10, NIST AI RMF
-- **Bug bounty reports** and CVE databases
-- **Red team findings** from major AI labs
+Synthesizes academic papers (arXiv, NeurIPS, ICML, ACL, USENIX Security, IEEE S&P), industry publications (Anthropic, OpenAI, Google DeepMind, Microsoft Research, Meta), security research (Simon Willison, Johann Rehberger, Kai Greshake), standards (OWASP LLM Top 10, NIST AI RMF), bug bounty reports, CVE databases, and red team findings.
 
-All claims are traceable to specific sources documented in individual files.
+All claims are traceable to sources in individual files.
 
 ---
 
-## Navigation
-
-→ **Next**: [01-FUNDAMENTALS.md](./01-FUNDAMENTALS.md) - Begin with the architectural root cause
+[Next →](01-FUNDAMENTALS.md)

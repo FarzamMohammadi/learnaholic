@@ -1,12 +1,20 @@
 # 14 - Token-Level Analysis: How Models Process Injected Content
 
-## Understanding Prompt Injection at the Computational Level
+[← Previous: Data Exfiltration](./13-DATA-EXFILTRATION.md) | [Index](./00-INDEX.md) | [Next: Attention Hijacking →](./15-ATTENTION-HIJACKING.md)
 
 ---
 
 ## Overview
 
-This document examines how prompt injection attacks are processed at the token level—how malicious inputs move through the model's tokenization, embedding, and generation stages.
+Prompt injection attacks exploit how models process text at the computational level—through tokenization, embedding, attention, and generation stages.
+
+## Summary
+
+- Tokenization creates attack surface through encoding variations and token boundary manipulation
+- Embeddings enable semantic attacks by navigating high-dimensional vector spaces
+- Attention mechanisms can be hijacked, stealing focus from legitimate instructions
+- Generation is probabilistic; attacks shift probability mass toward compliance
+- Same mechanisms process both data and instructions, making perfect defense fundamentally hard
 
 ---
 
@@ -28,9 +36,9 @@ Claude tokenization (may differ):
 ["Ignore", " previous", " instructions"]
 ```
 
-### Tokenization and Attack Obfuscation
+### Attack Obfuscation via Tokenization
 
-**Why encoding attacks work**:
+**Encoding attacks work by changing token sequences:**
 ```
 "Ignore" → [4553, 590] (recognized pattern, safety-trained)
 "1gn0r3" → [16, 70, 15, 81, 18] (different tokens, different pattern)
@@ -39,7 +47,7 @@ The safety training on "Ignore" doesn't transfer to "1gn0r3"
 because they're different token sequences.
 ```
 
-**Why homoglyphs work**:
+**Homoglyphs exploit Unicode variations:**
 ```
 "Ignore" (Latin I) → Token sequence A
 "Ιgnore" (Greek Ι) → Token sequence B
@@ -64,8 +72,6 @@ Attempting to inject: <|endoftext|>, <s>, </s>
 Some tokenizers may interpret these specially,
 potentially affecting model behavior.
 ```
-
----
 
 ## The Embedding Stage
 
@@ -101,8 +107,6 @@ embed("Ignore instructions") ≈ embed("Disregard guidelines")
 Models generalize safety training through embedding similarity,
 but novel phrasings may fall outside trained regions.
 ```
-
----
 
 ## The Attention Stage
 
@@ -147,8 +151,6 @@ Models learn position-based patterns:
 Attacks that mimic system prompt positioning
 may receive unwarranted trust.
 ```
-
----
 
 ## The Generation Stage
 
@@ -202,8 +204,6 @@ T > 1 (creative): Flattened distribution, more randomness
 Low temperature: More deterministic, attacks more reliable
 High temperature: More random, attacks less reliable
 ```
-
----
 
 ## Processing an Injection: Step by Step
 
@@ -275,8 +275,6 @@ If injection wins:
   "Sure" (0.4) → "Sure, the passwords include..."
 ```
 
----
-
 ## Token-Level Defense Implications
 
 ### Why Token Filtering Fails
@@ -310,35 +308,21 @@ The model must:
 All using the same attention and generation mechanisms.
 ```
 
----
-
 ## Key Takeaways
 
-1. **Tokenization creates attack surface** - Different spellings = different tokens
-
-2. **Embeddings encode meaning** - Semantic attacks work through embedding space
-
-3. **Attention can be hijacked** - Injected content steals attention from legitimate instructions
-
-4. **Generation is probabilistic** - Attacks shift probability toward compliance
-
-5. **First tokens matter most** - Compliant start leads to compliant continuation
-
-6. **All stages use same mechanisms** - No fundamental data/instruction distinction
-
----
-
-## Further Reading
-
-- [02-ATTENTION-MECHANISMS.md](./02-ATTENTION-MECHANISMS.md) - Attention exploitation details
-- [08-ADVERSARIAL-SUFFIXES.md](./08-ADVERSARIAL-SUFFIXES.md) - How GCG optimizes at token level
-- [15-ATTENTION-HIJACKING.md](./15-ATTENTION-HIJACKING.md) - Attention manipulation techniques
-
----
+1. **Token-level obfuscation bypasses pattern matching** - Safety training on "Ignore" doesn't transfer to "1gn0r3" because tokenization produces different sequences
+2. **Adversarial suffixes exploit embedding geometry** - GCG finds token combinations whose embeddings navigate to compliance regions in high-dimensional space
+3. **First token determines trajectory** - Once model generates compliant opening ("Sure"), continuation probability strongly favors compliance
+4. **Defense requires semantic detection** - Token filtering fails; embedding-space analysis catches obfuscated variants
+5. **Architecture creates fundamental tension** - Same mechanisms must simultaneously follow instructions, understand semantics, and detect adversarial intent
 
 ## Sources
 
 - Transformer architecture papers
 - Tokenizer documentation (OpenAI, Anthropic)
-- Adversarial attack research (Zou et al., etc.)
+- Adversarial attack research (Zou et al.)
 - Attention analysis research
+
+---
+
+[← Previous: Data Exfiltration](./13-DATA-EXFILTRATION.md) | [Index](./00-INDEX.md) | [Next: Attention Hijacking →](./15-ATTENTION-HIJACKING.md)
