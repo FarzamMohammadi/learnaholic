@@ -6,7 +6,14 @@
 
 ## Overview
 
-Human-in-the-loop (HITL) controls are the ultimate defense against prompt injection—a human reviewer can catch attacks that bypass all automated defenses. However, HITL doesn't scale, so the challenge is determining WHEN to involve humans and designing efficient approval workflows.
+Human-in-the-loop (HITL) controls catch attacks that bypass automated defenses. A human reviewer provides the ultimate safety net. The challenge is determining when to involve humans without creating bottlenecks or approval fatigue.
+
+## Summary
+
+- Classify actions by risk level to determine when approval is needed
+- Design async workflows that don't block user experience
+- Use multi-factor risk scoring to prioritize human attention
+- Implement tiered escalation for efficient security response
 
 ---
 
@@ -86,9 +93,7 @@ class ApprovalDecision:
     auto_deny_on_timeout: bool
 
 class HITLDecisionEngine:
-    """
-    Determine when human approval is required.
-    """
+    """Determine when human approval is required."""
     
     # Actions that ALWAYS require human approval
     ALWAYS_REQUIRE = {
@@ -106,13 +111,11 @@ class HITLDecisionEngine:
         ActionCategory.CODE_EXECUTION: RiskLevel.LOW,
     }
     
-    def decide(self, 
+    def decide(self,
                action_category: ActionCategory,
                risk_level: RiskLevel,
                context: dict) -> ApprovalDecision:
-        """
-        Decide if human approval is required.
-        """
+        """Decide if human approval is required."""
         
         # Always require approval for certain categories
         if action_category in self.ALWAYS_REQUIRE:
@@ -219,9 +222,7 @@ class ApprovalRequest:
         self.denial_reason = None
 
 class ApprovalWorkflow:
-    """
-    Async approval workflow for HITL controls.
-    """
+    """Async approval workflow for HITL controls."""
     
     def __init__(self, 
                  notification_service,
@@ -238,9 +239,7 @@ class ApprovalWorkflow:
                                 timeout_minutes: int = 30,
                                 on_approve: Callable = None,
                                 on_deny: Callable = None) -> ApprovalRequest:
-        """
-        Create an approval request and notify approvers.
-        """
+        """Create an approval request and notify approvers."""
         
         request = ApprovalRequest(
             action_description=action,
@@ -407,9 +406,7 @@ class RiskFactor:
     description: str
 
 class RiskScorer:
-    """
-    Calculate risk scores for LLM actions.
-    """
+    """Calculate risk scores for LLM actions."""
     
     def __init__(self):
         self.factor_weights = {
@@ -422,9 +419,7 @@ class RiskScorer:
         }
     
     def calculate_risk(self, context: dict) -> dict:
-        """
-        Calculate overall risk score from multiple factors.
-        """
+        """Calculate overall risk score from multiple factors."""
         factors = []
         
         # Factor 1: Action severity
@@ -634,9 +629,7 @@ class RiskScorer:
 
 ```python
 class EscalationManager:
-    """
-    Manage escalation of security events.
-    """
+    """Manage escalation of security events."""
     
     ESCALATION_TIERS = [
         {
@@ -666,9 +659,7 @@ class EscalationManager:
     ]
     
     def escalate(self, event: dict, current_tier: int = 1) -> dict:
-        """
-        Escalate an event to the appropriate tier.
-        """
+        """Escalate an event to the appropriate tier."""
         tier_config = self.ESCALATION_TIERS[current_tier - 1]
         
         # Execute tier actions
@@ -692,15 +683,19 @@ class EscalationManager:
 
 ---
 
-## Summary
+## Key Takeaways
 
-HITL controls provide the strongest defense against prompt injection but must be used judiciously:
+HITL controls provide the strongest defense but must be applied strategically:
 
-1. **Classify actions** by risk level to determine when approval is needed
-2. **Design async workflows** that don't block user experience
-3. **Use risk scoring** to prioritize human attention
-4. **Implement tiered escalation** for efficient response
-5. **Balance security with usability** - too many approvals causes fatigue
+- Too few approvals leave gaps; too many cause approval fatigue
+- Risk scoring automates the decision of when to escalate to humans
+- Async workflows keep systems responsive while requests await approval
+- Tiered escalation ensures right-level response without over-alerting
+
+## Sources
+
+- [OWASP LLM Security](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - Risk classification patterns
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) - Human oversight controls
 
 ---
 

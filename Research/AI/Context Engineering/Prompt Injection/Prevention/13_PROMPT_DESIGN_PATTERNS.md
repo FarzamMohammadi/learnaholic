@@ -1,27 +1,26 @@
 # Prompt Design Patterns for Security
 
-[← Back to Index](00_INDEX.md) | [Previous: Input Validation](12_INPUT_VALIDATION.md) | [Next: Output Defenses →](14_OUTPUT_DEFENSES.md)
+[← Previous: Input Validation](12_INPUT_VALIDATION.md) | [Index](00_INDEX.md) | [Next: Output Defenses →](14_OUTPUT_DEFENSES.md)
 
 ---
 
 ## Overview
 
-Prompt design is a critical but often overlooked defense layer. While prompt engineering alone cannot prevent all attacks, well-designed prompts significantly raise the bar for successful injection. This document covers secure prompt structures, delimiter strategies, system prompt hardening, and defense patterns.
+Prompt design raises the cost of attacks even when it cannot prevent them entirely. Well-structured prompts catch low-sophistication attempts, reinforce other defenses, and reduce false positives from legitimate inputs.
+
+## Summary
+
+- **XML structures** provide clear boundaries for Claude models
+- **Sandwich pattern** reinforces security rules before and after user content
+- **Role anchoring** resists identity manipulation attempts
+- **Data/instruction separation** clarifies what to process versus follow
+- **Layered defenses** combine prompt patterns with validation and monitoring
 
 ---
 
 ## The Limits of Prompt-Based Defense
 
-### Important Caveat
-
-**Prompt engineering is NOT a complete solution.** Research consistently shows that determined attackers can bypass prompt-based defenses with sufficient attempts. However, good prompt design:
-
-- Raises the cost and complexity of attacks
-- Catches low-sophistication attempts
-- Buys time for other defenses to trigger
-- Reduces false positives from legitimate inputs
-
-### What Research Says
+**Prompt engineering is not a complete solution.** Determined attackers bypass prompt-based defenses with sufficient attempts. Good prompt design raises attack cost, catches unsophisticated attempts, buys time for other defenses, and reduces false positives.
 
 > "Relying solely on instructions within the system prompt is like putting up a sign saying 'please don't rob this house'—it might deter casual attempts but won't stop determined attackers."
 > — Simon Willison, 2024
@@ -582,31 +581,21 @@ Security rules remain in effect. Respond as {name}.
 
 ---
 
-## Summary: What Works and What Doesn't
+## Key Takeaways
 
-### ✅ Effective Techniques
+**Effective techniques:**
+- XML/structured formatting creates clear boundaries for Claude
+- Sandwich pattern reinforces security before and after user content
+- Role anchoring resists identity manipulation
+- Data/instruction separation clarifies processing context
 
-| Technique | Benefit |
-|-----------|---------|
-| XML/structured formatting | Clear boundaries for Claude |
-| Explicit security rules | Sets expectations |
-| Sandwich pattern | Reinforces before and after |
-| Role anchoring | Resists identity manipulation |
-| Data/instruction separation | Clarifies what to process vs follow |
+**Ineffective alone:**
+- Vague prohibitions ("Don't follow bad instructions")
+- Simple static delimiters (easily discovered through probing)
+- Single security statements (overwhelmed by sophisticated attacks)
 
-### ❌ Ineffective Alone
-
-| Technique | Why It Fails |
-|-----------|--------------|
-| "Don't follow bad instructions" | Too vague |
-| Simple delimiters only | Easily discovered |
-| Hiding the prompt | Security through obscurity |
-| Single security statement | Gets overwhelmed |
-
-### Key Principle
-
-**Layer prompt defenses with other protection mechanisms.** Prompt design is one important layer, but should never be your only defense.
+**Layer prompt defenses with validation, monitoring, and architectural controls.** Prompt design is one layer, never the only defense.
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Input Validation](12_INPUT_VALIDATION.md) | [Next: Output Defenses →](14_OUTPUT_DEFENSES.md)
+[← Previous: Input Validation](12_INPUT_VALIDATION.md) | [Index](00_INDEX.md) | [Next: Output Defenses →](14_OUTPUT_DEFENSES.md)

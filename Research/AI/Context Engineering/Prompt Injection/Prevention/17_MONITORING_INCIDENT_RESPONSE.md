@@ -1,18 +1,24 @@
 # Monitoring and Incident Response
 
-[← Back to Index](00_INDEX.md) | [Previous: Human-in-the-Loop](16_HUMAN_IN_THE_LOOP.md) | [Next: Effectiveness Analysis →](18_EFFECTIVENESS_ANALYSIS.md)
+[← Previous: Human-in-the-Loop](16_HUMAN_IN_THE_LOOP.md) | [Index](00_INDEX.md) | [Next: Effectiveness Analysis →](18_EFFECTIVENESS_ANALYSIS.md)
 
 ---
 
 ## Overview
 
-Comprehensive monitoring enables detection of attacks, supports incident response, and provides data for continuous improvement. This document covers logging strategies, detection patterns, alerting systems, and incident response playbooks specific to prompt injection.
+Detection without visibility is guesswork. Monitoring LLM interactions provides attack visibility, enables rapid response, and drives continuous defense improvements. This covers logging strategies, anomaly detection, alerting systems, and incident response playbooks.
+
+## Summary
+
+- **Comprehensive logging** captures input, processing, output, and metadata for forensic analysis
+- **Anomaly detection** identifies attack patterns across rate, behavior, and tool usage dimensions
+- **Tiered alerting** balances responsiveness with alert fatigue through severity-based routing
+- **Incident playbooks** provide structured responses from detection through post-mortem
+- **Security metrics** track defense effectiveness and inform continuous improvement
 
 ---
 
 ## Logging Strategy
-
-### What to Log
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -51,7 +57,7 @@ Comprehensive monitoring enables detection of attacks, supports incident respons
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Structured Logging Implementation
+**Structured Logging Implementation:**
 
 ```python
 import json
@@ -222,9 +228,7 @@ class SecurityLogger:
 
 ---
 
-## Detection Patterns
-
-### Anomaly Detection
+## Anomaly Detection
 
 ```python
 from collections import defaultdict
@@ -421,8 +425,6 @@ class AnomalyDetector:
 
 ## Alerting System
 
-### Alert Configuration
-
 ```python
 from enum import Enum
 from typing import List, Callable
@@ -565,8 +567,6 @@ DEFAULT_RULES = [
 
 ## Incident Response Playbook
 
-### Prompt Injection Incident Response
-
 ```yaml
 # PROMPT INJECTION INCIDENT RESPONSE PLAYBOOK
 
@@ -673,9 +673,7 @@ escalation_contacts:
 
 ---
 
-## Dashboard Metrics
-
-### Key Security Metrics to Track
+## Security Metrics
 
 ```python
 SECURITY_METRICS = {
@@ -760,16 +758,18 @@ SECURITY_METRICS = {
 
 ---
 
-## Summary
+## Key Takeaways
 
-Effective monitoring and incident response requires:
+- **Logs are forensic foundation**: Structured logging with request IDs, risk scores, and validation results enables post-incident analysis
+- **Behavioral patterns reveal attacks**: Multi-turn escalation, unusual tool requests, and rate spikes often precede successful injections
+- **Alert throttling prevents fatigue**: Severity-based routing and time-based throttling ensure critical alerts reach responders
+- **Playbooks compress response time**: Pre-defined containment actions by severity reduce mean-time-to-respond from hours to minutes
 
-1. **Comprehensive logging** of all LLM interactions
-2. **Real-time anomaly detection** for attack patterns
-3. **Tiered alerting** to avoid alert fatigue
-4. **Documented playbooks** for consistent response
-5. **Metrics dashboards** for visibility and trends
+## Sources
+
+- NIST Incident Response Guidelines - containment and recovery phases adapted for LLM context
+- OWASP Logging Best Practices - structured logging patterns for security events
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Human-in-the-Loop](16_HUMAN_IN_THE_LOOP.md) | [Next: Effectiveness Analysis →](18_EFFECTIVENESS_ANALYSIS.md)
+[← Previous: Human-in-the-Loop](16_HUMAN_IN_THE_LOOP.md) | [Index](00_INDEX.md) | [Next: Effectiveness Analysis →](18_EFFECTIVENESS_ANALYSIS.md)

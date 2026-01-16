@@ -6,13 +6,19 @@
 
 ## Overview
 
-Not all defenses are created equal. This document provides an honest assessment of defense effectiveness based on benchmark data, research findings, and real-world experience. Understanding what actually works—and what provides only an illusion of security—is critical for building robust systems.
+Honest assessment of defense effectiveness based on benchmark data, research findings, and real-world experience. Distinguishes what actually works from security theater.
+
+## Summary
+
+- Training-based defenses (Meta-SecAlign, SecAlign) and architectural solutions (CaMeL) show strongest evidence
+- More capable models are more vulnerable (0.64 correlation between capability and vulnerability)
+- No single defense is sufficient—determined attackers bypass isolated defenses
+- System prompts, role separation, and keyword blocklists provide minimal protection alone
+- Defense selection depends on threat model: low/medium threats need layering, high/critical threats need architectural solutions
 
 ---
 
-## The Honest Truth About Prompt Injection Defense
-
-### Key Research Findings
+## Research Findings
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -39,7 +45,7 @@ Not all defenses are created equal. This document provides an honest assessment 
 
 ---
 
-## What Actually Works (High Confidence)
+## High-Confidence Defenses
 
 ### Tier 1: Strong Evidence of Effectiveness
 
@@ -106,7 +112,7 @@ ARCHITECTURE:
 
 ---
 
-## What Provides Partial Protection
+## Partial Protection Defenses
 
 ### Tier 2: Moderate Evidence, Known Limitations
 
@@ -181,7 +187,7 @@ PIGuard (MOF):
 
 ---
 
-## Security Theater (Low Effectiveness)
+## Security Theater
 
 ### Tier 3: Insufficient on Their Own
 
@@ -244,9 +250,7 @@ RESULT:
 
 ---
 
-## Benchmark Evidence Summary
-
-### Major Benchmarks and Findings
+## Benchmark Evidence
 
 #### BIPIA (Benchmark for Indirect Prompt Injection Attacks)
 ```
@@ -318,7 +322,7 @@ IMPLICATION:
 
 ---
 
-## Real-World Effectiveness Matrix
+## Effectiveness Matrix
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -393,26 +397,38 @@ CRITICAL THREAT (Lethal Trifecta present):
 
 ---
 
-## Summary: Honest Assessment
+## Key Takeaways
 
-### What We Know Works
-1. **Training-based defenses** (SecAlign, Meta-SecAlign) provide strongest protection
-2. **Architectural defenses** (CaMeL) provide provable guarantees for compatible tasks
-3. **Multi-layer defense** is mandatory—no single layer is sufficient
-4. **Human-in-the-loop** is the ultimate backstop but doesn't scale
+**What works:**
+- Training-based defenses (SecAlign, Meta-SecAlign) provide strongest protection
+- Architectural defenses (CaMeL) provide provable guarantees for compatible tasks
+- Multi-layer defense is mandatory—no single layer is sufficient
+- Human-in-the-loop is the ultimate backstop but doesn't scale
 
-### What We Know Doesn't Work Alone
-1. System prompt instructions
-2. Message role separation
-3. Keyword blocklists
-4. Single-layer defenses
-5. LLM-as-judge without other defenses
+**What doesn't work alone:**
+- System prompt instructions
+- Message role separation
+- Keyword blocklists
+- Single-layer defenses
+- LLM-as-judge without other defenses
 
-### The Uncomfortable Reality
-- Prompt injection may never be fully "solved"
+**The uncomfortable reality:**
+- Prompt injection may never be fully solved
 - More capable models may be more vulnerable
 - Defense-in-depth is the only viable strategy
 - Some high-risk use cases may not be feasible
+
+## Sources
+
+- [BIPIA Benchmark](https://arxiv.org/abs/2312.05238) - Capability-vulnerability correlation study
+- [InjecAgent](https://arxiv.org/abs/2403.02691) - Agent attack success rates
+- [AgentDojo](https://arxiv.org/abs/2406.13352) - Defense effectiveness evaluation
+- [Meta-SecAlign](https://arxiv.org/abs/2410.13073) - Training-based defense research
+- [CaMeL Framework](https://arxiv.org/abs/2410.02711) - Architectural defense with provable guarantees
+- [Constitutional Classifiers v2](https://www.anthropic.com/research/constitutional-classifiers) - Anthropic production defense
+- [Prompt Guard 2](https://ai.meta.com/blog/prompt-guard-2-adversarial-attacks/) - Meta detection classifier
+- [TensorTrust](https://tensortrust.ai/) - Role separation research
+- [WASP Benchmark](https://arxiv.org/abs/2410.18718) - Web agent security evaluation
 
 ---
 

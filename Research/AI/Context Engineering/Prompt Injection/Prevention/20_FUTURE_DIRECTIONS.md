@@ -6,7 +6,15 @@
 
 ## Overview
 
-Prompt injection defense is a rapidly evolving field. This document examines unsolved problems, promising research directions, and predictions for how the landscape may evolve. Understanding these frontiers helps practitioners prepare for future challenges and opportunities.
+Prompt injection remains fundamentally unsolved. This document examines open problems, promising research directions, and predictions for the field's evolution.
+
+## Summary
+
+- **Fundamental problem**: Transformers cannot architecturally distinguish instructions from data
+- **Research directions**: Formal verification, architectural innovations, improved training, better detection, agent-specific defenses
+- **Industry trends**: Training-based defenses becoming standard, detection APIs commoditizing, agentic security frameworks emerging
+- **Reality check**: "Solved" means managed like other security challenges, not eliminated
+- **Practitioner guidance**: Stay current, build modular systems, embrace defense-in-depth
 
 ---
 
@@ -57,7 +65,7 @@ Prompt injection defense is a rapidly evolving field. This document examines uns
 
 ### 1. Formal Verification of LLM Security
 
-**Goal**: Mathematically prove security properties of LLM systems.
+Mathematically prove security properties of LLM systems.
 
 ```
 Current State:
@@ -79,7 +87,7 @@ Research Needed:
 
 ### 2. Architectural Innovations
 
-**Goal**: Design architectures that inherently separate instructions from data.
+Design architectures that inherently separate instructions from data.
 
 ```
 Promising Approaches:
@@ -107,7 +115,7 @@ Promising Approaches:
 
 ### 3. Improved Training Methods
 
-**Goal**: Train models that inherently resist injection.
+Train models that inherently resist injection.
 
 ```
 Current Best: SecAlign / Meta-SecAlign
@@ -125,7 +133,7 @@ Future Research:
 
 ### 4. Detection Advances
 
-**Goal**: Detect injections with higher accuracy and lower latency.
+Detect injections with higher accuracy and lower latency.
 
 ```
 Current Limitations:
@@ -144,7 +152,7 @@ Promising Directions:
 
 ### 5. Agent-Specific Defenses
 
-**Goal**: Secure agentic systems that operate autonomously.
+Secure agentic systems that operate autonomously.
 
 ```
 Unique Challenges for Agents:
@@ -374,31 +382,19 @@ FOR ORGANIZATIONS:
 
 ---
 
-## Summary: The Path Forward
-
-### Key Takeaways
+## Key Takeaways
 
 1. **The problem is fundamental** - Transformers cannot architecturally distinguish instructions from data
-
-2. **Significant progress has been made** - Training-based and architectural defenses show promise
-
-3. **Defense-in-depth is mandatory** - No single layer is sufficient
-
+2. **Significant progress exists** - Training-based and architectural defenses show promise
+3. **Defense-in-depth is mandatory** - No single layer suffices
 4. **The arms race continues** - Expect ongoing evolution of attacks and defenses
-
 5. **Human oversight remains critical** - Especially for high-stakes decisions
 
-6. **The field needs more research** - Formal methods, verification, and novel architectures
+> Prompt injection may never be fully "solved." Instead, it will be "managed" like other security challenges—through continuous improvement, defense-in-depth, and accepting residual risk. The goal is not perfection but making attacks expensive, detectable, and containable.
 
-### Final Thought
+## Sources
 
-> Prompt injection may never be fully "solved" in the way we solve mathematical problems. Instead, it may be "managed" like other security challenges—through continuous improvement, defense-in-depth, and accepting residual risk. The goal is not perfection but making attacks expensive, detectable, and containable.
-
----
-
-## References and Further Reading
-
-### Foundational Papers
+**Foundational Papers:**
 - "Ignore This Title and HackAPrompt" (2023) - Attack taxonomy
 - "Not What You've Signed Up For" (2023) - Indirect injection
 - "TensorTrust" (2024) - Attack/defense game
@@ -407,19 +403,19 @@ FOR ORGANIZATIONS:
 - "SecAlign" (2025) - Preference optimization defense
 - "CaMeL" (2025) - Architectural defense
 
-### Industry Resources
-- OWASP LLM Top 10: https://owasp.org/www-project-top-10-for-llm-applications/
+**Industry Resources:**
+- [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-llm-applications/)
 - NIST AI Risk Management Framework
 - Anthropic Safety Documentation
 - OpenAI Model Spec
 - Google Gemini Safety Documentation
 
-### Tools and Frameworks
-- Prompt Guard 2: https://github.com/meta-llama/PurpleLlama
-- LlamaFirewall: https://github.com/meta-llama/PurpleLlama
-- Garak: https://github.com/NVIDIA/garak
-- Protect AI LLM Guard: https://github.com/protectai/llm-guard
-- Rebuff: https://github.com/protectai/rebuff
+**Tools and Frameworks:**
+- [Prompt Guard 2](https://github.com/meta-llama/PurpleLlama)
+- [LlamaFirewall](https://github.com/meta-llama/PurpleLlama)
+- [Garak](https://github.com/NVIDIA/garak)
+- [Protect AI LLM Guard](https://github.com/protectai/llm-guard)
+- [Rebuff](https://github.com/protectai/rebuff)
 
 ---
 

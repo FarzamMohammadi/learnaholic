@@ -1,24 +1,29 @@
 # OWASP and Standards-Based Frameworks
 
-[← Back to Index](00_INDEX.md) | [Previous: Startup Solutions](10_STARTUP_SOLUTIONS.md) | [Next: Input Validation →](12_INPUT_VALIDATION.md)
+[← Previous: Startup Solutions](10_STARTUP_SOLUTIONS.md) | [Index](00_INDEX.md) | [Next: Input Validation →](12_INPUT_VALIDATION.md)
 
 ---
 
 ## Overview
 
-Industry frameworks provide structured approaches to LLM security based on collective expertise. This document covers the OWASP LLM Top 10, the Prevention Cheat Sheet, NIST AI Risk Management Framework, and AWS defense-in-depth patterns.
+Industry frameworks provide structured approaches to LLM security based on collective expertise. This document covers OWASP LLM Top 10, OWASP Prevention Cheat Sheet, NIST AI Risk Management Framework, and AWS defense-in-depth patterns.
+
+## Summary
+
+- **OWASP LLM Top 10**: Ranks prompt injection as #1 threat with seven prevention strategies
+- **OWASP Cheat Sheet**: Provides attack taxonomy and implementation checklist
+- **NIST AI RMF**: Four-function framework (Govern, Map, Measure, Manage) with security controls
+- **AWS Defense-in-Depth**: Five-layer architecture assuming injection can succeed
 
 ---
 
-## OWASP LLM Top 10 (2025)
+## OWASP LLM Top 10
 
-### LLM01: Prompt Injection
+### LLM01: Prompt Injection (Rank #1)
 
-**Rank: #1 (Most Critical)**
+Attackers manipulate LLM behavior through crafted inputs, either directly or indirectly via external content.
 
-Prompt injection occurs when attackers manipulate LLM behavior through crafted inputs, either directly or indirectly via external content.
-
-### Prevention Strategies (OWASP Recommended)
+### Seven Prevention Strategies
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -89,38 +94,35 @@ Prompt injection occurs when attackers manipulate LLM behavior through crafted i
 
 ## OWASP Prompt Injection Prevention Cheat Sheet
 
-### Complete Attack Coverage
+### Attack Taxonomy
 
-**Direct Injection Techniques**:
+**Direct Injection**:
 - Instruction override ("Ignore previous instructions")
 - Context switching ("New task: ...")
 - Privilege escalation ("You are now admin mode")
 - Roleplay exploitation ("Pretend you are DAN")
 
-**Indirect Injection Techniques**:
+**Indirect Injection**:
 - Document poisoning (malicious content in files)
 - Web content injection (embedded in scraped pages)
-- RAG poisoning (malicious content in retrieval corpus)
+- RAG poisoning (malicious retrieval corpus)
 - Multi-turn manipulation (gradual context shift)
 
 **Encoding Attacks**:
-- Base64 encoding
-- Hexadecimal encoding
+- Base64, hexadecimal, ROT13
 - Unicode smuggling (zero-width characters)
-- ROT13 and other ciphers
 - HTML/XML entity encoding
 
 **Specialized Attacks**:
 - Typoglycemia (scrambled words)
 - Best-of-N jailbreaking
 - HTML/Markdown injection
-- Multi-turn/persistent attacks
 - Agent-specific (thought injection, tool manipulation)
 
-### Cheat Sheet Best Practices
+### Implementation Pattern
 
 ```python
-# OWASP Recommended Implementation Pattern
+# OWASP-compliant implementation pattern
 
 class OWASPCompliantLLM:
     def __init__(self):
@@ -176,11 +178,8 @@ class OWASPCompliantLLM:
         
         return response
     
-    def build_secure_prompt(self, user_input: str, context: dict, 
+    def build_secure_prompt(self, user_input: str, context: dict,
                             segregate_external: bool) -> str:
-        """
-        Build prompt following OWASP guidelines.
-        """
         system_prompt = """
         You are a helpful assistant with strict security constraints.
         
@@ -213,10 +212,10 @@ class OWASPCompliantLLM:
         return f"{system_prompt}\n\n{external_block}\n\nUser: {user_input}"
 ```
 
-### Checklist Format
+### Prevention Checklist
 
 ```
-OWASP PROMPT INJECTION PREVENTION CHECKLIST
+OWASP PREVENTION CHECKLIST
 
 INPUT HANDLING:
 [ ] Implement input validation with fuzzy matching
@@ -255,13 +254,11 @@ OPERATIONAL:
 
 ---
 
-## NIST AI Risk Management Framework (AI RMF)
+## NIST AI Risk Management Framework
 
-### Framework Overview
+NIST AI RMF provides structured approaches to managing AI risks, including prompt injection.
 
-The NIST AI RMF provides a structured approach to managing AI risks, including security risks from prompt injection.
-
-### Core Functions
+### Four Core Functions
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -302,13 +299,13 @@ The NIST AI RMF provides a structured approach to managing AI risks, including s
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Security-Specific Recommendations
+### Security Recommendations
 
-| Area | NIST Recommendation | Prompt Injection Application |
-|------|---------------------|------------------------------|
-| Detection | Target detection within 15 minutes | Real-time injection monitoring |
-| Containment | Automated containment within 5 minutes | Auto-block on detection |
-| Threat Modeling | Include semantic attack vectors | Model injection attack paths |
+| Area | NIST Target | Prompt Injection Application |
+|------|-------------|------------------------------|
+| Detection | <15 minutes | Real-time injection monitoring |
+| Containment | <5 minutes | Auto-block on detection |
+| Threat Modeling | Semantic attack vectors | Model injection attack paths |
 | Testing | Regular adversarial evaluation | Continuous red teaming |
 
 ### AI 600-1 Security Controls
@@ -356,11 +353,9 @@ INCIDENT_RESPONSE:
 
 ## AWS Defense-in-Depth for GenAI
 
-### Core Principle
+**Core Principle**: Assume prompt injection can succeed. Design controls to mitigate impact even when attacks bypass LLM defenses.
 
-**"Assume prompt injection can succeed"**—design controls to mitigate impact even when attacks bypass LLM defenses.
-
-### Architecture Pattern
+### Five-Layer Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -417,11 +412,7 @@ import boto3
 bedrock = boto3.client('bedrock-runtime')
 
 def call_with_guardrails(prompt: str, guardrail_id: str) -> dict:
-    """
-    Call Bedrock with guardrails for prompt injection protection.
-    """
-    
-    # First, apply guardrails to the input
+    # Apply guardrails to the input
     guardrail_response = bedrock.apply_guardrail(
         guardrailIdentifier=guardrail_id,
         guardrailVersion='DRAFT',
@@ -471,7 +462,7 @@ def call_with_guardrails(prompt: str, guardrail_id: str) -> dict:
     }
 ```
 
-### Key AWS Principle: Authorization is Defense
+### Authorization as Last Line of Defense
 
 ```
 INJECTION SUCCEEDS → LLM REQUESTS: "Delete all files"
@@ -495,12 +486,10 @@ INJECTION SUCCEEDS → LLM REQUESTS: "Delete all files"
 
 ---
 
-## Implementation Reference
-
-### Combined Framework Checklist
+## Combined Framework Checklist
 
 ```
-COMPREHENSIVE SECURITY CHECKLIST (OWASP + NIST + AWS)
+COMPREHENSIVE CHECKLIST (OWASP + NIST + AWS)
 
 GOVERNANCE (NIST GOVERN):
 [ ] Established AI security policies
@@ -545,17 +534,21 @@ TESTING:
 
 ---
 
-## Summary
+## Key Takeaways
 
-Standards-based frameworks provide structured approaches to LLM security:
+- OWASP ranks prompt injection as the #1 LLM threat, providing comprehensive prevention strategies and attack taxonomy
+- NIST AI RMF offers enterprise-grade risk management with specific security timelines (detect <15min, contain <5min)
+- AWS defense-in-depth assumes injection succeeds, relying on authorization controls as the final defense layer
+- Combine multiple frameworks for comprehensive protection rather than relying on a single approach
 
-- **OWASP LLM Top 10**: Comprehensive vulnerability taxonomy
-- **OWASP Cheat Sheet**: Practical implementation guidance
-- **NIST AI RMF**: Enterprise risk management structure
-- **AWS Patterns**: Cloud-native defense-in-depth
+## Sources
 
-Use these frameworks as foundations, adapting to your specific context and risk profile.
+- [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - LLM vulnerability rankings
+- [OWASP Prompt Injection Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Prompt_Injection_Cheat_Sheet.html) - Implementation guidance
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) - Enterprise risk management
+- [AWS Bedrock Guardrails](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html) - Cloud defense patterns
+- [MITRE ATLAS](https://atlas.mitre.org/) - AI threat taxonomy
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Startup Solutions](10_STARTUP_SOLUTIONS.md) | [Next: Input Validation →](12_INPUT_VALIDATION.md)
+[← Previous: Startup Solutions](10_STARTUP_SOLUTIONS.md) | [Index](00_INDEX.md) | [Next: Input Validation →](12_INPUT_VALIDATION.md)

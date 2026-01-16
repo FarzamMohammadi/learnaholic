@@ -6,7 +6,15 @@
 
 ## Overview
 
-Agentic AI systems—those that can take actions in the world through tools, APIs, and autonomous operation—represent the highest-risk category for prompt injection. When an LLM can send emails, modify files, execute code, or make API calls, successful injection can cause real-world harm. This document covers the critical security considerations for agentic systems.
+Agentic AI systems—those that can take actions in the world through tools, APIs, and autonomous operation—represent the highest-risk category for prompt injection. When an LLM can send emails, modify files, execute code, or make API calls, successful injection can cause real-world harm.
+
+## Summary
+
+- **Lethal Trifecta**: Never combine all three of private data access, untrusted input, and external actions
+- **Tool Security**: Implement capability-based access control, input validation, and user confirmation for sensitive operations
+- **MCP Hardening**: Display exact commands, sandbox execution, require explicit authorization, and log everything
+- **Multi-Agent Trust**: Treat all inter-agent communication as untrusted; validate at boundaries
+- **Code Execution**: Use strong sandboxing (Firecracker, gVisor, Docker) with resource limits and network isolation
 
 ---
 
@@ -73,32 +81,25 @@ Simon Willison's "Lethal Trifecta" identifies the three capabilities that, when 
 
 ```python
 class SecureAgentArchitecture:
-    """
-    Demonstrate architectural patterns that avoid the Lethal Trifecta.
-    """
-    
+    """Architectural patterns that avoid the Lethal Trifecta."""
+
     @staticmethod
     def pattern_1_read_only():
         """
         Pattern: Private Data + Untrusted Input (NO external actions)
         Use case: RAG system that answers questions about internal docs
         """
-        # Has: Access to private documents
-        # Has: Processes user queries (untrusted)
-        # Missing: Cannot take external actions
         
         class ReadOnlyRAG:
             def __init__(self, document_store):
                 self.docs = document_store
-            
+
             def query(self, user_question: str) -> str:
-                # Can read docs, can process user input
-                # CANNOT send emails, make API calls, etc.
                 relevant_docs = self.docs.search(user_question)
                 return self.llm.generate(
                     f"Answer based on docs: {relevant_docs}\n"
                     f"Question: {user_question}",
-                    tools=[]  # NO TOOLS AVAILABLE
+                    tools=[]  # NO TOOLS - cannot take external actions
                 )
     
     @staticmethod
@@ -107,22 +108,13 @@ class SecureAgentArchitecture:
         Pattern: Private Data + External Actions (NO untrusted input)
         Use case: Scheduled report generator
         """
-        # Has: Access to private data (metrics, databases)
-        # Has: Can send emails/reports
-        # Missing: No external/untrusted input
-        
         class IsolatedAutomation:
             def generate_weekly_report(self):
-                # Reads from internal data only (trusted)
                 metrics = self.db.get_weekly_metrics()
-                
-                # Generates report (no user input involved)
                 report = self.llm.generate(
-                    f"Generate report for metrics: {metrics}",
-                    # No untrusted content ever enters this flow
+                    f"Generate report for metrics: {metrics}"
+                    # No untrusted input - no injection vector
                 )
-                
-                # Sends externally (but no injection vector)
                 self.email.send(report, to="team@company.com")
     
     @staticmethod
@@ -131,21 +123,12 @@ class SecureAgentArchitecture:
         Pattern: Untrusted Input + External Actions (NO private data)
         Use case: Public-facing assistant that can search/book
         """
-        # Has: Processes arbitrary user input
-        # Has: Can make bookings, searches
-        # Missing: No access to private/sensitive data
-        
         class PublicAssistant:
             def handle_request(self, user_input: str):
-                # Can process untrusted input
-                # Can take actions (search, book)
-                # CANNOT access private data - even if injected,
-                # there's nothing sensitive to steal
-                
                 return self.llm.generate(
                     user_input,
-                    tools=[self.public_search, self.booking_api],
-                    # NO access to: emails, files, credentials
+                    tools=[self.public_search, self.booking_api]
+                    # No private data access - nothing sensitive to exfiltrate
                 )
 ```
 
@@ -157,10 +140,8 @@ class SecureAgentArchitecture:
 
 ```python
 class SecureToolRegistry:
-    """
-    Tool registry with capability-based access control.
-    """
-    
+    """Tool registry with capability-based access control."""
+
     def __init__(self):
         self.tools = {}
         self.capability_levels = {
@@ -185,12 +166,10 @@ class SecureToolRegistry:
             "requires_confirmation": requires_confirmation
         }
     
-    def get_tools_for_context(self, 
+    def get_tools_for_context(self,
                                context: dict,
                                max_capability: str = "read_only") -> list:
-        """
-        Return only tools appropriate for the context.
-        """
+        """Return only tools appropriate for the context."""
         max_level = self.capability_levels[max_capability]
         
         available = []
@@ -340,10 +319,8 @@ import hashlib
 import time
 
 class SecureMCPServer:
-    """
-    Security-hardened MCP server implementation.
-    """
-    
+    """Security-hardened MCP server implementation."""
+
     def __init__(self, config: dict):
         self.logger = logging.getLogger("mcp_security")
         self.tool_registry = {}
@@ -369,13 +346,11 @@ class SecureMCPServer:
             "invocation_count": 0
         }
     
-    async def handle_tool_call(self, 
-                                tool_name: str, 
+    async def handle_tool_call(self,
+                                tool_name: str,
                                 params: Dict[str, Any],
                                 context: dict) -> dict:
-        """
-        Handle tool call with full security checks.
-        """
+        """Handle tool call with full security checks."""
         
         # 1. Check if tool is registered and allowed
         if tool_name not in self.tool_registry:
@@ -534,10 +509,8 @@ class SecureMCPServer:
 
 ```python
 class ZeroTrustAgentOrchestrator:
-    """
-    Orchestrator that implements zero-trust between agents.
-    """
-    
+    """Orchestrator that implements zero-trust between agents."""
+
     def __init__(self):
         self.agents = {}
         self.validator = OutputValidator()
@@ -556,9 +529,7 @@ class ZeroTrustAgentOrchestrator:
                                    target_agent: str,
                                    message: str,
                                    context: dict) -> dict:
-        """
-        Handle communication between agents with validation.
-        """
+        """Handle communication between agents with validation."""
         
         # 1. Validate the source agent's message
         validation = self.validator.validate(message)
@@ -635,23 +606,19 @@ import subprocess
 from typing import Dict, Any
 
 class FirecrackerSandbox:
-    """
-    Execute code in Firecracker microVM for maximum isolation.
-    """
-    
+    """Execute code in Firecracker microVM for maximum isolation."""
+
     def __init__(self, config: dict):
         self.timeout = config.get("timeout", 30)
         self.memory_mb = config.get("memory_mb", 128)
         self.vcpu_count = config.get("vcpu_count", 1)
         self.network_enabled = config.get("network", False)
     
-    async def execute_code(self, 
-                           code: str, 
+    async def execute_code(self,
+                           code: str,
                            language: str,
                            inputs: Dict[str, Any] = None) -> dict:
-        """
-        Execute code in isolated microVM.
-        """
+        """Execute code in isolated microVM."""
         
         # 1. Create microVM configuration
         vm_config = {
@@ -710,16 +677,14 @@ class FirecrackerSandbox:
 
 ---
 
-## Summary: Agentic Security Principles
+## Key Takeaways
 
-### Critical Rules
-
-1. **Never satisfy all three legs of the Lethal Trifecta**
-2. **Require human confirmation for sensitive actions**
-3. **Apply least privilege to all tool access**
-4. **Treat all inter-agent communication as untrusted**
-5. **Sandbox all code execution**
-6. **Log everything for audit and incident response**
+1. **Never satisfy all three legs of the Lethal Trifecta** - Systems with private data access, untrusted input, and external actions create perfect conditions for exploitation
+2. **Require human confirmation for sensitive actions** - Email sending, file deletion, and API calls with side effects need explicit approval
+3. **Apply least privilege to all tool access** - Tools should have minimum necessary capabilities; use scoped permissions and time limits
+4. **Treat all inter-agent communication as untrusted** - Validate and sanitize at every boundary; never assume agent output is safe
+5. **Sandbox all code execution** - Use strong isolation (Firecracker, gVisor, Docker) with resource limits and network restrictions
+6. **Log everything for audit and incident response** - Comprehensive logging enables detection and post-incident analysis
 
 ### Risk Assessment Matrix
 
@@ -731,6 +696,12 @@ class FirecrackerSandbox:
 | Write + Untrusted input | High | Strong validation + HITL |
 | External comms + Private data | High | Architectural separation |
 | All three (Lethal Trifecta) | **Critical** | **Redesign architecture** |
+
+## Sources
+
+- [Simon Willison - Prompt Injection Explained](https://simonwillison.net/2023/Apr/14/worst-that-can-happen/) - Lethal Trifecta concept
+- [Anthropic Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification and security considerations
+- [Firecracker](https://firecracker-microvm.github.io/) - Secure microVM sandboxing
 
 ---
 

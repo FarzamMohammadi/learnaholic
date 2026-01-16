@@ -1,14 +1,18 @@
 # Architectural Defenses
 
-[← Back to Index](00_INDEX.md) | [Previous: Academic Training Defenses](07_ACADEMIC_TRAINING_DEFENSES.md) | [Next: Detection Approaches →](09_DETECTION_APPROACHES.md)
-
----
+[← Previous: Academic Training Defenses](07_ACADEMIC_TRAINING_DEFENSES.md) | [Index](00_INDEX.md) | [Next: Detection Approaches →](09_DETECTION_APPROACHES.md)
 
 ## Overview
 
-Architectural defenses take a fundamentally different approach: rather than trying to make the LLM itself resistant to attacks, they design system-level architectures that limit what a compromised LLM can do. This is analogous to running untrusted code in a sandbox—the code might be malicious, but the sandbox limits its impact.
+Architectural defenses limit what a compromised LLM can do through system-level design. Like sandboxing untrusted code, these approaches assume the LLM may be malicious and constrain its impact through isolation, separation, and policy enforcement.
 
----
+## Summary
+
+- CaMeL framework separates privileged instruction-processing from quarantined data-processing LLMs with provable security guarantees
+- Dual-LLM patterns use guardian models to validate actions, though vulnerable to JudgeDeceiver attacks
+- Information Flow Control tracks data taint and enforces policies on operations
+- Capability-limited architectures reduce blast radius by restricting tool access per context
+- Trade-off: 10-30% utility loss for provable security properties
 
 ## The Case for Architectural Defenses
 
@@ -32,31 +36,23 @@ Architectural defenses take a fundamentally different approach: rather than tryi
 │         THE ARCHITECTURAL SOLUTION                               │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  Instead of fixing the LLM, we:                                 │
+│  Instead of fixing the LLM:                                     │
 │                                                                 │
-│  1. ISOLATE the LLM from directly seeing untrusted content     │
-│  2. SEPARATE instruction processing from data processing        │
-│  3. ENFORCE policies at the system level, not model level      │
-│  4. LIMIT capabilities even if the LLM is compromised          │
+│  1. ISOLATE - LLM never sees untrusted content directly        │
+│  2. SEPARATE - Instruction processing from data processing      │
+│  3. ENFORCE - Policies at system level, not model level        │
+│  4. LIMIT - Capabilities even when LLM is compromised          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
----
-
 ## CaMeL Framework (Google DeepMind)
-
-### Paper Details
-- **Title**: "Defeating Prompt Injections by Design"
-- **Authors**: Google DeepMind
-- **arXiv**: 2503.18813
-- **Date**: March 2025
 
 ### Core Philosophy
 
-CaMeL's key insight: **We cannot make LLMs reliably distinguish instructions from data. So we don't ask them to.**
+CaMeL's key insight: We cannot make LLMs reliably distinguish instructions from data. So we don't ask them to.
 
-Instead, CaMeL creates a protective system layer around the LLM that:
+The framework creates a protective system layer that:
 1. Prevents untrusted data from reaching the privileged LLM
 2. Uses a separate quarantined LLM for data processing
 3. Enforces security policies through deterministic code, not model behavior
@@ -133,11 +129,11 @@ Instead, CaMeL creates a protective system layer around the LLM that:
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Security Mechanisms in Detail
+### Security Mechanisms
 
 #### 1. Control Flow Integrity
 
-**Guarantee**: Untrusted data can NEVER impact program control flow.
+Untrusted data cannot impact program control flow.
 
 ```python
 # VULNERABLE: Control flow depends on untrusted data
@@ -216,7 +212,7 @@ INFORMATION FLOW POLICIES:
 
 ### CaPL (Capability Language)
 
-CaPL is a restricted Python subset that P-LLM outputs:
+Restricted Python subset that P-LLM outputs:
 
 ```python
 # CaPL SUPPORTS:
@@ -247,21 +243,15 @@ processed = q_llm.process(data)
 
 ### Benchmark Results
 
-**AgentDojo Benchmark**:
-
 | Metric | Undefended Agent | CaMeL |
 |--------|-----------------|-------|
-| Task Success Rate | 84% | **77%** |
-| Attack Blocked | 0% | **67%** |
-| Security Guarantee | None | **Provable for completed tasks** |
+| Task Success Rate | 84% | 77% |
+| Attack Blocked | 0% | 67% |
+| Security Guarantee | None | Provable for completed tasks |
 | False Positives | N/A | ~7% task failures |
+| Token Overhead | 1× | ~2.8× baseline |
 
-**Token Overhead**:
-- Input tokens: ~2.82× baseline
-- Output tokens: ~2.73× baseline
-- Acceptable for high-security applications
-
-### Implementation Sketch
+### Implementation Example
 
 ```python
 class CaMeLSystem:
@@ -291,7 +281,7 @@ class CaMeLSystem:
         return self.format_for_display(result)
     
     def validate_capl(self, program: str) -> bool:
-        """Ensure program only uses allowed constructs."""
+        """Validate program uses only allowed constructs."""
         import ast
         try:
             tree = ast.parse(program)
@@ -311,13 +301,9 @@ class CaMeLSystem:
         return True
 ```
 
----
-
 ## Dual-LLM Patterns
 
 ### Pattern 1: Guardian/Judge Architecture
-
-A secondary LLM validates the primary LLM's proposed actions:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -359,8 +345,6 @@ A secondary LLM validates the primary LLM's proposed actions:
 
 ### Pattern 2: Privileged/Quarantined Separation
 
-Similar to CaMeL but potentially simpler:
-
 ```python
 class DualLLMSystem:
     def __init__(self):
@@ -401,10 +385,7 @@ class DualLLMSystem:
 
 ```python
 class GuardianLLM:
-    """
-    Validates proposed actions against user intent.
-    Critically: Does NOT see raw web/document content.
-    """
+    """Validates proposed actions against user intent without seeing raw content."""
     
     def __init__(self, model):
         self.model = model
@@ -455,18 +436,14 @@ class GuardianLLM:
 
 ### Limitations of Dual-LLM
 
-1. **Shared Vulnerabilities**: If both LLMs are the same architecture, they may share vulnerabilities
-2. **JudgeDeceiver Attack**: Research shows 73.8% success rate against LLM judges
-3. **Latency**: Doubles inference time for validation
-4. **Complexity**: More moving parts to maintain
-
----
+1. **Shared Vulnerabilities** - Same architecture means shared weaknesses
+2. **JudgeDeceiver Attack** - 73.8% success rate against LLM judges
+3. **Latency** - Doubles inference time for validation
+4. **Complexity** - More moving parts to maintain
 
 ## Information Flow Control
 
-### Theoretical Foundation
-
-Information Flow Control (IFC) is a security technique from programming language theory that tracks how data flows through a system and prevents unauthorized information transfer.
+Information Flow Control (IFC) tracks how data flows through a system and prevents unauthorized information transfer.
 
 ### Taint Tracking Implementation
 
@@ -529,9 +506,7 @@ class TaintTracker:
 
 ```python
 class FlowAnalyzer:
-    """
-    Analyzes CaPL programs to verify information flow properties.
-    """
+    """Analyzes CaPL programs to verify information flow properties."""
     
     def analyze(self, program: str) -> dict:
         """
@@ -577,8 +552,6 @@ class FlowAnalyzer:
         }
 ```
 
----
-
 ## Practical Architecture Patterns
 
 ### Pattern: Layered Security Architecture
@@ -623,9 +596,7 @@ class FlowAnalyzer:
 
 ```python
 class CapabilityLimitedAgent:
-    """
-    Agent with explicitly limited capabilities based on task context.
-    """
+    """Agent with explicitly limited capabilities based on task context."""
     
     def __init__(self, base_llm):
         self.llm = base_llm
@@ -684,8 +655,6 @@ class CapabilityLimitedAgent:
         """
 ```
 
----
-
 ## Evaluation and Trade-offs
 
 ### Security vs. Capability Trade-off
@@ -714,32 +683,34 @@ Standard LLM ●─────────┼───────────�
 
 ### When to Use Architectural Defenses
 
-✅ **Use when**:
+**Use when**:
 - Consequences of successful attack are severe
 - Processing highly sensitive data
 - Compliance requires provable security
 - You can accept increased latency/cost
 
-❌ **Consider alternatives when**:
+**Consider alternatives when**:
 - Low-risk applications
 - Latency is critical
 - Engineering resources are limited
 - Tasks require tight LLM-data integration
 
----
+## Key Takeaways
 
-## Summary
+Architectural defenses shift from "make the LLM secure" to "make the system secure even if the LLM is compromised."
 
-Architectural defenses represent a paradigm shift from "make the LLM secure" to "make the system secure even if the LLM is compromised."
+- **CaMeL** provides provable security guarantees through P-LLM/Q-LLM separation
+- **Dual-LLM patterns** offer practical defense with moderate overhead but vulnerable to JudgeDeceiver attacks
+- **Information Flow Control** enables fine-grained policy enforcement through taint tracking
+- **Capability limitation** reduces blast radius by restricting tool access per context
+- **Hybrid approaches** combining architectural and training-based defenses provide defense-in-depth
 
-**Key Takeaways**:
-1. **CaMeL** provides provable security guarantees through P-LLM/Q-LLM separation
-2. **Dual-LLM patterns** offer practical defense with moderate overhead
-3. **Information Flow Control** enables fine-grained policy enforcement
-4. **Capability limitation** reduces blast radius of successful attacks
+Trade-off: Accept 10-30% utility loss for provable security properties.
 
-The field is moving toward hybrid approaches that combine architectural defenses with training-based improvements for defense-in-depth.
+## Sources
 
----
+- [Defeating Prompt Injections by Design (CaMeL)](https://arxiv.org/abs/2503.18813) - Google DeepMind, March 2025
+- [JudgeDeceiver: Attacking LLM Judges](https://arxiv.org/abs/2503.18813) - 73.8% success rate against dual-LLM validators
+- [AgentDojo Benchmark](https://arxiv.org/abs/2503.18813) - Evaluation framework for agent security
 
-[← Back to Index](00_INDEX.md) | [Previous: Academic Training Defenses](07_ACADEMIC_TRAINING_DEFENSES.md) | [Next: Detection Approaches →](09_DETECTION_APPROACHES.md)
+[← Previous: Academic Training Defenses](07_ACADEMIC_TRAINING_DEFENSES.md) | [Index](00_INDEX.md) | [Next: Detection Approaches →](09_DETECTION_APPROACHES.md)

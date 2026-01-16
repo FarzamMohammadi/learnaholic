@@ -1,18 +1,24 @@
 # Academic Training-Based Defenses
 
-[← Back to Index](00_INDEX.md) | [Previous: Meta Purple Llama](06_META_PURPLE_LLAMA.md) | [Next: Architectural Defenses →](08_ARCHITECTURAL_DEFENSES.md)
+[← Previous](06_META_PURPLE_LLAMA.md) | [Index](00_INDEX.md) | [Next →](08_ARCHITECTURAL_DEFENSES.md)
 
 ---
 
 ## Overview
 
-Training-based defenses represent the most promising category for prompt injection prevention because they modify the model's weights to internalize security behaviors rather than bolting on external filters. This document covers the cutting-edge academic research: StruQ, SecAlign, Meta-SecAlign, Instructional Segment Embedding (ISE), and adversarial fine-tuning methodologies.
+Training-based defenses modify model weights to internalize security behaviors, making protection intrinsic rather than external. This approach offers stronger resistance than filters by teaching models to distinguish instructions from data and prioritize trusted sources.
+
+## Summary
+
+- **StruQ**: Architectural separation using special delimiter tokens (strong against simple attacks, weak vs GCG)
+- **SecAlign**: Preference optimization teaching models to prefer secure outputs (near-zero ASR on most attacks)
+- **Meta-SecAlign**: Production-scale SecAlign with new [input] role (0.5% ASR, 40% utility trade-off)
+- **ISE**: Segment embeddings encode instruction priority (+15-18% security, +4% capability)
+- **Adversarial Fine-Tuning**: Training on attack examples (requires continuous updates)
 
 ---
 
-## The Training Defense Paradigm
-
-### Why Training-Based Defenses Matter
+## Training vs External Filters
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -44,26 +50,23 @@ Training-based defenses represent the most promising category for prompt injecti
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Key Insight
+**Standard instruction fine-tuning teaches what to do. Training-based defenses teach what NOT to do:**
 
-Standard instruction fine-tuning teaches models what TO do, but not what NOT to do. Training-based defenses explicitly teach models to:
 1. Distinguish instructions from data
-2. Prioritize trusted over untrusted instructions
-3. Refuse to follow injected commands
+2. Prioritize trusted over untrusted sources
+3. Refuse injected commands
 
 ---
 
 ## StruQ (Structured Queries)
 
-### Paper Details
-- **Title**: "StruQ: Defending Against Prompt Injection with Structured Queries"
-- **Venue**: USENIX Security 2025
-- **Authors**: Sizhe Chen et al. (UC Berkeley)
-- **Code**: https://github.com/Sizhe-Chen/StruQ
+**Paper**: "StruQ: Defending Against Prompt Injection with Structured Queries" (USENIX Security 2025)
+**Authors**: Sizhe Chen et al. (UC Berkeley)
+**Code**: https://github.com/Sizhe-Chen/StruQ
 
 ### Core Mechanism
 
-StruQ introduces architectural separation between instructions and data at the input level using special tokens that are reserved during training.
+StruQ separates instructions from data using special delimiter tokens (`[INST]`, `[DATA]`) reserved during training. Models trained from base learn to only follow text within instruction tags.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -208,15 +211,13 @@ class StruQModel:
 
 ## SecAlign (Security Alignment)
 
-### Paper Details
-- **Title**: "SecAlign: Defending Against Prompt Injection with Preference Optimization"
-- **Venue**: ACM CCS 2025
-- **Authors**: Facebook AI Research (FAIR)
-- **Code**: https://github.com/facebookresearch/SecAlign
+**Paper**: "SecAlign: Defending Against Prompt Injection with Preference Optimization" (ACM CCS 2025)
+**Authors**: Facebook AI Research (FAIR)
+**Code**: https://github.com/facebookresearch/SecAlign
 
-### Core Insight
+### Core Mechanism
 
-Standard SFT (Supervised Fine-Tuning) only teaches correct behavior. SecAlign uses DPO (Direct Preference Optimization) to explicitly teach models what NOT to do—specifically, to prefer secure outputs over insecure ones that follow injected instructions.
+Standard SFT teaches correct behavior. SecAlign uses DPO to teach what NOT to do—preferring secure outputs over insecure ones that follow injected instructions.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -422,14 +423,12 @@ messages = [
 
 ## Instructional Segment Embedding (ISE)
 
-### Paper Details
-- **Title**: "Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy"
-- **Venue**: ICLR 2025
-- **Code**: https://github.com/tongwu2020/ISE
+**Paper**: "Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy" (ICLR 2025)
+**Code**: https://github.com/tongwu2020/ISE
 
 ### Core Mechanism
 
-ISE embeds instruction priority directly into the model architecture through learnable segment embeddings, similar to how BERT distinguishes sentence A from sentence B.
+ISE embeds instruction priority into model architecture through learnable segment embeddings (similar to BERT's sentence A/B distinction). Three segments: S0 (system), S1 (user), S2 (data)—model learns priority hierarchy.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -535,15 +534,13 @@ def create_ise_training_example(system_prompt, user_input, data, response):
 
 ### Key Benefit
 
-ISE improves security WITHOUT sacrificing capability—in fact, it slightly improves instruction-following ability while dramatically improving injection resistance.
+ISE improves both security AND capability—+4% instruction-following while increasing injection resistance.
 
 ---
 
 ## Adversarial Fine-Tuning
 
-### Overview
-
-Adversarial fine-tuning trains models on examples of attacks paired with correct (non-compromised) responses, teaching the model to resist specific attack patterns.
+Adversarial fine-tuning trains models on attack examples paired with correct (non-compromised) responses. This teaches resistance to specific attack patterns.
 
 ### Methodology
 
@@ -753,17 +750,21 @@ def train_secalign_model(
 
 ---
 
-## Summary
+## Key Takeaways
 
-Training-based defenses represent the most promising path forward for prompt injection prevention. Key takeaways:
+1. **SecAlign/Meta-SecAlign**: Most effective and production-ready. Works with existing instruction-tuned models.
+2. **ISE**: Only defense that improves both security AND capability through architectural modification.
+3. **StruQ**: Strong against simple attacks, vulnerable to optimization attacks like GCG.
+4. **Adversarial Fine-Tuning**: Essential complement but requires continuous updates as new attacks emerge.
+5. **Trade-off exists**: Meta-SecAlign achieves 0.5% ASR but sacrifices 40% utility. Choose based on risk tolerance.
 
-1. **SecAlign/Meta-SecAlign**: Most effective, production-ready, works with existing models
-2. **ISE**: Improves both security AND capability through architectural modification
-3. **StruQ**: Strong against simple attacks, weaker against optimization attacks
-4. **Adversarial Fine-Tuning**: Essential complement, requires ongoing maintenance
+## Sources
 
-The field is rapidly evolving—stay current with the latest papers and benchmark results.
+- Chen, S. et al. (2025). "StruQ: Defending Against Prompt Injection with Structured Queries". USENIX Security. [GitHub](https://github.com/Sizhe-Chen/StruQ)
+- Facebook AI Research (2025). "SecAlign: Defending Against Prompt Injection with Preference Optimization". ACM CCS. [GitHub](https://github.com/facebookresearch/SecAlign)
+- Meta (2025). Meta-SecAlign models. [HuggingFace](https://huggingface.co/meta-llama)
+- Wu, T. et al. (2025). "Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy". ICLR. [GitHub](https://github.com/tongwu2020/ISE)
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Meta Purple Llama](06_META_PURPLE_LLAMA.md) | [Next: Architectural Defenses →](08_ARCHITECTURAL_DEFENSES.md)
+[← Previous](06_META_PURPLE_LLAMA.md) | [Index](00_INDEX.md) | [Next →](08_ARCHITECTURAL_DEFENSES.md)

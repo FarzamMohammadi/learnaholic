@@ -2,13 +2,17 @@
 
 [← Back to Index](00_INDEX.md) | [Previous: Microsoft Defenses](05_MICROSOFT_DEFENSES.md) | [Next: Academic Training Defenses →](07_ACADEMIC_TRAINING_DEFENSES.md)
 
----
-
 ## Overview
 
-Meta's Purple Llama initiative represents the most comprehensive open-source AI security ecosystem available. It includes Prompt Guard 2 for injection detection, Llama Guard 4 for content safety, LlamaFirewall for orchestration, Code Shield for code security, and CyberSecEval for comprehensive benchmarking. The open-source philosophy makes these tools accessible to the entire AI community.
+Meta's Purple Llama is an open-source AI security ecosystem. Five core components: Prompt Guard 2 (injection detection), Llama Guard 4 (content safety), LlamaFirewall (orchestration), Code Shield (code security), and CyberSecEval (benchmarking).
 
----
+## Summary
+
+- **Prompt Guard 2**: Best-in-class open-source injection classifier (97.5% recall @ 1% FPR)
+- **Llama Guard 4**: Multi-modal safety model with 14-category taxonomy
+- **LlamaFirewall**: Unified orchestration framework with novel Chain-of-Thought auditing
+- **Code Shield**: Static analysis for 8 languages detecting vulnerabilities in LLM-generated code
+- **CyberSecEval v4**: Comprehensive benchmark suite including AutoPatchBench and CyberSOCEval
 
 ## Prompt Guard 2
 
@@ -159,13 +163,9 @@ def batch_classify(self, texts: list[str], batch_size: int = 32) -> list[dict]:
     return results
 ```
 
----
-
 ## Llama Guard 4
 
-### Overview
-
-Llama Guard 4 is Meta's latest content safety model, featuring multi-modal capabilities (text + images) and a comprehensive 14-category safety taxonomy.
+Llama Guard 4 is Meta's latest content safety model with multi-modal capabilities (text + images) and a 14-category safety taxonomy.
 
 ### Specifications
 
@@ -291,13 +291,9 @@ result = guard.check_safety(
 # → {"safe": False, "violated_categories": ["S9"], ...}
 ```
 
----
-
 ## LlamaFirewall
 
-### Overview
-
-LlamaFirewall is an orchestration framework that combines multiple security scanners into a unified pipeline, providing comprehensive protection for LLM applications.
+LlamaFirewall combines multiple security scanners into a unified pipeline for LLM application protection.
 
 ### Core Components
 
@@ -460,11 +456,7 @@ class CustomPIIScanner(Scanner):
 firewall.register_scanner(Role.ASSISTANT, CustomPIIScanner())
 ```
 
----
-
 ## Code Shield
-
-### Overview
 
 Code Shield provides static analysis for LLM-generated code, detecting security vulnerabilities across 8 programming languages.
 
@@ -512,11 +504,7 @@ print(result)
 # }
 ```
 
----
-
 ## CyberSecEval (v4)
-
-### Overview
 
 CyberSecEval is Meta's comprehensive benchmark suite for evaluating LLM security. Version 4 adds AutoPatchBench and CyberSOCEval.
 
@@ -613,8 +601,6 @@ results = {
 }
 ```
 
----
-
 ## Integration Example: Full Security Pipeline
 
 ```python
@@ -687,36 +673,22 @@ class MetaSecurityPipeline:
         }
 ```
 
----
+## Key Takeaways
 
-## Summary: Meta's Defense Philosophy
+**Open-source ecosystem philosophy**: Meta prioritizes community accessibility over proprietary control, enabling widespread adoption and customization.
 
-### Core Principles
+**Layered defense approach**: No single tool solves all threats. Combine Prompt Guard 2 (fast triage), Llama Guard 4 (content safety), and AlignmentCheck (CoT auditing) for comprehensive coverage.
 
-1. **Open Source First**: All tools freely available to the community
+**Novel contribution**: AlignmentCheck is the first open-source implementation of chain-of-thought auditing for security, detecting goal hijacking by analyzing reasoning traces.
 
-2. **Layered Defense**: Multiple specialized tools for different threat types
+**Production-ready performance**: Prompt Guard 2 achieves 97.5% recall at 1% FPR with 92ms latency, making it viable for real-time applications.
 
-3. **Comprehensive Benchmarking**: CyberSecEval enables rigorous evaluation
+## Sources
 
-4. **Novel Techniques**: AlignmentCheck introduces CoT auditing
-
-5. **Production Ready**: High-performance models suitable for deployment
-
-### Strengths
-
-- Best-in-class open-source prompt injection classifier (Prompt Guard 2)
-- Comprehensive safety taxonomy (Llama Guard 4)
-- Unified orchestration (LlamaFirewall)
-- Rigorous benchmarking (CyberSecEval v4)
-
-### Unique Contributions
-
-- First open-source Chain-of-Thought auditing (AlignmentCheck)
-- Multi-modal safety classification (Llama Guard 4)
-- Code security analysis (Code Shield)
-- Research-backed "Rule of Two" guidance
-
----
+- [Purple Llama GitHub Repository](https://github.com/meta-llama/PurpleLlama) - Official codebase and documentation
+- [Prompt Guard 2 Paper](https://ai.meta.com/research/publications/prompt-guard-2/) - Technical details and benchmarks
+- [Llama Guard 4 Model Card](https://huggingface.co/meta-llama/Llama-Guard-4-12B) - Safety taxonomy and usage
+- [CyberSecEval v4](https://github.com/meta-llama/PurpleLlama/tree/main/CybersecurityBenchmarks) - Benchmark suite and evaluation methodology
+- [LlamaFirewall Documentation](https://github.com/meta-llama/PurpleLlama/tree/main/Firewall) - Integration guides and scanner API
 
 [← Back to Index](00_INDEX.md) | [Previous: Microsoft Defenses](05_MICROSOFT_DEFENSES.md) | [Next: Academic Training Defenses →](07_ACADEMIC_TRAINING_DEFENSES.md)

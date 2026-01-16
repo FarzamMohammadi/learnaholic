@@ -6,11 +6,20 @@
 
 ## Overview
 
-Detection-based defenses aim to identify prompt injection attacks before or during processing. While no detection method is perfect, these approaches provide valuable defense layers when combined with other techniques. This document covers classifiers, statistical methods, attention analysis, activation-based detection, and LLM-as-judge approaches.
+Detection methods identify prompt injection attacks before or during processing. No method is perfect alone—combine them for defense-in-depth.
+
+## Summary
+
+- **Classifiers** (Prompt Guard 2, PIGuard) achieve 0.995-0.998 ROC AUC but suffer from over-defense and novel attack bypasses
+- **Perplexity detection** catches optimization-generated attacks but misses natural-language injections
+- **Attention tracking** detects task distraction with +10% AUROC improvement, training-free
+- **Activation analysis** (TaskTracker) achieves >0.99 ROC AUC by detecting task hijacking in internal states
+- **LLM-as-Judge** vulnerable to JudgeDeceiver attacks (73.8% success rate against judges)
+- **Ensemble methods** combine detectors for adaptive resistance and reduced false positives
 
 ---
 
-## Detection Methods at a Glance
+## Methods Comparison
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -72,7 +81,7 @@ Detection-based defenses aim to identify prompt injection attacks before or duri
 
 ### Prompt Guard 2 (Meta)
 
-The current state-of-the-art open-source classifier.
+State-of-the-art open-source classifier.
 
 **Performance**:
 | Metric | 86M Model | 22M Model |
@@ -151,9 +160,7 @@ class PromptGuardDetector:
 
 ### PIGuard / InjecGuard (ACL 2025)
 
-**Innovation**: MOF (Mitigating Over-defense for Free) training strategy.
-
-**Problem Solved**: Standard classifiers learn surface heuristics (trigger words like "ignore") causing high false-positive rates on benign inputs.
+**Innovation**: MOF (Mitigating Over-defense for Free) training strategy reduces false positives from trigger-word heuristics.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -269,7 +276,7 @@ Perplexity: 23 → MISSED
 
 ### Attention Tracker (NAACL 2025)
 
-**Key Insight**: During injection attacks, attention shifts from the original instruction to the injected instruction—a detectable "distraction effect."
+**Key Insight**: Injection attacks shift attention from original to injected instructions—a detectable "distraction effect."
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -387,7 +394,7 @@ Architecture-aware attacks can optimize to maintain normal attention patterns wh
 
 ### Key Insight
 
-When a model's task goal is hijacked by an injection, its internal activations change in detectable ways—even before the attack succeeds in the output.
+Task hijacking changes internal activations detectably—even before attack output appears.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -546,7 +553,7 @@ Attackers can craft injections that minimize activation delta by:
 
 ### Concept
 
-Use a secondary LLM to evaluate whether the primary LLM's proposed output indicates successful injection.
+Secondary LLM evaluates whether primary LLM output indicates successful injection.
 
 ### Implementation
 
@@ -693,7 +700,7 @@ class EnsembleDetector:
 
 ---
 
-## Detection Limitations Summary
+## Limitations
 
 | Method | Strength | Weakness |
 |--------|----------|----------|
@@ -703,18 +710,36 @@ class EnsembleDetector:
 | **Activation** | Catches task hijacking | Evasion via task-framing |
 | **LLM-Judge** | Semantic understanding | JudgeDeceiver, shared vulnerabilities |
 
-**Key Takeaway**: No detection method is sufficient alone. Use ensembles as one layer in defense-in-depth.
-
 ---
 
 ## Best Practices
 
-1. **Use multiple detection methods** in ensemble
-2. **Tune thresholds** on your specific use case
-3. **Monitor and log** all detections for analysis
-4. **Update regularly** as new attacks emerge
-5. **Never rely solely** on detection—combine with other defenses
-6. **Test adversarially** with known bypasses
+1. Use multiple detection methods in ensemble
+2. Tune thresholds on your specific use case
+3. Monitor and log all detections for analysis
+4. Update regularly as new attacks emerge
+5. Never rely solely on detection—combine with other defenses
+6. Test adversarially with known bypasses
+
+---
+
+## Key Takeaways
+
+- No single detection method suffices—attackers target specific weaknesses
+- Ensemble methods provide adaptive resistance through diverse failure modes
+- Classifiers excel on known attacks but struggle with novel patterns
+- Internal model analysis (attention, activation) offers training-free detection but remains evadable
+- LLM-as-Judge shares vulnerabilities with the models it evaluates
+
+---
+
+## Sources
+
+- [Prompt Guard 2](https://ai.meta.com/research/publications/prompt-guard-2/) - Meta's open-source classifier
+- [PIGuard/InjecGuard (ACL 2025)](https://github.com/leolee99/PIGuard) - MOF training strategy
+- [Attention Tracker (NAACL 2025)](https://arxiv.org/abs/2410.01656) - Attention-based detection
+- [TaskTracker (SaTML 2025)](https://arxiv.org/abs/2410.01011) - Activation-based defense
+- [JudgeDeceiver](https://arxiv.org/abs/2410.02764) - Adversarial attacks on LLM judges
 
 ---
 

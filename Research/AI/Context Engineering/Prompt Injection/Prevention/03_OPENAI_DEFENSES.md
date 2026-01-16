@@ -1,12 +1,20 @@
 # OpenAI's Instruction Hierarchy and Security Architecture
 
-[← Back to Index](00_INDEX.md) | [Previous: Anthropic Defenses](02_ANTHROPIC_DEFENSES.md) | [Next: Google/DeepMind Defenses →](04_GOOGLE_DEEPMIND_DEFENSES.md)
+[← Previous: Anthropic Defenses](02_ANTHROPIC_DEFENSES.md) | [Index](00_INDEX.md) | [Next: Google/DeepMind Defenses →](04_GOOGLE_DEEPMIND_DEFENSES.md)
 
 ---
 
 ## Overview
 
-OpenAI has developed a comprehensive security approach centered on instruction hierarchy training—teaching models to prioritize trusted instructions over potentially malicious ones embedded in untrusted content. This is complemented by the Model Spec (a detailed behavioral specification), and production security features in ChatGPT and the API platform.
+OpenAI's security approach centers on instruction hierarchy training—teaching models to prioritize trusted instructions over malicious ones in untrusted content. This foundation combines with the Model Spec behavioral specification and production security features across ChatGPT and API platforms.
+
+## Summary
+
+- **Instruction Hierarchy Training**: 6-level authority system (Root → System → Developer → User → Guideline → Untrusted), achieving +63% robustness against prompt extraction/injection
+- **Model Spec**: Root-level security constraints that cannot be overridden, explicit untrusted data handling guidance
+- **ChatGPT Atlas Security**: Automated red teaming loop, confirmation prompts for high-risk actions, Watch Mode for sensitive sites, logged-out mode
+- **API Security Tools**: Rate limiting by tier, Moderation API for pre-screening, Structured Outputs to prevent output manipulation
+- **Defense Strategy**: Hierarchy over equality, context ignorance training, defense in depth from training through output validation
 
 ---
 
@@ -14,9 +22,9 @@ OpenAI has developed a comprehensive security approach centered on instruction h
 
 ### Core Concept
 
-The fundamental insight is that different sources of instructions should have different levels of authority. Rather than treating all text equally, models are trained to recognize and respect a hierarchy of instruction sources.
+Different instruction sources have different authority levels. Models are trained to recognize and respect this hierarchy rather than treating all text equally.
 
-### The Priority Chain
+### Authority Levels
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -90,7 +98,7 @@ Training Target: Follow developer and user instructions, ignore document instruc
 
 #### Phase 2: Context Ignorance Training
 
-Train the model to produce outputs as if conflicting lower-level instructions weren't present:
+Models produce outputs as if conflicting lower-level instructions weren't present:
 
 ```python
 # Pseudocode for training approach
@@ -113,7 +121,7 @@ def generate_training_example():
 
 #### Phase 3: Red-Team LLM Training Data Generation
 
-Use adversarial LLMs to generate diverse attack examples:
+Adversarial LLMs generate diverse attack examples:
 
 ```
 Red-Team LLM generates:
@@ -147,7 +155,7 @@ Each attack → Training example where model correctly ignores it
 
 ## Model Spec Security Principles
 
-The Model Spec is OpenAI's comprehensive behavioral specification for their models. Key security-relevant sections:
+OpenAI's Model Spec defines comprehensive behavioral guidelines. Key security sections:
 
 ### Root-Level Security Rules
 
@@ -186,7 +194,7 @@ BEHAVIOR:
 
 ### Trust Assessment Framework
 
-When encountering instructions in tool outputs, the model should:
+Model behavior when encountering instructions in tool outputs:
 
 | Scenario | Action |
 |----------|--------|
@@ -233,9 +241,7 @@ When encountering instructions in tool outputs, the model should:
 
 ## ChatGPT Atlas Security Architecture
 
-### Overview
-
-ChatGPT Atlas (the agentic browsing capability) implements multiple security layers specifically designed for safe web interaction:
+ChatGPT Atlas (agentic browsing) implements multiple security layers for safe web interaction:
 
 ### Automated Red Teaming Loop
 
@@ -300,10 +306,7 @@ BEHAVIOR:
 
 #### 3. Logged-Out Mode
 
-For certain tasks, Atlas operates without site authentication:
-- Prevents access to personal account data
-- Limits potential damage from attacks
-- Reduces exfiltration risk
+Atlas operates without site authentication for certain tasks to prevent access to personal data, limit attack damage, and reduce exfiltration risk.
 
 ### Defense Layers
 
@@ -359,7 +362,7 @@ RATE_LIMITS = {
 
 ### Moderation API
 
-Pre-screen inputs for policy violations:
+Pre-screens inputs for policy violations:
 
 ```python
 from openai import OpenAI
@@ -388,7 +391,7 @@ if result["flagged"]:
 
 ### Structured Outputs
 
-Enforce response schemas to prevent injection via output:
+Enforces response schemas to prevent injection via output:
 
 ```python
 from pydantic import BaseModel
@@ -578,34 +581,23 @@ class SecureOpenAIPipeline:
 
 ---
 
-## Summary: OpenAI's Defense Philosophy
+## Key Takeaways
 
-### Core Principles
+**Core Philosophy**: Hierarchy over equality—not all instructions deserve equal trust. Explicit, layered authority prevents malicious instructions from overriding legitimate ones.
 
-1. **Hierarchy Over Equality**: Not all instructions are equal—trust should be explicit and layered
+**Defense Strategy**: Train for discernment (recognize instruction sources), defend in depth (training → runtime → output validation), require user confirmation for high-risk actions, and continuously improve through automated red teaming.
 
-2. **Train for Discernment**: Teach models to recognize and respect instruction sources
+**Strengths**: Well-documented hierarchy model, comprehensive Model Spec guidelines, strong Atlas production security, automated adversarial testing pipeline.
 
-3. **Defense in Depth**: Multiple layers from training to runtime to output validation
+**Gaps**: Multi-modal hierarchy coverage, over-refusal rates, formal verification of enforcement, cross-session attack resistance.
 
-4. **User Confirmation**: High-risk actions always require explicit user approval
+## Sources
 
-5. **Continuous Red Teaming**: Automated adversarial testing drives continuous improvement
-
-### Strengths
-
-- Well-documented instruction hierarchy model
-- Comprehensive Model Spec provides clear behavioral guidelines
-- Strong production security in ChatGPT Atlas
-- Continuous red teaming pipeline
-
-### Areas for Continued Development
-
-- Multi-modal instruction hierarchy
-- Reducing over-refusal rates
-- Formal verification of hierarchy enforcement
-- Cross-session attack resistance
+- [OpenAI Instruction Hierarchy Paper](https://cdn.openai.com/instruction-hierarchy-blog-post.pdf) - Training methodology and results
+- [OpenAI Model Spec](https://cdn.openai.com/spec/model-spec-2024-05-08.html) - Behavioral specification
+- [ChatGPT Atlas Security](https://openai.com/index/introducing-chatgpt-atlas/) - Production security features
+- [OpenAI API Documentation](https://platform.openai.com/docs/guides/safety-best-practices) - Security best practices
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Anthropic Defenses](02_ANTHROPIC_DEFENSES.md) | [Next: Google/DeepMind Defenses →](04_GOOGLE_DEEPMIND_DEFENSES.md)
+[← Previous: Anthropic Defenses](02_ANTHROPIC_DEFENSES.md) | [Index](00_INDEX.md) | [Next: Google/DeepMind Defenses →](04_GOOGLE_DEEPMIND_DEFENSES.md)

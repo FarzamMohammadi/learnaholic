@@ -6,11 +6,17 @@
 
 ## Overview
 
-This document provides a complete taxonomy of prompt injection defense mechanisms, organized by approach type, with guidance on when to use each and how to layer them effectively. No single defense is sufficient—the goal is constructing a defense-in-depth architecture where breach of any single layer doesn't compromise the system.
+Complete taxonomy of prompt injection defense mechanisms, organized by approach type. No single defense is sufficient—defense-in-depth architecture ensures breach of any single layer doesn't compromise the system.
+
+## Summary
+
+- **Six defense categories**: Training-based, Detection-based, Architectural, Input/Output, Operational, and Framework guidance
+- **Defense-in-depth is mandatory**: Layer multiple defenses assuming each will fail
+- **No silver bullet exists**: Goal is raising attack cost and limiting damage, not perfect security
 
 ---
 
-## Defense Categories at a Glance
+## Defense Categories
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -296,9 +302,9 @@ class InputValidationPipeline:
 
 ---
 
-## Defense-in-Depth Layering Strategy
+## Layering Strategy
 
-### The Five-Layer Model
+### Five-Layer Model
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -418,19 +424,25 @@ Layers Active: All + Architectural
 
 ---
 
-## Summary: No Silver Bullet
+## Key Takeaways
 
-**The fundamental truth**: Prompt injection cannot be "solved" in the traditional security sense because LLMs fundamentally cannot distinguish instructions from data at the architectural level.
+Prompt injection cannot be "solved" because LLMs fundamentally cannot distinguish instructions from data. The practical approach:
 
-**The practical approach**: 
-1. Layer multiple defenses (defense-in-depth)
-2. Assume any layer will fail
-3. Limit blast radius through least privilege and architectural separation
-4. Monitor continuously
-5. Maintain incident response capability
-6. Stay current with evolving research
+1. **Layer multiple defenses** - Defense-in-depth is mandatory, not optional
+2. **Assume failure** - Design so breach of any single layer doesn't compromise the system
+3. **Limit blast radius** - Least privilege and architectural separation contain damage
+4. **Monitor continuously** - Detection and response capabilities are essential
+5. **Accept imperfection** - Goal is raising attack cost and limiting damage, not perfect security
 
-**The goal is not perfect security** (impossible) but raising the cost and complexity of attacks while limiting damage when they succeed.
+## Sources
+
+- OWASP LLM Top 10 (2023-2025)
+- Anthropic: Constitutional AI and prompt injection research
+- OpenAI: Instruction hierarchy training
+- Google DeepMind: CaMeL framework
+- Meta: Purple Llama and Prompt Guard 2
+- Academic research: SecAlign, StruQ, ISE, TaskTracker, PIGuard
+- NIST AI Risk Management Framework
 
 ---
 

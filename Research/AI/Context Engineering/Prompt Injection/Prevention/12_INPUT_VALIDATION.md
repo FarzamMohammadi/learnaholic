@@ -1,12 +1,19 @@
 # Input Validation and Sanitization
 
-[← Back to Index](00_INDEX.md) | [Previous: OWASP Frameworks](11_OWASP_FRAMEWORKS.md) | [Next: Prompt Design Patterns →](13_PROMPT_DESIGN_PATTERNS.md)
+[← Previous: OWASP Frameworks](11_OWASP_FRAMEWORKS.md) | [Index](00_INDEX.md) | [Next: Prompt Design Patterns →](13_PROMPT_DESIGN_PATTERNS.md)
 
 ---
 
 ## Overview
 
-Input validation is the first line of defense against prompt injection. While not sufficient alone, proper input handling catches low-sophistication attacks and reduces the attack surface. This document covers sanitization patterns, encoding detection, length limits, and filtering strategies.
+Input validation catches low-sophistication attacks and reduces attack surface. Not sufficient alone, but essential as a first defense layer.
+
+## Summary
+
+- **Pipeline approach** - Five stages: length checks, encoding detection, pattern matching, semantic analysis, sanitization
+- **Encoding attacks** - Detect Base64, Unicode smuggling, homoglyphs, zero-width characters
+- **Pattern matching** - Regex for instruction override, role manipulation, privilege escalation
+- **Critical limitation** - Cannot detect novel attacks or actual malicious intent; always combine with other defenses
 
 ---
 
@@ -87,9 +94,7 @@ class ValidationResult:
     details: dict
 
 class PromptInjectionValidator:
-    """
-    Comprehensive input validation for prompt injection prevention.
-    """
+    """Comprehensive input validation for prompt injection prevention."""
     
     # Known attack patterns (regex)
     ATTACK_PATTERNS = [
@@ -154,9 +159,7 @@ class PromptInjectionValidator:
         self.strict_mode = strict_mode
     
     def validate(self, text: str) -> ValidationResult:
-        """
-        Comprehensive validation of input text.
-        """
+        """Comprehensive validation of input text."""
         flags = []
         details = {}
         
@@ -376,9 +379,7 @@ import base64
 import re
 
 class Base64Detector:
-    """
-    Detect and analyze Base64-encoded content that may contain attacks.
-    """
+    """Detect and analyze Base64-encoded content that may contain attacks."""
     
     # Minimum length for suspicious Base64 (shorter strings are common in normal use)
     MIN_SUSPICIOUS_LENGTH = 40
@@ -394,9 +395,7 @@ class Base64Detector:
     ]
     
     def detect(self, text: str) -> dict:
-        """
-        Detect Base64-encoded segments and analyze them.
-        """
+        """Detect Base64-encoded segments and analyze them."""
         results = {
             "base64_found": False,
             "segments": [],
@@ -455,9 +454,7 @@ class Base64Detector:
 
 ```python
 class UnicodeSmuggleDetector:
-    """
-    Detect Unicode-based smuggling and obfuscation techniques.
-    """
+    """Detect Unicode-based smuggling and obfuscation techniques."""
     
     # Suspicious Unicode categories
     SUSPICIOUS_CATEGORIES = {
@@ -490,9 +487,7 @@ class UnicodeSmuggleDetector:
     }
     
     def detect(self, text: str) -> dict:
-        """
-        Comprehensive Unicode smuggling detection.
-        """
+        """Comprehensive Unicode smuggling detection."""
         results = {
             "zero_width_found": [],
             "homoglyphs_found": [],
@@ -563,9 +558,7 @@ class UnicodeSmuggleDetector:
 import tiktoken
 
 class TokenLimiter:
-    """
-    Enforce token limits to prevent context overflow attacks.
-    """
+    """Enforce token limits to prevent context overflow attacks."""
     
     def __init__(self, 
                  model: str = "gpt-4",
@@ -579,12 +572,10 @@ class TokenLimiter:
         """Count tokens in text."""
         return len(self.encoding.encode(text))
     
-    def check_limits(self, 
-                     user_input: str, 
+    def check_limits(self,
+                     user_input: str,
                      system_prompt: str = "") -> dict:
-        """
-        Check if input respects token limits.
-        """
+        """Check if input respects token limits."""
         user_tokens = self.count_tokens(user_input)
         system_tokens = self.count_tokens(system_prompt)
         total_tokens = user_tokens + system_tokens
@@ -598,12 +589,10 @@ class TokenLimiter:
             "remaining_for_output": self.max_total_tokens - total_tokens
         }
     
-    def truncate_if_needed(self, 
-                           text: str, 
+    def truncate_if_needed(self,
+                           text: str,
                            max_tokens: int = None) -> str:
-        """
-        Truncate text to fit within token limit.
-        """
+        """Truncate text to fit within token limit."""
         max_tokens = max_tokens or self.max_input_tokens
         tokens = self.encoding.encode(text)
         
@@ -638,7 +627,7 @@ Research shows that input validation learns "surface heuristics" rather than det
 
 ---
 
-## Best Practices Summary
+## Implementation Best Practices
 
 1. **Layer validation stages** - Each stage catches different attack types
 2. **Use fuzzy matching** - Catches typos and variations
@@ -651,4 +640,14 @@ Research shows that input validation learns "surface heuristics" rather than det
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: OWASP Frameworks](11_OWASP_FRAMEWORKS.md) | [Next: Prompt Design Patterns →](13_PROMPT_DESIGN_PATTERNS.md)
+## Key Takeaways
+
+- Input validation blocks simple attacks but cannot detect malicious intent
+- Attackers bypass keyword filters with typos, spacing, synonyms, and novel phrasing
+- Encoding detection (Base64, Unicode) catches obfuscation but not double-encoding
+- Always combine input validation with architectural defenses and output filtering
+- Log validation results to track attack evolution and reduce false positives
+
+---
+
+[← Previous: OWASP Frameworks](11_OWASP_FRAMEWORKS.md) | [Index](00_INDEX.md) | [Next: Prompt Design Patterns →](13_PROMPT_DESIGN_PATTERNS.md)

@@ -1,12 +1,20 @@
 # Output Validation and Defenses
 
-[← Back to Index](00_INDEX.md) | [Previous: Prompt Design Patterns](13_PROMPT_DESIGN_PATTERNS.md) | [Next: Agentic Security →](15_AGENTIC_SECURITY.md)
+[← Previous: Prompt Design Patterns](13_PROMPT_DESIGN_PATTERNS.md) | [Index](00_INDEX.md) | [Next: Agentic Security →](15_AGENTIC_SECURITY.md)
 
 ---
 
 ## Overview
 
-Output validation is the last line of defense before LLM responses reach users or downstream systems. It catches successful attacks that bypassed input filtering, detects data leakage, and ensures responses conform to expected formats. This document covers comprehensive output defense strategies.
+Output validation catches attacks that bypass input filters. Validates responses before they reach users or downstream systems by detecting injection success, data leakage, and format violations.
+
+## Summary
+
+- **Five-stage pipeline**: injection detection, prompt leakage, sensitive data, schema validation, content sanitization
+- **Injection detection**: pattern matching for role changes, instruction acknowledgment, jailbreak markers
+- **Leakage prevention**: canary tokens, phrase matching, similarity scoring against system prompts
+- **Data protection**: PII/credential regex patterns, automatic redaction
+- **Format enforcement**: JSON schema validation, markdown/URL sanitization
 
 ---
 
@@ -65,22 +73,18 @@ Output validation is the last line of defense before LLM responses reach users o
 └─────────────────────────────────────────────────────────────────┘
 ```
 
----
-
 ## Injection Success Detection
 
-Detect when the LLM's response indicates a successful injection:
+Pattern matching identifies when LLM output indicates successful prompt injection:
 
 ```python
 import re
 from typing import List, Tuple
 
 class InjectionSuccessDetector:
-    """
-    Detect patterns in LLM output that indicate successful prompt injection.
-    """
-    
-    # Patterns indicating the model is following injected instructions
+    """Detect patterns indicating successful prompt injection."""
+
+    # Model following injected instructions
     SUCCESS_PATTERNS = [
         # Acknowledgment of new instructions
         (r'(okay|sure|alright),?\s*(i\'ll|i\s+will)\s+(now\s+)?(ignore|disregard)', 'instruction_acknowledgment'),
@@ -113,12 +117,7 @@ class InjectionSuccessDetector:
     ]
     
     def detect(self, response: str) -> Tuple[bool, List[dict]]:
-        """
-        Detect injection success patterns in response.
-        
-        Returns:
-            (is_suspicious, list of matched patterns)
-        """
+        """Returns (is_suspicious, list of matched patterns)."""
         response_lower = response.lower()
         matches = []
         
@@ -155,20 +154,16 @@ class InjectionSuccessDetector:
         return severity_map.get(category, "medium")
 ```
 
----
-
 ## Prompt Leakage Detection
 
-Detect when the response contains system prompt fragments:
+Identifies system prompt exposure through canary tokens, phrase matching, and similarity analysis:
 
 ```python
 from difflib import SequenceMatcher
 import hashlib
 
 class PromptLeakageDetector:
-    """
-    Detect system prompt leakage in LLM responses.
-    """
+    """Detect system prompt leakage in LLM responses."""
     
     def __init__(self, system_prompt: str, canary_tokens: List[str] = None):
         self.system_prompt = system_prompt
@@ -181,7 +176,7 @@ class PromptLeakageDetector:
         self.prompt_hash = hashlib.sha256(system_prompt.encode()).hexdigest()[:16]
     
     def _extract_phrases(self, text: str, min_length: int = 20) -> List[str]:
-        """Extract distinctive phrases from system prompt."""
+        """Extract distinctive phrases from system prompt (min 20 chars)."""
         phrases = []
         
         # Split by sentences and lines
@@ -193,9 +188,7 @@ class PromptLeakageDetector:
         return phrases
     
     def detect(self, response: str) -> dict:
-        """
-        Detect prompt leakage in response.
-        """
+        """Detect prompt leakage in response."""
         results = {
             "leakage_detected": False,
             "canary_leaked": False,
@@ -237,27 +230,22 @@ class PromptLeakageDetector:
     
     def _calculate_similarity(self, response: str) -> float:
         """Calculate similarity between response and system prompt."""
-        # Use SequenceMatcher for fuzzy comparison
         matcher = SequenceMatcher(None, 
                                    self.system_prompt.lower(), 
                                    response.lower())
         return matcher.ratio()
 ```
 
----
-
 ## Sensitive Data Detection
 
-Prevent exposure of PII and credentials:
+Regex patterns detect and redact PII and credentials:
 
 ```python
 import re
 from typing import List, Dict
 
 class SensitiveDataDetector:
-    """
-    Detect sensitive data patterns in LLM outputs.
-    """
+    """Detect sensitive data patterns in LLM outputs."""
     
     PII_PATTERNS = {
         # US Social Security Number
@@ -309,9 +297,7 @@ class SensitiveDataDetector:
             self.patterns.update(custom_patterns)
     
     def detect(self, text: str) -> Dict:
-        """
-        Scan text for sensitive data patterns.
-        """
+        """Scan text for sensitive data patterns."""
         findings = {
             "contains_sensitive": False,
             "pii_found": [],
@@ -370,11 +356,9 @@ class SensitiveDataDetector:
         return redacted
 ```
 
----
-
 ## Schema Validation
 
-Enforce structured output formats:
+Pydantic models enforce expected JSON structure and detect injection markers in fields:
 
 ```python
 from pydantic import BaseModel, ValidationError, validator
@@ -382,20 +366,14 @@ from typing import Optional, List, Any
 import json
 
 class OutputSchemaValidator:
-    """
-    Validate LLM outputs against expected schemas.
-    """
-    
+    """Validate LLM outputs against expected schemas."""
+
     def __init__(self, schema_class: type):
-        """
-        Initialize with a Pydantic model class.
-        """
+        """Initialize with a Pydantic model class."""
         self.schema_class = schema_class
     
     def validate(self, output: str) -> dict:
-        """
-        Validate output against schema.
-        """
+        """Validate output against schema."""
         result = {
             "valid": False,
             "parsed": None,
@@ -471,11 +449,9 @@ class CodeAnalysisResponse(BaseModel):
     safe_to_execute: bool = False
 ```
 
----
-
 ## URL and Markdown Sanitization
 
-Prevent exfiltration via rendered content:
+Removes or validates images, links, and data URLs to prevent exfiltration via rendered content:
 
 ```python
 import re
@@ -483,11 +459,9 @@ from urllib.parse import urlparse
 from typing import Set
 
 class MarkdownSanitizer:
-    """
-    Sanitize markdown to prevent data exfiltration.
-    """
-    
-    # Allowlisted domains for images/links
+    """Sanitize markdown to prevent data exfiltration."""
+
+    # Allowlisted domains
     DEFAULT_ALLOWED_DOMAINS: Set[str] = {
         'example.com',
         'cdn.example.com',
@@ -498,9 +472,7 @@ class MarkdownSanitizer:
         self.allowed_domains = allowed_domains or self.DEFAULT_ALLOWED_DOMAINS
     
     def sanitize(self, markdown: str) -> dict:
-        """
-        Sanitize markdown content.
-        """
+        """Sanitize markdown content."""
         result = {
             "sanitized": markdown,
             "removed_images": [],
@@ -600,17 +572,13 @@ class MarkdownSanitizer:
         return sanitized, matches
 ```
 
----
-
 ## Complete Output Validator
 
-Combining all stages:
+Orchestrates all validation stages in a single pipeline:
 
 ```python
 class ComprehensiveOutputValidator:
-    """
-    Complete output validation pipeline.
-    """
+    """Complete output validation pipeline."""
     
     def __init__(self, 
                  system_prompt: str,
@@ -628,9 +596,7 @@ class ComprehensiveOutputValidator:
             self.schema_validator = OutputSchemaValidator(schema_class)
     
     def validate(self, response: str) -> dict:
-        """
-        Run complete validation pipeline.
-        """
+        """Run complete validation pipeline."""
         results = {
             "passed": True,
             "sanitized_output": response,
@@ -685,8 +651,6 @@ class ComprehensiveOutputValidator:
         return results
 ```
 
----
-
 ## Usage Example
 
 ```python
@@ -716,18 +680,16 @@ else:
 
 ---
 
-## Summary
+## Key Takeaways
 
-Output validation provides critical last-line defense:
+Output validation catches what input filters miss. Implement all five stages for defense-in-depth: injection detection blocks hijacked responses, leakage prevention protects system prompts, sensitive data detection prevents credential exposure, schema validation enforces structure, and markdown sanitization stops exfiltration via rendered content. Always combine with input validation and prompt design patterns.
 
-1. **Injection Success Detection** - Catch when attacks worked
-2. **Prompt Leakage Detection** - Protect system prompts
-3. **Sensitive Data Detection** - Prevent PII/secret exposure
-4. **Schema Validation** - Enforce expected formats
-5. **Markdown Sanitization** - Prevent exfiltration via rendered content
+## Sources
 
-Always combine with input validation and other defenses for defense-in-depth.
+- [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - LLM security guidelines
+- [Pydantic Documentation](https://docs.pydantic.dev/) - Schema validation framework
+- [Python regex patterns](https://docs.python.org/3/library/re.html) - Pattern matching reference
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Prompt Design Patterns](13_PROMPT_DESIGN_PATTERNS.md) | [Next: Agentic Security →](15_AGENTIC_SECURITY.md)
+[← Previous: Prompt Design Patterns](13_PROMPT_DESIGN_PATTERNS.md) | [Index](00_INDEX.md) | [Next: Agentic Security →](15_AGENTIC_SECURITY.md)

@@ -6,7 +6,15 @@
 
 ## Overview
 
-Microsoft has developed a comprehensive suite of AI security tools centered around Azure AI Content Safety, with specific focus on prompt injection through Prompt Shields and the Spotlighting technique. Their approach combines cloud-based APIs, enterprise integration, and research innovations.
+Microsoft's AI security centers on Azure AI Content Safety, featuring Prompt Shields for injection detection and the Spotlighting technique for content transformation. Their defense combines cloud APIs, enterprise integration, and research-backed innovations.
+
+## Summary
+
+- **Azure AI Content Safety** - Cloud API suite with Prompt Shields for direct/indirect attack detection, groundedness checking, and content moderation
+- **Spotlighting Technique** - Three transformation modes (delimiting, datamarking, encoding) reduce attack success from >50% to <3%
+- **M365 Copilot Security** - Multi-layer protection with jailbreak classifiers, Graph API enforcement, and Defender XDR integration
+- **Gateway Architecture** - API Management integration enables centralized pre-screening before LLM requests
+- **Enterprise Tooling** - Production-ready APIs with Azure Monitor logging and multi-classifier ensemble patterns
 
 ---
 
@@ -233,9 +241,7 @@ class SecureAzureOpenAI:
 
 ## Spotlighting Technique
 
-### Concept
-
-Spotlighting transforms untrusted content to make it distinguishable from instructions, leveraging the model's ability to recognize and handle specially formatted text.
+Spotlighting transforms untrusted content to distinguish it from instructions. Models recognize and handle the specially formatted text as data rather than commands.
 
 ### Three Modes
 
@@ -601,33 +607,32 @@ class SecurityAuditLogger:
 
 ---
 
-## Summary: Microsoft's Defense Philosophy
+## Key Takeaways
 
-### Core Principles
+**Defense Philosophy:**
+- API-first security enables centralized protection callable from any application
+- Enterprise integration spans M365, Defender, and Purview ecosystems
+- Multi-modal coverage protects text, image, and code inputs
+- Spotlighting technique offers research-backed transformation approach
+- Defense in depth combines multiple classifiers, gateway patterns, and DLP
 
-1. **API-First Security**: Centralized security services callable from any application
-
-2. **Enterprise Integration**: Deep integration with M365, Defender, Purview ecosystem
-
-3. **Multi-Modal Protection**: Text, image, and code all covered
-
-4. **Research Innovation**: Spotlighting technique represents novel approach
-
-5. **Defense in Depth**: Multiple classifier types, gateway pattern, DLP integration
-
-### Strengths
-
-- Production-ready, enterprise-grade APIs
+**Strengths:**
+- Production-ready enterprise APIs with <300ms latency
 - Deep Microsoft ecosystem integration
-- Well-documented Spotlighting research
+- Spotlighting reduces attack success to <3%
 - Comprehensive M365 Copilot security model
 
-### Areas for Continued Development
+**Limitations:**
+- Latency overhead for multi-classifier ensemble
+- Adaptive attacks may evolve against static techniques
+- Limited open-source tooling availability
 
-- Real-time latency improvements
-- Adaptive attack resistance
-- Multi-modal prompt injection
-- Open-source tooling
+## Sources
+
+- [Azure AI Content Safety Documentation](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/) - Official API reference
+- [Microsoft Research: Spotlighting](https://www.microsoft.com/en-us/research/publication/spotlighting-a-new-approach-to-prompt-injection-mitigation/) - Original research paper
+- [M365 Copilot Security](https://learn.microsoft.com/en-us/copilot/security) - Enterprise security model
+- [Azure API Management Policies](https://learn.microsoft.com/en-us/azure/api-management/api-management-policies) - Gateway integration patterns
 
 ---
 

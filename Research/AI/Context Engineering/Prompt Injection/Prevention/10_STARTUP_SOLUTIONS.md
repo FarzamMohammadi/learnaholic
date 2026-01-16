@@ -1,14 +1,20 @@
 # Startup and Commercial Solutions
 
-[← Back to Index](00_INDEX.md) | [Previous: Detection Approaches](09_DETECTION_APPROACHES.md) | [Next: OWASP Frameworks →](11_OWASP_FRAMEWORKS.md)
+[← Previous: Detection Approaches](09_DETECTION_APPROACHES.md) | [Index](00_INDEX.md) | [Next: OWASP Frameworks →](11_OWASP_FRAMEWORKS.md)
 
 ---
 
 ## Overview
 
-The prompt injection defense market has seen rapid growth, with numerous startups and established security companies offering solutions. This document surveys the commercial landscape, from dedicated LLM security APIs to comprehensive AI security platforms.
+The prompt injection defense market spans dedicated LLM security APIs, comprehensive platforms, red teaming tools, and open-source solutions. Major acquisitions (Lakera by Check Point, Robust Intelligence by Cisco) signal market maturation.
 
----
+## Summary
+
+- **Detection APIs**: Lakera Guard (<50ms latency, 100+ languages), Protect AI LLM Guard (open-source, self-hosted), Rebuff (self-hardening via attack logs)
+- **Red Teaming**: NVIDIA Garak (vulnerability scanner), Promptfoo (testing framework)
+- **Output Validation**: Guardrails AI (structured outputs), NeMo Guardrails (conversational safety)
+- **Enterprise Platforms**: Arthur AI (monitoring), Harmonic Security (shadow AI detection), Robust Intelligence (Cisco-integrated)
+- **Selection factors**: Latency requirements, open-source needs, integration ecosystem, enterprise features
 
 ## Market Landscape
 
@@ -36,16 +42,11 @@ The prompt injection defense market has seen rapid growth, with numerous startup
 └─────────────────────────────────────────────────────────────────┘
 ```
 
----
-
 ## Lakera Guard
 
-### Overview
-- **Company**: Lakera (acquired by Check Point, 2025)
-- **Product**: Real-time LLM security API
-- **Unique Value**: Threat intelligence from Gandalf (public AI security game)
-
-### Capabilities
+**Company**: Lakera (acquired by Check Point, 2025)
+**Type**: Real-time LLM security API
+**Unique**: Threat intelligence from Gandalf (public AI security game with 100,000+ daily attack attempts)
 
 | Feature | Description |
 |---------|-------------|
@@ -55,13 +56,6 @@ The prompt injection defense market has seen rapid growth, with numerous startup
 | Toxicity Detection | Content policy enforcement |
 | Latency | <50ms per request |
 | Languages | 100+ languages supported |
-
-### Threat Intelligence: Gandalf
-
-Lakera operates Gandalf, a public "capture the flag" game where players try to extract secrets from an AI. This provides:
-- **100,000+ daily attack attempts** to analyze
-- Continuous dataset of novel attack techniques
-- Real-world adversarial training data
 
 ### Integration
 
@@ -95,19 +89,16 @@ else:
     pass
 ```
 
-### Pricing (as of 2025)
-- Free tier: 1,000 requests/month
-- Pro: $0.001 per request
-- Enterprise: Custom pricing with SLA
-
----
+### Pricing (January 2026)
+- Free: 1,000 requests/month
+- Pro: $0.001/request
+- Enterprise: Custom with SLA
 
 ## Protect AI LLM Guard
 
-### Overview
-- **Type**: Open-source, self-hosted
-- **Focus**: Comprehensive input/output scanning
-- **License**: Apache 2.0
+**Type**: Open-source, self-hosted
+**License**: Apache 2.0
+**Focus**: Comprehensive input/output scanning with modular scanners
 
 ### Scanner Categories
 
@@ -196,14 +187,11 @@ def secure_llm_call(user_input: str, llm_func) -> str:
 - **Docker**: `docker pull laiyer/llm-guard-api`
 - **Kubernetes**: Helm chart available
 
----
-
 ## Rebuff
 
-### Overview
-- **Type**: Open-source, self-hardening
-- **Focus**: LangChain-native integration
-- **Unique**: Self-improving via attack logging
+**Type**: Open-source, self-hardening
+**Focus**: LangChain-native integration
+**Unique**: Self-improving via attack logging
 
 ### Four-Layer Defense
 
@@ -261,20 +249,17 @@ else:
 ```
 
 ### Limitations
-- Explicitly states "cannot provide 100% protection"
-- Prototype stage—not production-hardened
-- Depends on OpenAI API for LLM detection layer
-
----
+- Prototype stage, not production-hardened
+- Depends on OpenAI API for layer 2 detection
+- Cannot provide 100% protection (stated explicitly)
 
 ## NVIDIA Garak
 
-### Overview
-- **Type**: Open-source vulnerability scanner
-- **Focus**: Red teaming and testing
-- **Maintained by**: NVIDIA
+**Type**: Open-source vulnerability scanner
+**Maintained by**: NVIDIA
+**Focus**: Red teaming and automated testing against 100+ attack probes
 
-### Capabilities
+### Probe Categories
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -345,14 +330,11 @@ python -m garak --model_type openai --model_name gpt-4 \
 }
 ```
 
----
-
 ## Guardrails AI
 
-### Overview
-- **Type**: Open-source output validation
-- **Focus**: Structured output enforcement
-- **Use Case**: Ensuring LLM outputs meet specifications
+**Type**: Open-source output validation
+**Focus**: Structured output enforcement
+**Use Case**: Ensuring LLM outputs meet specifications
 
 ### Key Features
 
@@ -399,14 +381,11 @@ print(result.validation_passed)
 | `ProvenanceCheck` | Verify claims against sources |
 | `GibberishDetector` | Detect nonsensical outputs |
 
----
-
 ## NVIDIA NeMo Guardrails
 
-### Overview
-- **Type**: Open-source, dialog management
-- **Focus**: Conversational AI safety
-- **Integration**: LangChain, custom LLMs
+**Type**: Open-source dialog management
+**Focus**: Conversational AI safety with declarative rules
+**Integration**: LangChain, custom LLMs
 
 ### Colang Configuration
 
@@ -449,14 +428,11 @@ response = await rails.generate(
 )
 ```
 
----
-
 ## Arthur AI
 
-### Overview
-- **Type**: Commercial platform
-- **Focus**: LLM evaluation and monitoring
-- **Features**: Arthur Shield for security
+**Type**: Commercial platform
+**Focus**: LLM evaluation and monitoring
+**Feature**: Arthur Shield for input/output security screening
 
 ### Arthur Shield
 
@@ -482,14 +458,11 @@ output_result = shield.screen_output(
 )
 ```
 
----
-
 ## Harmonic Security
 
-### Overview
-- **Type**: Commercial, enterprise-focused
-- **Focus**: Shadow AI detection + security
-- **Unique**: Discovers unauthorized AI usage
+**Type**: Commercial enterprise platform
+**Focus**: Shadow AI detection and security
+**Unique**: Discovers unauthorized AI usage across organization
 
 ### Capabilities
 
@@ -525,8 +498,6 @@ output_result = shield.screen_output(
 └─────────────────────────────────────────────────────────────────┘
 ```
 
----
-
 ## Comparison Matrix
 
 | Solution | Type | Latency | Open Source | Injection Detection | Best For |
@@ -539,8 +510,6 @@ output_result = shield.screen_output(
 | **NeMo Guardrails** | Library | Medium | Yes | Good | Conversational AI |
 | **Arthur Shield** | API | Medium | No | Good | Enterprise monitoring |
 | **Harmonic** | Platform | ~200ms | No | Good | Enterprise security |
-
----
 
 ## Selection Guide
 
@@ -571,4 +540,17 @@ output_result = shield.screen_output(
 
 ---
 
-[← Back to Index](00_INDEX.md) | [Previous: Detection Approaches](09_DETECTION_APPROACHES.md) | [Next: OWASP Frameworks →](11_OWASP_FRAMEWORKS.md)
+## Sources
+
+- [Lakera Guard Documentation](https://www.lakera.ai/) - API specs and pricing
+- [Protect AI LLM Guard](https://github.com/protectai/llm-guard) - Open-source repository
+- [Rebuff GitHub](https://github.com/protectai/rebuff) - Self-hardening framework
+- [NVIDIA Garak](https://github.com/NVIDIA/garak) - Vulnerability scanner
+- [Guardrails AI](https://www.guardrailsai.com/) - Output validation framework
+- [NVIDIA NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails) - Conversational safety
+- [Arthur AI Shield](https://www.arthur.ai/) - Enterprise monitoring platform
+- [Harmonic Security](https://www.harmonic.security/) - Shadow AI detection
+
+---
+
+[← Previous: Detection Approaches](09_DETECTION_APPROACHES.md) | [Index](00_INDEX.md) | [Next: OWASP Frameworks →](11_OWASP_FRAMEWORKS.md)
