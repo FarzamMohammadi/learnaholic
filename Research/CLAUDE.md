@@ -23,11 +23,11 @@ Agent location: `.claude/agents/doc-refiner.md` (includes all 31 quality rules)
 ## Directory Structure
 
 ```
-Research/
-├── AI/Context Engineering/Prompt Injection/
-│   ├── How & Why/     # Attack mechanisms (related series)
-│   └── Prevention/    # Defense strategies (related series)
+research/
+├── ai/context-engineering/prompt-injection/
+│   ├── how-and-why/     # Attack mechanisms (related series)
+│   └── prevention/      # Defense strategies (related series)
 ├── .claude/
-│   └── agents/        # Custom agents
-└── .doc-templates/    # Document templates
+│   └── agents/          # Custom agents
+└── .doc-templates/      # Document templates
 ```
