@@ -42,21 +42,9 @@ Follow established best practices for each language. All existing files in this 
 
 ## Section READMEs
 
-Every top-level directory has a `README.md` that describes what's inside. Follow this template:
+A section README only exists when it adds information the root README doesn't already provide — naming conventions, file format explanations, organizational patterns unique to that section. Most sections don't need one.
 
-```markdown
-# [Section Name]
-
-[One sentence: what this section contains and at what depth.]
-
-## Contents
-
-| File/Directory | Description |
-|----------------|-------------|
-| ... | ... |
-```
-
-Keep thin sections ultra-short. A 3-line README is better than none.
+**Never repeat what the parent README or folder name already tells the reader.**
 
 ---
 
