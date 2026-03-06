@@ -37,3 +37,38 @@ Follow established best practices for each language. All existing files in this 
 - Special characters: `&`, `;`, `'`, etc.
 - Mixed conventions in the same directory level
 - Underscores (except for Python files or language-specific requirements)
+
+---
+
+## Section READMEs
+
+Every top-level directory has a `README.md` that describes what's inside. Follow this template:
+
+```markdown
+# [Section Name]
+
+[One sentence: what this section contains and at what depth.]
+
+## Contents
+
+| File/Directory | Description |
+|----------------|-------------|
+| ... | ... |
+```
+
+Keep thin sections ultra-short. A 3-line README is better than none.
+
+---
+
+## Link Collections
+
+Curated link dumps use `reading-list.md` as the filename. Not `random.md`, not `links.md` -- one convention across the repo.
+
+---
+
+## Documentation Tone
+
+- Reader's time is sacred -- every sentence transfers knowledge
+- Active voice, concrete over abstract
+- No filler, no fluff, no restating the obvious
+- Tables for structured references, not paragraphs

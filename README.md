@@ -1,30 +1,25 @@
 # Learnaholic
 
-> **Important:** All contributors (human or AI) must read and follow the [Repository Guidelines](./repo-guidelines.md) before making any changes.
+Structured notes, implementations, and research from continuous learning -- algorithms in C++, system design and coding problems in C#, AI security research, curated articles, and multi-year learning roadmaps.
 
-A personal knowledge repository for continuous learning and skill development.
+> **All contributors (human or AI) must read the [Repository Guidelines](./repo-guidelines.md) before making changes.**
 
-## Overview
+> **Note:** Sections listed alphabetically.
 
-This repository contains:
-- Notes and documentation
-- Learning resources
-- Technical articles and book notes
-- Code implementations and practice problems
-- Research on various topics
+---
 
-## Directory Reference
+## Sections
 
-| Directory | Description |
-|-----------|-------------|
-| [ai](./ai/) | AI research and techniques |
-| [algorithms](./algorithms/) | Algorithm implementations |
-| [articles](./articles/) | Curated technical articles |
-| [books](./books/) | Book notes and study resources |
-| [coding-problems](./coding-problems/) | Practice problems and solutions |
-| [computing](./computing/) | Computing fundamentals |
-| [oop](./oop/) | Object-oriented programming principles |
-| [prompts](./prompts/) | AI prompt templates |
-| [research](./research/) | In-depth research documentation |
-| [roadmaps](./roadmaps/) | Structured learning paths |
-| [videos](./videos/) | Educational video references |
+| Section | What's inside |
+|---------|--------------|
+| [ai](./ai/) | LLM response improvement techniques (3-part series), agent marketplace evaluation, context engineering visuals |
+| [algorithms](./algorithms/) | Sorting (bubble, merge, quick, counting) and searching (binary) in C++ |
+| [articles](./articles/) | Curated technical articles on code quality, distributed systems, databases, UX, and documentation |
+| [books](./books/) | Chapter-by-chapter study notes -- currently: Computer Systems: A Programmer's Perspective |
+| [coding-problems](./coding-problems/) | C# implementations (LRU cache variants, IP validation) and system design exercises with Excalidraw diagrams |
+| [computing](./computing/) | Hardware architecture fundamentals and a structured learning roadmap |
+| [oop](./oop/) | SOLID and APIE principles with C# before/after examples |
+| [prompts](./prompts/) | AI prompt templates for textbook-guided learning sessions |
+| [research](./research/) | Deep-dive research -- prompt injection attack mechanisms (22 docs) and prevention strategies (20 docs) with navigation, templates, and a doc-refiner agent |
+| [roadmaps](./roadmaps/) | Backend engineering roadmap and a 3-year / 100-unit elite SWE plan |
+| [videos](./videos/) | Notes from educational videos on software development and personal growth |
